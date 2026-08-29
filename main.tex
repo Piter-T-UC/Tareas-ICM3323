@@ -84,6 +84,9 @@
   boxrule=0.8pt, arc=1.5mm,
   top=10pt, bottom=10pt, left=9pt, right=9pt
 }
+
+\newcommand{\dnode}[5]{\coordinate (#1) at ({#2 + (\amp*#4)/1000},{#3 + (\amp*#5)/1000});}
+
 % ===== MACRO: color proporcional al esfuerzo =====
 % Escala roja (tracción) hasta +41.77 MPa (máx), azul (compresión) hasta -66.67 MPa (mín)
 % Uso: \sigmabar{nodoA}{nodoB}{valor_sigma}
@@ -94,15 +97,14 @@
     \draw[line width=1.4pt, gray] (#1) -- (#2);
   \else
     \ifdim \sval pt < 0pt
-      \pgfmathsetmacro{\pct}{100*\aval/66.67}
+      \pgfmathsetmacro{\pct}{100*\aval/\smin}
       \draw[line width=1.4pt, blue!\pct!white] (#1) -- (#2);
     \else
-      \pgfmathsetmacro{\pct}{100*\aval/41.77}
+      \pgfmathsetmacro{\pct}{100*\aval/\smax}
       \draw[line width=1.4pt, red!\pct!white] (#1) -- (#2);
     \fi
   \fi
 }
-
 
 %================================================================
 % Documento

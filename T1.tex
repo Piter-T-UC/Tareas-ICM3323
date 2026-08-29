@@ -901,6 +901,12 @@ Este fue en problema de estatica por ende reutilice la matriz de nodos y conecti
 \end{tikzpicture}
 
 \end{center}
+
+
+Como podemos apreciar ninguna barra tiene un largo mayor a $5 \text{m}$, esto debido a que el largo mayor es $$\sqrt{2^2+3.5^2}=4.031\text{m}$$
+
+
+
 % ===== MACRO: color proporcional al esfuerzo (generalizado) =====
 \def\smax{51.00}   % maximo esfuerzo de traccion (MPa)
 \def\smin{63.41717}   % magnitud del minimo esfuerzo de compresion (MPa)
@@ -1004,14 +1010,12 @@ Este fue en problema de estatica por ende reutilice la matriz de nodos y conecti
 \end{center}
 
 
-Como podemos apreciar ninguna barra tiene un largo mayor a $5 \text{m}$, esto debido a que el largo mayor es $$\sqrt{2^2+3.5^2}=4.031\text{m}$$
 
 
 % ===== FACTOR DE AMPLIFICACION =====
 \def\amp{100} % ajusta este valor si la deformada se ve muy chica o muy exagerada
 
 % Calcula coordenada deformada: (x0,y0) + amp*(ux,uy)[mm->m]
-\newcommand{\dnode}[5]{\coordinate (#1) at ({#2 + (\amp*#4)/1000},{#3 + (\amp*#5)/1000})}
 
 \begin{center}
 \begin{tikzpicture}[scale=0.5]
@@ -1178,7 +1182,13 @@ Como podemos apreciar ninguna barra tiene un largo mayor a $5 \text{m}$, esto de
 
 
 %%Muestra del 2
+\def\smax{41.77}
+\def\smin{66.67}
+%%Muestra del 2
 \begin{center}
+{%
+\def\smax{41.667}
+\def\smin{66.667}
 \begin{tikzpicture}[scale=0.42]
 \tikzset{joint/.style={circle, fill=black, inner sep=1.5pt}}
 % Nodos
@@ -1197,30 +1207,30 @@ Como podemos apreciar ninguna barra tiene un largo mayor a $5 \text{m}$, esto de
 
 % ===== BARRAS con color proporcional al esfuerzo exacto =====
 % Cuerda inferior
-\sigmabar{n0}{n1}{-6.49}
-\sigmabar{n1}{n2}{26.78}
-\sigmabar{n2}{n3}{26.67}
-\sigmabar{n3}{n4}{-6.55}
-\sigmabar{n4}{n5}{-39.84}
+\sigmabar{n0}{n1}{-6.667}
+\sigmabar{n1}{n2}{26.667}
+\sigmabar{n2}{n3}{26.667}
+\sigmabar{n3}{n4}{-6.667}
+\sigmabar{n4}{n5}{-40.000}
 % Cuerda superior
-\sigmabar{n6}{n7}{0.16}
-\sigmabar{n7}{n8}{-33.20}
-\sigmabar{n8}{n9}{-66.67}
-\sigmabar{n9}{n10}{-66.55}
-\sigmabar{n10}{n11}{-33.17}
+\sigmabar{n6}{n7}{0.000}
+\sigmabar{n7}{n8}{-33.333}
+\sigmabar{n8}{n9}{-66.667}
+\sigmabar{n9}{n10}{-66.667}
+\sigmabar{n10}{n11}{-33.333}
 % Verticales
-\sigmabar{n0}{n6}{0.07}
-\sigmabar{n1}{n7}{25.08}
-\sigmabar{n2}{n8}{0.02}
-\sigmabar{n3}{n9}{-25.00}
-\sigmabar{n4}{n10}{-24.97}
-\sigmabar{n5}{n11}{-24.98}
+\sigmabar{n0}{n6}{0.000}
+\sigmabar{n1}{n7}{25.000}
+\sigmabar{n2}{n8}{0.000}
+\sigmabar{n3}{n9}{-25.000}
+\sigmabar{n4}{n10}{-25.000}
+\sigmabar{n5}{n11}{-25.000}
 % Diagonales
-\sigmabar{n0}{n7}{-41.55}
-\sigmabar{n1}{n8}{-41.58}
-\sigmabar{n2}{n9}{0.0001}
-\sigmabar{n3}{n10}{41.74}
-\sigmabar{n4}{n11}{41.77}
+\sigmabar{n0}{n7}{-41.667}
+\sigmabar{n1}{n8}{-41.667}
+\sigmabar{n2}{n9}{-0.000}
+\sigmabar{n3}{n10}{41.667}
+\sigmabar{n4}{n11}{41.667}
 
 % Nodos
 \foreach \n in {0,...,11}{\node[joint] at (n\n) {};}
@@ -1241,22 +1251,95 @@ Como podemos apreciar ninguna barra tiene un largo mayor a $5 \text{m}$, esto de
 \end{tikzpicture}
 
 \vspace{0.6em}
-% ===== COLORBAR (escala continua con min/0/max) =====
+% ===== COLORBAR =====
 \begin{tikzpicture}[scale=0.42]
 \def\barlen{20}
 \def\barh{0.6}
-\pgfmathsetmacro{\zeropos}{\barlen*66.67/(66.67+41.77)} % posición del 0 en la barra
-% degradado azul -> blanco -> rojo
+\pgfmathsetmacro{\zeropos}{\barlen*\smin/(\smin+\smax)}
 \shade[left color=blue, right color=white] (0,0) rectangle (\zeropos,\barh);
 \shade[left color=white, right color=red] (\zeropos,0) rectangle (\barlen,\barh);
 \draw (0,0) rectangle (\barlen,\barh);
-% ticks
 \draw (0,0) -- (0,-0.15) node[below] {\small $-66.67$ MPa (mín, comp.)};
 \draw (\zeropos,0) -- (\zeropos,-0.15) node[below] {\small $0$};
-\draw (\barlen,0) -- (\barlen,-0.15) node[below] {\small $41.77$ MPa (máx, tracc.)};
+\draw (\barlen,0) -- (\barlen,-0.15) node[below] {\small $41.67$ MPa (máx, tracc.)};
 \node[above] at (0,\barh) {\scriptsize Compresión};
 \node[above] at (\barlen,\barh) {\scriptsize Tracción};
 \end{tikzpicture}
+}%
+\end{center}
+
+\vspace{1em}
+\begin{center}
+{%
+\begin{tikzpicture}[scale=0.42]
+\tikzset{joint/.style={circle, fill=black, inner sep=1.5pt}}
+\tikzset{jointdef/.style={circle, fill=red!70!black, inner sep=1.3pt}}
+
+% ===== Nodos originales =====
+\coordinate (n0)  at (0,0);
+\coordinate (n1)  at (4,0);
+\coordinate (n2)  at (8,0);
+\coordinate (n3)  at (12,0);
+\coordinate (n4)  at (16,0);
+\coordinate (n5)  at (20,0);
+\coordinate (n6)  at (0,3);
+\coordinate (n7)  at (4,3);
+\coordinate (n8)  at (8,3);
+\coordinate (n9)  at (12,3);
+\coordinate (n10) at (16,3);
+\coordinate (n11) at (20,3);
+
+% ===== Nodos deformados (original + amp * desplazamiento) =====
+\dnode{m0}{0}{0}{0.000}{0.000}
+\dnode{m1}{4}{0}{-0.129}{-5.302}
+\dnode{m2}{8}{0}{0.388}{-9.550}
+\dnode{m3}{12}{0}{0.906}{-9.331}
+\dnode{m4}{16}{0}{0.777}{-5.011}
+\dnode{m5}{20}{0}{0.000}{0.000}
+\dnode{m6}{0}{3}{2.439}{0.000}
+\dnode{m7}{4}{3}{2.439}{-4.938}
+\dnode{m8}{8}{3}{1.792}{-9.550}
+\dnode{m9}{12}{3}{0.498}{-9.695}
+\dnode{m10}{16}{3}{-0.797}{-5.375}
+\dnode{m11}{20}{3}{-1.444}{-0.364}
+
+% ===== Estructura original (referencia, gris punteado) =====
+\draw[dashed, gray, line width=0.8pt]
+  (n0)--(n1)--(n2)--(n3)--(n4)--(n5)
+  (n6)--(n7)--(n8)--(n9)--(n10)--(n11)
+  (n0)--(n6) (n1)--(n7) (n2)--(n8) (n3)--(n9) (n4)--(n10) (n5)--(n11)
+  (n0)--(n7) (n1)--(n8) (n2)--(n9) (n3)--(n10) (n4)--(n11);
+
+% ===== Estructura deformada (solida, coloreada) =====
+\draw[thick, blue!70!black]
+  (m0)--(m1)--(m2)--(m3)--(m4)--(m5)
+  (m6)--(m7)--(m8)--(m9)--(m10)--(m11)
+  (m0)--(m6) (m1)--(m7) (m2)--(m8) (m3)--(m9) (m4)--(m10) (m5)--(m11)
+  (m0)--(m7) (m1)--(m8) (m2)--(m9) (m3)--(m10) (m4)--(m11);
+
+% Nodos originales (fantasma) y deformados
+\foreach \n in {0,...,11}{\node[joint, fill=gray!60] at (n\n) {};}
+\foreach \n in {0,...,11}{\node[jointdef] at (m\n) {};}
+
+% Apoyos (en posicion original, no se mueven)
+\draw[fill=gray!40] (0,0) -- (-0.4,-0.7) -- (0.4,-0.7) -- cycle;
+\draw (-0.6,-0.7) -- (0.6,-0.7);
+\foreach \x in {-0.6,-0.4,-0.2,0,0.2,0.4}{\draw (\x,-0.7) -- (\x-0.15,-0.95);}
+\draw[fill=gray!40] (20,0) -- (19.6,-0.7) -- (20.4,-0.7) -- cycle;
+\draw (19.4,-0.7) -- (20.6,-0.7);
+\foreach \x in {19.4,19.6,19.8,20.0,20.2,20.4}{\draw (\x,-0.7) -- (\x-0.15,-0.95);}
+
+% Etiqueta del desplazamiento maximo (nodo 8)
+\draw[-{Latex[length=2mm]}, thin] (m8) -- ++(1.2,0.3)
+  node[right] {\small $|\vec{u}|_{8} \approx 9.72\,\text{mm}$};
+\end{tikzpicture}
+
+\vspace{0.3em}
+{\small
+\tikz[baseline=-0.5ex]\draw[dashed, gray, line width=1pt] (0,0)--(0.5,0); \; Estructura original \qquad
+\tikz[baseline=-0.5ex]\draw[thick, blue!70!black] (0,0)--(0.5,0); \; Deformada (amplificada $\times\,100$)
+}
+}%
 \end{center}
 
 \end{desarrollo}
