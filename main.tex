@@ -1,0 +1,134 @@
+\documentclass[11pt]{article}
+
+%================================================================
+% Paquetes
+%================================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,shorthands=off]{babel} % shorthands=off evita que "<" y ">"
+                                            % queden activos y choquen con las
+                                            % flechas de TikZ (->, <->, etc.)
+\usepackage{pgfplots}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{mathpazo}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage{tikz}
+\usepackage{enumitem}
+\usepackage{titlesec}
+
+%================================================================
+% Paleta de colores
+%================================================================
+\definecolor{ucred}{RGB}{117,26,41}    % granate, tono institucional
+\definecolor{devcolor}{RGB}{45,70,95}  % azul pizarra, para el desarrollo
+
+
+\usepackage{listings}
+
+\definecolor{codebg}{RGB}{248,248,248}
+\definecolor{codekw}{RGB}{0,92,197}      % palabras clave (def, for, if...)
+\definecolor{codestr}{RGB}{163,21,21}    % strings
+\definecolor{codecom}{RGB}{106,153,85}   % comentarios
+\definecolor{codenum}{RGB}{9,134,88}     % números
+
+\lstdefinestyle{pythonstyle}{
+    backgroundcolor=\color{codebg},
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{codekw}\bfseries,
+    stringstyle=\color{codestr},
+    commentstyle=\color{codecom}\itshape,
+    numberstyle=\tiny\color{gray},
+    numbers=left,
+    numbersep=8pt,
+    frame=single,
+    rulecolor=\color{gray!40},
+    breaklines=true,
+    breakatwhitespace=false,
+    showstringspaces=false,
+    tabsize=4,
+    language=Python,
+    morekeywords={self},
+    xleftmargin=1.5em,
+    framexleftmargin=1.2em,
+}
+%================================================================
+% Estilo de secciones
+%================================================================
+\titleformat{\section}
+  {\normalfont\Large\bfseries\color{ucred}}{\thesection}{0.6em}{}
+\titlespacing*{\section}{0pt}{1.4em}{0.8em}
+\usetikzlibrary{patterns, arrows.meta}
+%================================================================
+% Cajas (tcolorbox)
+%================================================================
+
+% Caja para el enunciado del problema
+\newtcolorbox{enunciado}[1]{
+  enhanced, breakable,
+  colback=ucred!4, colframe=ucred,
+  coltitle=white, fonttitle=\bfseries\large,
+  title={#1},
+  boxrule=0.9pt, arc=2mm,
+  top=8pt, bottom=10pt, left=9pt, right=9pt
+}
+
+% Caja para que el estudiante desarrolle su solucion
+\newtcolorbox{desarrollo}[1]{
+  enhanced, breakable,
+  colback=white, colframe=devcolor,
+  coltitle=white, fonttitle=\bfseries,
+  title={#1},
+  boxrule=0.8pt, arc=1.5mm,
+  top=10pt, bottom=10pt, left=9pt, right=9pt
+}
+% ===== MACRO: color proporcional al esfuerzo =====
+% Escala roja (tracción) hasta +41.77 MPa (máx), azul (compresión) hasta -66.67 MPa (mín)
+% Uso: \sigmabar{nodoA}{nodoB}{valor_sigma}
+\newcommand{\sigmabar}[3]{%
+  \pgfmathsetmacro{\sval}{#3}%
+  \pgfmathsetmacro{\aval}{abs(\sval)}%
+  \ifdim \aval pt < 1pt
+    \draw[line width=1.4pt, gray] (#1) -- (#2);
+  \else
+    \ifdim \sval pt < 0pt
+      \pgfmathsetmacro{\pct}{100*\aval/66.67}
+      \draw[line width=1.4pt, blue!\pct!white] (#1) -- (#2);
+    \else
+      \pgfmathsetmacro{\pct}{100*\aval/41.77}
+      \draw[line width=1.4pt, red!\pct!white] (#1) -- (#2);
+    \fi
+  \fi
+}
+
+
+%================================================================
+% Documento
+%================================================================
+\begin{document}
+
+%---------------------- Encabezado -----------------------------
+\begin{center}
+    {\scshape\large Pontificia Universidad Cat\'olica de Chile}\\[2pt]
+    {\scshape Escuela de Ingenier\'ia}\\[2pt]
+    {\small Departamento de Ingenier\'ia Mec\'anica y Metal\'urgica}\\[2pt]
+    {\small ICM 3323 --- Elementos Finitos en Dise\~no Mec\'anico}\\[10pt]
+    {\color{ucred}\rule{0.42\linewidth}{0.6pt}}\\[10pt]
+    {\Huge\bfseries\color{ucred} TAREA N\textdegree\ 1}
+\end{center}
+
+\vspace{4pt}
+\begin{flushright}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{rl}
+    Nombre: & Pedro Pablo Taboada Santibañez \\
+    Fecha:  & \today\\
+\end{tabular}
+\end{flushright}
+
+\vspace{0.6cm}
+
+\input{T1}
+\end{document}
