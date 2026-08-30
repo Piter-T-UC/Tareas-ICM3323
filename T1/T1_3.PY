@@ -484,9 +484,9 @@ apoyos = np.array([
 
 # [Nodo, Fx, Fy] 
 fuerzas_nodales = [
-    (9, 0.0 * ureg.kN,- 250.0 * ureg.kN, 0* ureg.kN),
-    (29, 0.0 * ureg.kN,- 250.0 * ureg.kN, 0* ureg.kN),
-    (29, 0 * ureg.kN,0 * ureg.kN, 100* ureg.kN),
+    (9, 0.0 * ureg.kN,- 25.0 * ureg.kN, 0* ureg.kN),
+    (29, 0.0 * ureg.kN,- 25.0 * ureg.kN, 0* ureg.kN),
+    (29, 0 * ureg.kN,0 * ureg.kN, 1* ureg.kN),
 ]
 
 

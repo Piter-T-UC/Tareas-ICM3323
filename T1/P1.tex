@@ -76,8 +76,7 @@ Como el \'area disminuye hacia el extremo libre, la tensi\'on \emph{crece} en es
 direcci\'on:
 $$\sigma_z(0)=\frac{P}{A_0}=1{,}875\ \text{MPa},\qquad
 \sigma_z(L)=\frac{P}{A_0}e=5{,}097\ \text{MPa}.$$
-La secci\'on cr\'itica es por tanto el extremo cargado,
-de modo que la barra trabaja muy lejos del l\'imite el\'astico y la hip\'otesis de
+La seccion critica por ende es el extremo libre el cual tiene un esfuerzo muy bajo comparado el de fluencia por ende la hipotesis de deformaciones lineales es correcta
 comportamiento lineal el\'astico queda justificada.
 \end{desarrollo}
 
@@ -417,7 +416,7 @@ Para esto lo que haremos sera graficar $\delta_z(z)$
         
         \addplot [
             %%only marks, % Solo muestra los puntos, sin conectarlos con líneas
-            mark=none, % Estilo del punto (círculo sólido)
+            mark=*, % Estilo del punto (círculo sólido)
             color=red,
             mark size=2.5pt
         ]
@@ -430,7 +429,7 @@ Para esto lo que haremos sera graficar $\delta_z(z)$
         
         \addplot [
             %%only marks, % Solo muestra los puntos, sin conectarlos con líneas
-            mark=none, % Estilo del punto (círculo sólido)
+            mark=*, % Estilo del punto (círculo sólido)
             color=green,
             mark size=2.5pt
         ]
@@ -445,7 +444,7 @@ Para esto lo que haremos sera graficar $\delta_z(z)$
         
         \addplot [
            % %only marks, % Solo muestra los puntos, sin conectarlos con líneas
-            mark=none, % Estilo del punto (círculo sólido)
+            mark=*, % Estilo del punto (círculo sólido)
             color=orange,
             mark size=2.5pt
         ]
@@ -556,7 +555,7 @@ coordinates {
         \addplot [
             %only marks, % Solo muestra los puntos, sin conectarlos con líneas
             mark=*, % Estilo del punto (círculo sólido)
-            color=yellow,
+            color=orange,
             mark size=2.5pt
         ]
 coordinates {
@@ -570,26 +569,6 @@ coordinates {
 
         \addlegendentry{MEF 5 Nodos (4 Elementos)}
 
-                % 2. Gráfica del set de puntos (dispersión)
-        \addplot [
-            %only marks, % Solo muestra los puntos, sin conectarlos con líneas
-            mark=*, % Estilo del punto (círculo sólido)
-            color=black,
-            mark size=2.5pt
-        ]
-        coordinates {
-    (0.0000, 0.00000)
-    (1.1111, 0.01069)
-    (2.2222, 0.02264)
-    (3.3333, 0.03599)
-    (4.4444, 0.05091)
-    (5.5556, 0.06758)
-    (6.6667, 0.08622)
-    (7.7778, 0.10704)
-    (8.8889, 0.13031)
-    (10.0000, 0.15632)
-};
-        \addlegendentry{MEF 10 Nodos}
 
         
         
@@ -632,25 +611,6 @@ punteadas indican los saltos.}
 \label{fig:comp-sigma}
 \end{center}
 Como podemos ver a medida que vamos aumentando la resolucion o la cantidad de nodos, de esta misma manera la cantidad de elementos el resultado se hace cada vez mas parecido al real.
-
-\begin{itemize}[itemsep=3pt]
-\item La soluci\'on anal\'itica entrega $\sigma_z(z)=(P/A_0)e^{z/L}$ y
-$w(z)=\tfrac{PL}{EA_0}\left(e^{z/L}-1\right)$, con
-$\sigma_{\max}=5{,}097$ MPa en $z=L$ y $w(L)=0{,}15640$ mm.
-\item El MEF con elementos de dos nodos y \'area constante reproduce estos campos
-con errores de $-14{,}91\%$, $-4{,}05\%$ y $-1{,}03\%$ en $w(L)$ para 1, 2 y 4
-elementos, con convergencia $\mathcal{O}(h^2)$ y siempre por defecto, al ser el
-modelo discreto m\'as r\'igido que la barra real.
-\item Las tensiones son constantes a trozos y discontinuas en los nodos. Su error
-respecto del valor anal\'itico en el punto medio del elemento vale
-$1/\cosh(L_e/2L)$, id\'entico para todos los elementos de una misma malla.
-\item En la secci\'on cr\'itica el MEF subestima la tensi\'on entre un $46\%$ y un
-$12\%$ seg\'un la malla, lo que constituye un error no conservador que debe tenerse
-presente al usar estos resultados para dimensionar.
-\item Con $FS\approx 59$ frente a $S_y=300$ MPa, la barra opera holgadamente en
-r\'egimen el\'astico y cualquiera de las tres mallas ser\'ia suficiente para un
-predimensionamiento. La elecci\'on del criterio de \'area equivalente influye tanto
-en la precisi\'on como el propio refinamiento de la malla.
-\end{itemize}
+En conclusión, a medida que vamos aumentando la cantidad de nodos, cada vez se asemeja mas la solucion real a la analitica, seria interesnate ver en un futuro para deformaciones plasticas como se comparan el modelo real con el modelo de elemento finito. Otra cosa que si bien no nombre pero si hice, fue que el error puede variar dependiendo de como tome el area del elemento.
 \end{desarrollo}
 

@@ -504,6 +504,8 @@ Como podemos apreciar ninguna barra tiene un largo mayor a $5 \text{m}$, esto de
 }
 \end{center}
 
+Como se puede apreciar, tenemos que este puente resiste muy bien las cargas verticales, y se ve como el arco superior esta completamente en compresion esto es muy parecido al problema de la catenaria invertida, en el cual la catenaria es la curva que se genera por una cuerda bajo peso propio, por ende esta solamente en tension, pero si la das vuelta se hace solo en compresion. Esfuerzos maximos bastante bajo el limite de fluenciua, se tendira que tener cuidado con las cargas de compresion y el pandeo pero se ve bastante bien.
+
 \end{desarrollo}
 
 
@@ -722,7 +724,7 @@ Como podemos apreciar ninguna barra tiene un largo mayor a $5 \text{m}$, esto de
 
 % Etiqueta del desplazamiento maximo (nodo 8)
 \draw[-{Latex[length=2mm]}, thin] (m8) -- ++(1.2,3.3)
-  node[right] {\small $|\vec{u}|_{8} \approx 9.72\,\text{mm}$};
+  node[right] {\small $u_{y8} \approx 9.62\,\text{mm}$};
 \end{tikzpicture}
 
 \vspace{0.3em}
@@ -732,6 +734,8 @@ Como podemos apreciar ninguna barra tiene un largo mayor a $5 \text{m}$, esto de
 }
 }%
 \end{center}
+Para este caso es un puente mucho mas simple, es clave ver el efecto de los elementos diagonales que unen los nodos que se encuentran o en tracción o en compresión pero son lo que hacen que la estructura no comporte como mecanismo si no que como estructura.
+
 
 \end{desarrollo}
 
@@ -949,8 +953,90 @@ Como podemos apreciar ninguna barra tiene un largo mayor a $5 \text{m}$, esto de
 \draw[-{Latex[length=2.5mm]}, thick, black] (11.06,1.061) -- ++(0,-1.1) node[below] {\tiny $25\,\text{kN}$};
 \end{tikzpicture}
 \end{center}
+
+La Figura~\ref{fig:p3d-deformada} muestra la configuraci\'on deformada del puente
+tridimensional superpuesta a la geometr\'ia original. Pero en este caso se tuvo agregar un nodo en el medio y agregar unos elementos transversales para poder soportar las cargas laterales, ya que antes se generaba que sea unj mecanismo y simplemente gire.
+
+\begin{center}
+\includegraphics[width=\linewidth]{T1/Puente 3d deformado 2.png}
+\captionof{figure}{Configuraci\'on deformada del puente 3D bajo la carga
+$P=50$ kN aplicada en el centro de la luz, repartida entre las dos celos\'ias. Aparte se le aplica una carga de $1\text{kN}$ en la direccion y para que no sea un mecanismo, por eso las deflexiones no son simetricas.
+Los desplazamientos est\'an amplificados 300 veces para hacerlos visibles; la
+deflexi\'on real m\'axima es de $3{,}76$ mm.}
+\label{fig:p3d-deformada}
+\end{center}
+
+\medskip
+La distribuci\'on de fuerzas axiales se presenta en la
+Figura~\ref{fig:p3d-esfuerzos}.
+
+\begin{center}
+\includegraphics[width=0.95\linewidth]{T1/puente3d_esfuerzos.png}
+\captionof{figure}{Fuerzas axiales por elemento en el puente 3D. El rojo indica
+tracci\'on y el azul compresi\'on. El valor extremo es de $-29{,}51$ MPa en
+compresi\'on (barra 6--8 del arco) y $+18{,}12$ MPa en tracci\'on (barra 9--10).}
+\label{fig:p3d-esfuerzos}
+\end{center}
+
+\medskip
+Finalmente, la Figura~\ref{fig:p3d-vertical} recoge el desplazamiento vertical de
+cada nodo, que permite verificar directamente la restricci\'on de dise\~no.
+
+\begin{center}
+\includegraphics[width=\linewidth]{T1/puente3d_deformacion_vertical.png}
+\captionof{figure}{Desplazamiento vertical nodal del puente 3D. El m\'aximo se
+produce en el nodo 29, en el centro de la luz, con $-3{,}76$ mm, holgadamente por
+debajo del l\'imite admisible de $10$ mm.}
+\label{fig:p3d-vertical}
+\end{center}
+como podemos apreciar no tenemos indeterminaciones, no tenemos problemas que sea un mecanismo, eso se debe a que una vez gira genera que los otros nodos si pueden tambien se muevan en la misma cantidad por ende no hay un cambio de la longitud de la barra, ademas como asumimos pequeñass deformaciones, una vez cambia tambien cambia la direccion que actuan las fuerzas, si bien puede que en un comienzo no soporte fuerzas en $z$ (antes del nodo interno 40), una vez se deforme si deberia poder soportarlo, habran casos que esto no sera asi y definitivamente es un mecanismo. Por eso mismo es que hay calcular el rango de la matriz de rigidez reducida, si no es igual a la cantidad de filas o columnas pues tienes un nodo libre el cual tienes que restringir.
+Respecto a los esfuerzos, se puede evr como ahora que se divide en 2 la fuerza de 50kN las cargas son la mitad, la gracia tambien del grafico de las fuerzas internas es que el valor coincide en MPa y kN debvido a que para pasar de $kN/mm^2$ a MPa, es necesario dividir por mil justo el valor del area por ende el valor maximo de traccion es menor a 30MPa
+
 \end{desarrollo}
+
+
+\section{Codigo problema 1}
 \lstinputlisting[style=pythonstyle, caption={FEM para elementos unidimensionales}, label={lst:solver}]{T1/T1_1.py}
+\section{Problema codigo 2}
+Teoricamente este codigo funciona para 1D,2D,3D pero en caso 2D y 1 D hayq ue poner restricciones $x$ e $y$ o en 2D en $z$
+\lstinputlisting[style=pythonstyle, caption={FEM para elementos 3D}, label={lst:solver}]{T1/T1_3.py}
 
+\newpage
+\section*{Declaraci\'on de uso de Inteligencia Artificial}
 
+En conformidad con las normas del curso, se declara a continuaci\'on el uso de
+herramientas de inteligencia artificial generativa en el desarrollo de esta tarea.
 
+\begin{center}
+\captionof{table}{Declaraci\'on de uso de herramientas de inteligencia artificial
+generativa en el desarrollo de la Tarea N$^\circ$ 1.}
+\label{tab:declaracion-ia}
+\small
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{|p{2.3cm}|p{3.6cm}|p{8.6cm}|}
+\hline
+\textbf{Herramienta} & \textbf{Prop\'osito} & \textbf{Forma en que influy\'o en el trabajo generado}\\
+\hline
+Claude (Anthropic) & Revisi\'on del informe &
+Revis\'o el desarrollo y detect\'o errores de formulaci\'on, inconsistencias entre
+el c\'odigo y los resultados reportados, y elementos gr\'aficos sin numeraci\'on
+ni cita. Las correcciones fueron evaluadas y aplicadas por el estudiante.\\
+\hline
+Claude (Anthropic) & Mejora del c\'odigo Python &
+Apoy\'o en la depuraci\'on y ordenamiento de los solvers de elementos finitos:
+criterio de \'area equivalente, definici\'on de \'area y cargas nodales del modelo
+3D, y funciones de visualizaci\'on de la geometr\'ia y de los esfuerzos.\\
+\hline
+Claude (Anthropic) & Traspaso de resultados a figuras &
+Asisti\'o en convertir los resultados num\'ericos obtenidos en Python a figuras
+vectoriales en Ti\emph{k}Z/pgfplots para su inclusi\'on en el informe.\\
+\hline
+\end{tabular}
+\end{center}
+
+\medskip
+El planteamiento de los problemas, la definici\'on de la geometr\'ia de las
+propuestas de dise\~no, la ejecuci\'on de los c\'alculos y la decisi\'on final
+sobre cada resultado incorporado son responsabilidad del estudiante, quien
+declara comprender, poder explicar y defender la totalidad del contenido
+presentado.
