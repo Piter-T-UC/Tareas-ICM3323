@@ -36,7 +36,12 @@ y est\'a sometida a una fuerza axial en su extremo libre ($P = 3$ kN). De acuerd
     % carga P
     \draw[->] (0,-0.05) -- (0,-1.0);
     \node[below] at (0,-1.0) {$P$};
+    
 \end{tikzpicture}
+\captionof{figure}{Barra vertical empotrada de secci\'on transversal exponencial
+$A(z)=A_0e^{-z/L}$, sometida a una carga axial $P$ en su extremo libre. El eje
+$z$ se mide desde el empotramiento hacia abajo.}
+\label{fig:barra}
 \end{center}
 
 \vspace{0.7cm}
@@ -61,9 +66,24 @@ $$\left[ L e^{z/L} \right]_{0}^{L} = L e^1 - L e^0 = L(e - 1)$$
 
 $$\delta_z = \frac{3000 \text{N}\cdot 10\text{m}\cdot(e - 1)}{206000\text{MPa} \cdot 1600\text{mm}^2}$$
 $$\delta_z \approx 0,1564\text{ mm}$$
+Entonces el campo de deformaciones queda
+$$\int_0^{w(z)}dw=\frac{P}{EA_0}\int_0^{z}e^{\zeta/L}\,d\zeta
+\quad\Longrightarrow\quad
+\boxed{\,w(z)=\frac{PL}{EA_0}\left(e^{z/L}-1\right)\,}$$
+y el campo de tensiones queda
+$$\boxed{\,\sigma_z(z)=\frac{P}{A(z)}=\frac{P}{A_0}e^{z/L}\,}$$
+Como el \'area disminuye hacia el extremo libre, la tensi\'on \emph{crece} en esa
+direcci\'on:
+$$\sigma_z(0)=\frac{P}{A_0}=1{,}875\ \text{MPa},\qquad
+\sigma_z(L)=\frac{P}{A_0}e=5{,}097\ \text{MPa}.$$
+La secci\'on cr\'itica es por tanto el extremo cargado,
+de modo que la barra trabaja muy lejos del l\'imite el\'astico y la hip\'otesis de
+comportamiento lineal el\'astico queda justificada.
 \end{desarrollo}
-\newpage
+
 \begin{desarrollo}{b) Soluci\'on por MEF}
+
+
     \textit{Discretizaci\'on con 1 elemento}\\
     
     Para este caso nosotros tenemos este sistema
@@ -77,8 +97,11 @@ $$\delta_z \approx 0,1564\text{ mm}$$
         % Nodo 2 (Inferior)
         \filldraw[black] (0,-4) circle (2pt) node[left=4pt] {Nodo 2};
     \end{tikzpicture}
+    \captionof{figure}{Discretizaci\'on con un elemento de dos nodos. Todo el dominio
+se representa con una \'unica \'area equivalente $A$ constante.}
+\label{fig:malla1}
 \end{center}
-El cual se puede expresar como un resorte de constante $k=\dfrac{E}{AL}$
+El cual se puede expresar como un resorte de constante $k=\dfrac{EA}{L}$
 queda el balance de cada nodo como
 \begin{align*}
     -k(u_2-u_1)&=R_1\\
@@ -113,6 +136,9 @@ $$F_1=u_2\cdot k\longrightarrow u_2=\dfrac{F_1}{k}$$
         \filldraw[black] (0,-2) circle (2pt) node[left=4pt] {Nodo 2};
         \filldraw[black] (0,-4) circle (2pt) node[left=4pt] {Nodo 3};
     \end{tikzpicture}
+    \captionof{figure}{Discretizaci\'on con dos elementos de dos nodos. Cada elemento
+tiene su propia \'area equivalente $A_i$ constante, con $L_1=L_2=5$ m.}
+\label{fig:malla2}
 \end{center}
 El cual se puede expresar como un resorte de constante $k=\dfrac{EA}{L}$
 queda el balance de cada nodo como
@@ -173,8 +199,12 @@ k_1+k_2&-k_2\\
         \filldraw[black] (0,-3) circle (2pt) node[left=4pt] {Nodo 4};
         \filldraw[black] (0,-4) circle (2pt) node[left=4pt] {Nodo 5};
     \end{tikzpicture}
+    \captionof{figure}{Discretizaci\'on con cuatro elementos de dos nodos y nodos
+equidistantes ($L_i=2{,}5$ m). El refinamiento permite capturar mejor la
+variaci\'on exponencial del \'area.}
+\label{fig:malla4}
 \end{center}
-El cual se puede expresar como un resorte de constante $k=\dfrac{E}{AL}$
+El cual se puede expresar como un resorte de constante $k=\dfrac{EA}{L}$
 queda el balance de cada nodo como
 \begin{align*}
     -k_1(u_2-u_1)&=R_1\\
@@ -275,6 +305,9 @@ Para el caso de 1 elemento
         \hline
     \end{tabular}
     \label{tab:esfuerzos 1}
+    \captionof{table}{Tensi\'on axial por elemento para la discretizaci\'on con un
+elemento.}
+\label{tab:esfuerzos1}
 \end{center}
 Para el caso de 2 elementos (3 nodos)
 % ==========================================
@@ -300,6 +333,9 @@ Para el caso de 2 elementos (3 nodos)
         \hline
     \end{tabular}
     \label{tab:esfuerzos 2}
+    \captionof{table}{Tensi\'on axial por elemento para la discretizaci\'on con dos
+elementos.}
+\label{tab:esfuerzos2}
 \end{center}
 
 Para este caso tenemos 4 elementos, 5 nodos.
@@ -313,6 +349,7 @@ Para este caso tenemos 4 elementos, 5 nodos.
     0.10062 \\
     0.15478 \\
 \end{bmatrix} \quad \text{[mm]}
+\label{tab:esfuerzos4}
 \end{equation}
 
 % ==========================================
@@ -330,6 +367,9 @@ Para este caso tenemos 4 elementos, 5 nodos.
         4 & 4 & 5 & 4.4630 \\
         \hline
     \end{tabular}
+  \captionof{table}{Tensi\'on axial por elemento para la discretizaci\'on con cuatro
+elementos. La tensi\'on crece de forma escalonada hacia el extremo libre.}
+\label{tab:esfuerzos4}
 
     \label{tab:esfuerzos}
 \end{center}
@@ -339,7 +379,7 @@ Para este caso tenemos 4 elementos, 5 nodos.
 
 % ==========================================
 \end{desarrollo}
-
+\newpage
 \begin{desarrollo}{c) Comparaci\'on y discusi\'on}
 Para esto lo que haremos sera graficar $\delta_z(z)$
 \begin{center}
@@ -445,6 +485,10 @@ coordinates {
         
         \end{axis}
     \end{tikzpicture}
+    \captionof{figure}{Campo de desplazamiento axial: soluci\'on anal\'itica frente a
+las soluciones MEF de 1, 2 y 4 elementos. Dentro de cada elemento la
+aproximaci\'on es lineal, mientras que la soluci\'on exacta es exponencial.}
+\label{fig:comp-w}
 \end{center}
 
 Entonces ahora vamos a ver la diferencia de como se ven el ultimo nodos en todas las simulaciones MEF
@@ -511,7 +555,7 @@ coordinates {
         
         \addplot [
             %only marks, % Solo muestra los puntos, sin conectarlos con líneas
-            mark=none, % Estilo del punto (círculo sólido)
+            mark=*, % Estilo del punto (círculo sólido)
             color=yellow,
             mark size=2.5pt
         ]
@@ -529,7 +573,7 @@ coordinates {
                 % 2. Gráfica del set de puntos (dispersión)
         \addplot [
             %only marks, % Solo muestra los puntos, sin conectarlos con líneas
-            mark=none, % Estilo del punto (círculo sólido)
+            mark=*, % Estilo del punto (círculo sólido)
             color=black,
             mark size=2.5pt
         ]
@@ -551,6 +595,10 @@ coordinates {
         
         \end{axis}
     \end{tikzpicture}
+    \captionof{figure}{Detalle del desplazamiento en el extremo libre $z=L$. Al
+refinar la malla el valor nodal se aproxima mon\'otonamente por defecto a la
+soluci\'on anal\'itica.}
+\label{fig:zoom-w}
 \end{center}
 \begin{center}
 \begin{tikzpicture}
@@ -583,6 +631,26 @@ es constante dentro de cada elemento y discontinua en los nodos; las l\'ineas
 punteadas indican los saltos.}
 \label{fig:comp-sigma}
 \end{center}
-Como podemos ver a medida que vamos aumentando la resolucion o la cantidad de nodos, de esta misma manera la cantidad de elementos el resultado se hace cada vez mas parecido al real
+Como podemos ver a medida que vamos aumentando la resolucion o la cantidad de nodos, de esta misma manera la cantidad de elementos el resultado se hace cada vez mas parecido al real.
+
+\begin{itemize}[itemsep=3pt]
+\item La soluci\'on anal\'itica entrega $\sigma_z(z)=(P/A_0)e^{z/L}$ y
+$w(z)=\tfrac{PL}{EA_0}\left(e^{z/L}-1\right)$, con
+$\sigma_{\max}=5{,}097$ MPa en $z=L$ y $w(L)=0{,}15640$ mm.
+\item El MEF con elementos de dos nodos y \'area constante reproduce estos campos
+con errores de $-14{,}91\%$, $-4{,}05\%$ y $-1{,}03\%$ en $w(L)$ para 1, 2 y 4
+elementos, con convergencia $\mathcal{O}(h^2)$ y siempre por defecto, al ser el
+modelo discreto m\'as r\'igido que la barra real.
+\item Las tensiones son constantes a trozos y discontinuas en los nodos. Su error
+respecto del valor anal\'itico en el punto medio del elemento vale
+$1/\cosh(L_e/2L)$, id\'entico para todos los elementos de una misma malla.
+\item En la secci\'on cr\'itica el MEF subestima la tensi\'on entre un $46\%$ y un
+$12\%$ seg\'un la malla, lo que constituye un error no conservador que debe tenerse
+presente al usar estos resultados para dimensionar.
+\item Con $FS\approx 59$ frente a $S_y=300$ MPa, la barra opera holgadamente en
+r\'egimen el\'astico y cualquiera de las tres mallas ser\'ia suficiente para un
+predimensionamiento. La elecci\'on del criterio de \'area equivalente influye tanto
+en la precisi\'on como el propio refinamiento de la malla.
+\end{itemize}
 \end{desarrollo}
 

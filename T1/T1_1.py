@@ -26,8 +26,8 @@ for i in range(n-1):
     N2=conectividad[i,1]
     x2 = nodos[N2]
     L_e = x2 - x1 #Esto es el largop de cada uno
-    A_1 = area((x1)/2,L)# aqui es donde saco la Area
-    A_2 = area((x2)/2,L)#probe con este metodo me dio mayor error
+    A_1 = area((x1),L)# aqui es donde saco la Area
+    A_2 = area((x2),L)#probe con este metodo me dio mayor error
     A_e= (A_1 + A_2)/2
     #A_e = area((x1+x2)/2,L)# aqui es donde saco la Area
     
