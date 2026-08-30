@@ -53,6 +53,13 @@
     morekeywords={self},
     xleftmargin=1.5em,
     framexleftmargin=1.2em,
+    inputencoding=utf8,          % <- nuevo
+    extendedchars=true,          % <- nuevo
+    literate=%                   % <- nuevo: le dice a listings cómo dibujar cada tilde
+        {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+        {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+        {ñ}{{\~n}}1 {Ñ}{{\~N}}1 {ü}{{\"u}}1 {Ü}{{\"U}}1
+        {¿}{{?`}}1 {¡}{{!`}}1,
 }
 %================================================================
 % Estilo de secciones
@@ -61,6 +68,11 @@
   {\normalfont\Large\bfseries\color{ucred}}{\thesection}{0.6em}{}
 \titlespacing*{\section}{0pt}{1.4em}{0.8em}
 \usetikzlibrary{patterns, arrows.meta}
+
+
+\usetikzlibrary{shapes.geometric}
+
+
 %================================================================
 % Cajas (tcolorbox)
 %================================================================
