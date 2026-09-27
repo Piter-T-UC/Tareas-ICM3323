@@ -1,24 +1,61 @@
 %---------------------- Problema 1 ------------------------------
 \section*{Problema 1}
 
-\begin{enunciado}{Enunciado}
-    % TODO: Pegar aqu\'i el enunciado del Problema 1 de la Tarea 2.
-    Reemplazar este texto por el enunciado completo del problema
-    (datos, geometr\'ia, propiedades del material, condiciones de borde,
-    y lo que se pide calcular/discutir).
+\begin{enunciado}{Problema 1 (2 puntos)}
+    Para la viga de acero indicada en la Figura se pide:
+    \begin{enumerate}[label=\alph*), itemsep=4pt]
+        \item Obtener la expresi\'on anal\'itica de los campos de desplazamiento,
+        rotaci\'on, momento y corte de acuerdo a la teor\'ia de vigas.
+        \item Obtener la soluci\'on por MEF de dichos campos utilizando al menos
+        tres discretizaciones diferentes con un n\'umero creciente de elementos
+        finitos de viga de dos nodos. Justificar la elecci\'on de cada una de las
+        discretizaciones propuestas.
+        \item Graficar, comparar y discutir las soluciones obtenidas en a) y b).
+    \end{enumerate}
+
+    \medskip
+    \noindent Datos: $E = 210$ GPa, $G = 80$ GPa, $S_y = 300$ MPa, secci\'on
+    circular, $I = I_0 - (z/L)\,I_1$ ($I_0 = 2\cdot 10^6$ mm$^4$,
+    $I_1 = 1\cdot 10^6$ mm$^4$), $L = 1$ m, $P = 1$ kN, $M = 2$ kNm.
 \end{enunciado}
 
 \vspace{0.7cm}
 
-% Figura del problema (opcional). Ejemplo de plantilla TikZ, ajustar o
-% eliminar seg\'un corresponda.
-% \begin{center}
-% \begin{tikzpicture}[scale=0.9, >=stealth, thick]
-%
-% \end{tikzpicture}
-% \captionof{figure}{Descripci\'on de la figura.}
-% \label{fig:t2-p1}
-% \end{center}
+\begin{center}
+\begin{tikzpicture}[scale=1.0, >=stealth, thick]
+    % ===== Empotramiento en la base =====
+    \draw[thick] (-0.7,0) -- (0.7,0);
+    \foreach \x in {-0.7,-0.5,...,0.5}
+        \draw (\x,0) -- (\x+0.2,-0.35);
+
+    % ===== Viga vertical =====
+    \draw[thick] (0,0) -- (0,4);
+
+    % ===== Momento M en el extremo superior =====
+    \draw[->, thick] (0.55,4.55) arc[start angle=-20, end angle=250, radius=0.4];
+    \node[right] at (0.9,4.15) {$M$};
+
+    % ===== Fuerza P a media altura (L/2) =====
+    \draw[->, thick] (-1.1,2) -- (0,2);
+    \node[left] at (-1.1,2) {$P$};
+
+    % ===== Cota L/2 (base hasta el punto de aplicaci\'on de P) =====
+    \draw[<->] (1.3,0) -- (1.3,2);
+    \node[right] at (1.3,1) {$L/2$};
+
+    % ===== Cota L (altura total) =====
+    \draw[<->] (2.1,0) -- (2.1,4);
+    \node[right] at (2.1,2) {$L$};
+
+    % ===== Eje z =====
+    \draw[->] (-1.9,0) -- (-1.9,0.9);
+    \node[left] at (-1.9,0.5) {$z$};
+\end{tikzpicture}
+\captionof{figure}{Viga vertical empotrada en la base, de longitud $L$, con un
+momento $M$ aplicado en el extremo libre y una fuerza horizontal $P$ aplicada
+a media altura ($z = L/2$).}
+\label{fig:t2-p1}
+\end{center}
 
 %---------------------- Desarrollo -------------------------------
 
