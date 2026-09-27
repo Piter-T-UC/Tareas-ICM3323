@@ -59,8 +59,89 @@ a media altura ($z = L/2$).}
 
 %---------------------- Desarrollo -------------------------------
 
-\begin{desarrollo}{a) Desarrollo te\'orico / planteamiento}
-    % TODO: desarrollo anal\'itico o planteamiento del problema.
+\begin{desarrollo}{a) Campos anal\'iticos de desplazamiento, rotaci\'on, momento y corte}
+
+\textbf{Convenci\'on y planteamiento}\\
+Tomo el eje $z$ a lo largo de la viga, con $z=0$ en el empotramiento (base) y
+$z=L$ en el extremo libre. Como solo hay flexi\'on (la carga $P$ es
+transversal al eje de la viga y $M$ es un momento puro), uso la teor\'ia
+cl\'asica de vigas (Euler--Bernoulli), donde el desplazamiento transversal
+$v(z)$ (en la direcci\'on de $P$) y el giro $\theta(z)=v'(z)$ se relacionan
+con el momento flector mediante
+$$E\,I(z)\,v''(z) = M(z), \qquad I(z) = I_0 - \frac{I_1}{L}\,z$$
+Como el empotramiento impide desplazamiento y giro, las condiciones de borde son
+$$v(0)=0, \qquad \theta(0)=v'(0)=0$$
+Notar que, al ser $I(z)$ lineal en $z$, las integrales que aparecen son del
+tipo $\int dz/(I_0-kz)$, que dan logaritmos naturales; por eso los campos no
+quedan polin\'omicos como en el caso de secci\'on constante.
+
+\textbf{Paso 1: Corte y momento por secciones}\\
+Como la viga est\'a empotrada en $z=0$ y libre en $z=L$, conviene cortar la
+viga en una posici\'on $z$ y hacer equilibrio del tramo que va de $z$ hasta el
+extremo libre (as\'i no aparecen las reacciones del empotramiento).
+
+Para $L/2 < z \le L$ (por encima del punto de aplicaci\'on de $P$), en ese
+tramo solo act\'ua el momento $M$ en la punta, que al ser un par no genera
+corte:
+$$V(z)=0, \qquad M(z)=M$$
+
+Para $0 \le z < L/2$, el tramo superior al corte incluye tanto la fuerza $P$
+(aplicada en $z=L/2$) como el momento $M$ (aplicado en $z=L$). Haciendo
+equilibrio de fuerzas y de momento respecto al corte:
+$$V(z)=P, \qquad M(z)=M+P\left(\frac{L}{2}-z\right)$$
+Se verifica que $M(z)$ es continuo en $z=L/2$ (ambas expresiones dan $M$) y
+que el corte tiene un salto $\Delta V=P$ en ese punto, como corresponde a una
+carga puntual.
+
+Con los datos num\'ericos ($E=210$ GPa$=210\,000$ MPa, $I_0=2\times10^6$
+mm$^4$, $I_1=1\times10^6$ mm$^4$, $L=1000$ mm, $P=1000$ N,
+$M=2\times10^6$ N$\cdot$mm), la inercia queda
+$$I(z)=2\times10^6-1000\,z \ \text{[mm}^4\text{]}, \qquad 0\le z\le 1000\ \text{mm}$$
+y el momento flector
+$$M(z)=\begin{cases}
+2.5\times10^6-1000\,z & 0\le z\le 500\ \text{mm}\\[4pt]
+2\times10^6 & 500\le z\le 1000\ \text{mm}
+\end{cases}\quad[\text{N}\cdot\text{mm}]$$
+
+\textbf{Paso 2: Integraci\'on del tramo $0\le z\le L/2$}\\
+Con los n\'umeros de este problema, $M(z)=I(z)+5\times10^5$ (la pendiente de
+$M(z)$ coincide num\'ericamente con la de $I(z)$, ambas $-1000$), lo que
+simplifica bastante la integral:
+$$\theta'(z)=v''(z)=\frac{M(z)}{E\,I(z)}=\frac{1}{E}\left[1+\frac{5\times10^5}{I(z)}\right]$$
+Integrando y aplicando $\theta(0)=0$:
+$$\boxed{\theta(z)=\frac{1}{E}\left[z+500\,\ln\!\left(\frac{I_0}{I(z)}\right)\right]},\qquad 0\le z\le \frac{L}{2}$$
+Integrando nuevamente y aplicando $v(0)=0$:
+$$\boxed{v(z)=\frac{1}{E}\left[\frac{z^2}{2}+500\,z\,\ln(I_0)+\tfrac12\,I(z)\big(\ln I(z)-1\big)-\tfrac12\,I_0\big(\ln I_0-1\big)\right]},\quad 0\le z\le \frac{L}{2}$$
+
+\textbf{Paso 3: Integraci\'on del tramo $L/2\le z\le L$}\\
+Aqu\'i $M(z)=M$ es constante, por lo que
+$$\theta'(z)=\frac{M}{E\,I(z)}$$
+Integrando y empalmando con $\theta(L/2)$ obtenido en el paso anterior (continuidad
+del giro, ya que la viga es un s\'olido continuo aunque el momento tenga un
+quiebre) se obtiene la constante de integraci\'on:
+$$\boxed{\theta(z)=\frac{1}{E}\Big[-2000\,\ln I(z)+29\,085.8\Big]},\qquad \frac{L}{2}\le z\le L$$
+Integrando una vez m\'as y empalmando $v(L/2)$ con el valor del tramo anterior
+(continuidad del desplazamiento):
+$$\boxed{v(z)=\frac{1}{E}\Big[2\,I(z)\big(\ln I(z)-1\big)+29\,085.8\,z-54\,046\,584.5\Big]},\qquad \frac{L}{2}\le z\le L$$
+
+\textbf{Resumen num\'erico}\\
+Evaluando las expresiones anteriores en los puntos notables:
+\begin{center}
+\begin{tabular}{ccccc}
+\hline
+$z$ [mm] & $I(z)$ [mm$^4$] & $M(z)$ [N$\cdot$mm] & $\theta(z)$ [rad] & $v(z)$ [mm]\\
+\hline
+0    & $2.0\times10^6$ & $2.5\times10^6$ & 0 & 0\\
+500  & $1.5\times10^6$ & $2.0\times10^6$ & $3.066\times10^{-3}$ & $0.7583$\\
+1000 & $1.0\times10^6$ & $2.0\times10^6$ & $6.927\times10^{-3}$ & $3.192$\\
+\hline
+\end{tabular}
+\end{center}
+Es decir, en el extremo libre la viga rota $\theta(L)\approx0.397^{\circ}$ y se
+desplaza $v(L)\approx3.19$ mm en la direcci\'on de $P$, con el corte
+$V(z)=P=1$ kN constante en la mitad inferior y nulo en la mitad superior, y el
+momento flector variando linealmente entre $2.5$ kNm (base) y $2$ kNm en todo
+el tramo superior (constante, igual al momento aplicado $M$).
 \end{desarrollo}
 
 \begin{desarrollo}{b) Soluci\'on por MEF}
