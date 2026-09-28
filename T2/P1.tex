@@ -52,8 +52,9 @@
     \node[left] at (-1.9,0.5) {$z$};
 \end{tikzpicture}
 \captionof{figure}{Viga vertical empotrada en la base, de longitud $L$, con un
-momento $M$ aplicado en el extremo libre y una fuerza horizontal $P$ aplicada
-a media altura ($z = L/2$).}
+momento torsor $M$ (actuando alrededor del eje longitudinal $z$ de la viga)
+aplicado en el extremo libre, y una fuerza horizontal $P$ (transversal al eje
+de la viga) aplicada a media altura ($z = L/2$).}
 \label{fig:t2-p1}
 \end{center}
 
@@ -63,85 +64,106 @@ a media altura ($z = L/2$).}
 
 \textbf{Convenci\'on y planteamiento}\\
 Tomo el eje $z$ a lo largo de la viga, con $z=0$ en el empotramiento (base) y
-$z=L$ en el extremo libre. Como solo hay flexi\'on (la carga $P$ es
-transversal al eje de la viga y $M$ es un momento puro), uso la teor\'ia
-cl\'asica de vigas (Euler--Bernoulli), donde el desplazamiento transversal
-$v(z)$ (en la direcci\'on de $P$) y el giro $\theta(z)=v'(z)$ se relacionan
-con el momento flector mediante
-$$E\,I(z)\,v''(z) = M(z), \qquad I(z) = I_0 - \frac{I_1}{L}\,z$$
-Como el empotramiento impide desplazamiento y giro, las condiciones de borde son
-$$v(0)=0, \qquad \theta(0)=v'(0)=0$$
-Notar que, al ser $I(z)$ lineal en $z$, las integrales que aparecen son del
-tipo $\int dz/(I_0-kz)$, que dan logaritmos naturales; por eso los campos no
-quedan polin\'omicos como en el caso de secci\'on constante.
+$z=L$ en el extremo libre. Ac\'a hay que tener cuidado con qu\'e tipo de
+solicitaci\'on genera cada carga: $P$ es una fuerza \textbf{transversal} al
+eje de la viga, por lo que genera \textbf{flexi\'on} (corte y momento
+flector); en cambio $M$ es un momento aplicado \textbf{alrededor del eje
+longitudinal} $z$ de la viga (un ``giro de tornillo'' sobre su propio eje),
+por lo que es un \textbf{momento torsor}, no flector. Como la viga es de
+secci\'on circular, no hay acoplamiento entre flexi\'on y torsi\'on, as\'i que
+resuelvo ambos efectos por separado y despu\'es los combino solo si hiciera
+falta calcular un esfuerzo combinado.
 
-\textbf{Paso 1: Corte y momento por secciones}\\
+Para la flexi\'on uso la teor\'ia cl\'asica de vigas (Euler--Bernoulli), donde
+el desplazamiento transversal $v(z)$ (en la direcci\'on de $P$) y el giro
+$\theta(z)=v'(z)$ se relacionan con el momento flector mediante
+$$E\,I(z)\,v''(z) = M_f(z), \qquad I(z) = I_0 - \frac{I_1}{L}\,z$$
+Para la torsi\'on, el \'angulo de giro por torsi\'on $\varphi(z)$ se relaciona
+con el momento torsor mediante
+$$G\,J(z)\,\varphi'(z) = T(z), \qquad J(z)=2\,I(z)$$
+(la secci\'on es circular, por lo que el momento polar de inercia es
+$J=I_x+I_y=2I$). El empotramiento impide desplazamiento, giro por flexi\'on y
+giro por torsi\'on, por lo que las condiciones de borde son
+$$v(0)=0,\quad \theta(0)=v'(0)=0,\quad \varphi(0)=0$$
+Notar que, al ser $I(z)$ (y por lo tanto $J(z)$) lineal en $z$, las integrales
+que aparecen son del tipo $\int dz/(I_0-kz)$, que dan logaritmos naturales;
+por eso los campos no quedan polin\'omicos como en el caso de secci\'on
+constante.
+
+\textbf{Paso 1: Corte, momento flector y momento torsor por secciones}\\
 Como la viga est\'a empotrada en $z=0$ y libre en $z=L$, conviene cortar la
 viga en una posici\'on $z$ y hacer equilibrio del tramo que va de $z$ hasta el
 extremo libre (as\'i no aparecen las reacciones del empotramiento).
 
-Para $L/2 < z \le L$ (por encima del punto de aplicaci\'on de $P$), en ese
-tramo solo act\'ua el momento $M$ en la punta, que al ser un par no genera
-corte:
-$$V(z)=0, \qquad M(z)=M$$
+Para el corte y el momento flector, solo importa $P$ (que act\'ua en
+$z=L/2$), ya que $M$ act\'ua en la direcci\'on axial y no aporta ni corte ni
+momento flector:
+$$V(z)=0,\quad M_f(z)=0 \qquad \text{para } L/2 < z \le L$$
+$$V(z)=P,\quad M_f(z)=P\left(\frac{L}{2}-z\right) \qquad \text{para } 0 \le z < L/2$$
+(el corte tiene un salto $\Delta V=P$ en $z=L/2$, como corresponde a una carga
+puntual, y el momento flector se anula continuamente en ese punto).
 
-Para $0 \le z < L/2$, el tramo superior al corte incluye tanto la fuerza $P$
-(aplicada en $z=L/2$) como el momento $M$ (aplicado en $z=L$). Haciendo
-equilibrio de fuerzas y de momento respecto al corte:
-$$V(z)=P, \qquad M(z)=M+P\left(\frac{L}{2}-z\right)$$
-Se verifica que $M(z)$ es continuo en $z=L/2$ (ambas expresiones dan $M$) y
-que el corte tiene un salto $\Delta V=P$ en ese punto, como corresponde a una
-carga puntual.
+Para el momento torsor, solo importa $M$ (aplicado en $z=L$, alrededor del eje
+de la viga); como es un par aplicado en la punta y no hay otra torca en el
+tramo, el equilibrio de cualquier corte da simplemente
+$$T(z)=M \qquad \text{para } 0 \le z \le L$$
+(el momento torsor es constante en toda la viga).
 
-Con los datos num\'ericos ($E=210$ GPa$=210\,000$ MPa, $I_0=2\times10^6$
-mm$^4$, $I_1=1\times10^6$ mm$^4$, $L=1000$ mm, $P=1000$ N,
-$M=2\times10^6$ N$\cdot$mm), la inercia queda
-$$I(z)=2\times10^6-1000\,z \ \text{[mm}^4\text{]}, \qquad 0\le z\le 1000\ \text{mm}$$
-y el momento flector
-$$M(z)=\begin{cases}
-2.5\times10^6-1000\,z & 0\le z\le 500\ \text{mm}\\[4pt]
-2\times10^6 & 500\le z\le 1000\ \text{mm}
-\end{cases}\quad[\text{N}\cdot\text{mm}]$$
+Con los datos num\'ericos ($E=210$ GPa$=210\,000$ MPa, $G=80$ GPa$=80\,000$
+MPa, $I_0=2\times10^6$ mm$^4$, $I_1=1\times10^6$ mm$^4$, $L=1000$ mm,
+$P=1000$ N, $M=2\times10^6$ N$\cdot$mm), la inercia y el momento polar quedan
+$$I(z)=2\times10^6-1000\,z\ \text{[mm}^4\text{]}, \qquad J(z)=2I(z)=4\times10^6-2000\,z\ \text{[mm}^4\text{]}$$
+y el momento flector y torsor
+$$M_f(z)=\begin{cases}
+5\times10^5-1000\,z & 0\le z\le 500\ \text{mm}\\[2pt]
+0 & 500\le z\le 1000\ \text{mm}
+\end{cases}\ [\text{N}\cdot\text{mm}], \qquad T(z)=2\times10^6\ \text{[N}\cdot\text{mm]},\ \ 0\le z\le 1000\ \text{mm}$$
 
-\textbf{Paso 2: Integraci\'on del tramo $0\le z\le L/2$}\\
-Con los n\'umeros de este problema, $M(z)=I(z)+5\times10^5$ (la pendiente de
-$M(z)$ coincide num\'ericamente con la de $I(z)$, ambas $-1000$), lo que
-simplifica bastante la integral:
-$$\theta'(z)=v''(z)=\frac{M(z)}{E\,I(z)}=\frac{1}{E}\left[1+\frac{5\times10^5}{I(z)}\right]$$
+\textbf{Paso 2: Flexi\'on -- tramo $0\le z\le L/2$}\\
+Con los n\'umeros de este problema, $M_f(z)=I(z)-1.5\times10^6$ (la pendiente
+de $M_f(z)$ coincide num\'ericamente con la de $I(z)$, ambas $-1000$), lo que
+simplifica la integral:
+$$\theta'(z)=v''(z)=\frac{M_f(z)}{E\,I(z)}=\frac{1}{E}\left[1-\frac{1.5\times10^6}{I(z)}\right]$$
 Integrando y aplicando $\theta(0)=0$:
-$$\boxed{\theta(z)=\frac{1}{E}\left[z+500\,\ln\!\left(\frac{I_0}{I(z)}\right)\right]},\qquad 0\le z\le \frac{L}{2}$$
+$$\boxed{\theta(z)=\frac{1}{E}\left[z+1500\,\ln\!\left(\frac{I(z)}{I_0}\right)\right]},\qquad 0\le z\le \frac{L}{2}$$
 Integrando nuevamente y aplicando $v(0)=0$:
-$$\boxed{v(z)=\frac{1}{E}\left[\frac{z^2}{2}+500\,z\,\ln(I_0)+\tfrac12\,I(z)\big(\ln I(z)-1\big)-\tfrac12\,I_0\big(\ln I_0-1\big)\right]},\quad 0\le z\le \frac{L}{2}$$
+$$\boxed{v(z)=\frac{1}{E}\left[\frac{z^2}{2}-1500\,z\,\ln(I_0)-1.5\,I(z)\big(\ln I(z)-1\big)+1.5\,I_0\big(\ln I_0-1\big)\right]},\quad 0\le z\le \frac{L}{2}$$
 
-\textbf{Paso 3: Integraci\'on del tramo $L/2\le z\le L$}\\
-Aqu\'i $M(z)=M$ es constante, por lo que
-$$\theta'(z)=\frac{M}{E\,I(z)}$$
-Integrando y empalmando con $\theta(L/2)$ obtenido en el paso anterior (continuidad
-del giro, ya que la viga es un s\'olido continuo aunque el momento tenga un
-quiebre) se obtiene la constante de integraci\'on:
-$$\boxed{\theta(z)=\frac{1}{E}\Big[-2000\,\ln I(z)+29\,085.8\Big]},\qquad \frac{L}{2}\le z\le L$$
-Integrando una vez m\'as y empalmando $v(L/2)$ con el valor del tramo anterior
-(continuidad del desplazamiento):
-$$\boxed{v(z)=\frac{1}{E}\Big[2\,I(z)\big(\ln I(z)-1\big)+29\,085.8\,z-54\,046\,584.5\Big]},\qquad \frac{L}{2}\le z\le L$$
+\textbf{Paso 3: Flexi\'on -- tramo $L/2\le z\le L$}\\
+Aqu\'i $M_f(z)=0$, por lo que $\theta'(z)=0$: el giro se mantiene constante e
+igual al valor alcanzado en $z=L/2$ (m\'as all\'a del punto de aplicaci\'on de
+$P$ la viga no tiene curvatura, solo gira r\'igidamente con la pendiente ya
+adquirida):
+$$\boxed{\theta(z)=\theta(L/2)}, \qquad v(z)=v(L/2)+\theta(L/2)\,(z-L/2), \qquad \frac{L}{2}\le z\le L$$
+
+\textbf{Paso 4: Torsi\'on (todo el tramo $0\le z\le L$)}\\
+Como $T(z)=M$ es constante,
+$$\varphi'(z)=\frac{M}{G\,J(z)}$$
+Integrando y aplicando $\varphi(0)=0$:
+$$\boxed{\varphi(z)=\frac{M}{2G}\left[-\frac{1}{1000}\ln\!\left(\frac{J(z)}{J(0)}\right)\right]=\frac{M}{2000\,G}\,\ln\!\left(\frac{J(0)}{J(z)}\right)},\qquad 0\le z\le L$$
 
 \textbf{Resumen num\'erico}\\
 Evaluando las expresiones anteriores en los puntos notables:
 \begin{center}
-\begin{tabular}{ccccc}
+\begin{tabular}{cccccc}
 \hline
-$z$ [mm] & $I(z)$ [mm$^4$] & $M(z)$ [N$\cdot$mm] & $\theta(z)$ [rad] & $v(z)$ [mm]\\
+$z$ [mm] & $I(z)$ [mm$^4$] & $M_f(z)$ [N$\cdot$mm] & $T(z)$ [N$\cdot$mm] & $\theta(z)$ [rad] & $v(z)$ [mm]\\
 \hline
-0    & $2.0\times10^6$ & $2.5\times10^6$ & 0 & 0\\
-500  & $1.5\times10^6$ & $2.0\times10^6$ & $3.066\times10^{-3}$ & $0.7583$\\
-1000 & $1.0\times10^6$ & $2.0\times10^6$ & $6.927\times10^{-3}$ & $3.192$\\
+0    & $2.0\times10^6$ & $5.0\times10^5$ & $2.0\times10^6$ & 0 & 0\\
+500  & $1.5\times10^6$ & $0$             & $2.0\times10^6$ & $3.261\times10^{-4}$ & $0.1061$\\
+1000 & $1.0\times10^6$ & $0$             & $2.0\times10^6$ & $3.261\times10^{-4}$ & $0.2692$\\
 \hline
 \end{tabular}
 \end{center}
-Es decir, en el extremo libre la viga rota $\theta(L)\approx0.397^{\circ}$ y se
-desplaza $v(L)\approx3.19$ mm en la direcci\'on de $P$, con el corte
-$V(z)=P=1$ kN constante en la mitad inferior y nulo en la mitad superior, y el
-momento flector variando linealmente entre $2.5$ kNm (base) y $2$ kNm en todo
-el tramo superior (constante, igual al momento aplicado $M$).
+y para el giro por torsi\'on, $\varphi(500)=3.596\times10^{-3}$ rad y
+$\varphi(1000)=8.664\times10^{-3}$ rad $\approx 0.497^{\circ}$.
+
+En resumen: por flexi\'on, el extremo libre se desplaza $v(L)\approx0.269$ mm
+en la direcci\'on de $P$ y rota $\theta(L)\approx0.0187^{\circ}$ (giro que ya
+se alcanza en $z=L/2$ y se mantiene constante hasta la punta, pues no hay
+momento flector m\'as all\'a de ese punto); y por torsi\'on, independiente de
+la flexi\'on, la secci\'on de la punta gira $\varphi(L)\approx0.497^{\circ}$
+alrededor del eje de la viga.
 \end{desarrollo}
 
 \begin{desarrollo}{b) Soluci\'on por MEF}
