@@ -59,10 +59,6 @@
     \draw[thin] (0,\yoffset-0.2) -- (0,\yoffsettwo-0.2);
 
 \end{tikzpicture}
-\captionof{figure}{Viga vertical empotrada en la base, de longitud $L$, con un
-momento torsor $M$ (actuando alrededor del eje longitudinal $z$ de la viga)
-aplicado en el extremo libre, y una fuerza horizontal $P$ (transversal al eje
-de la viga) aplicada a media altura ($z = L/2$).}
 \label{fig:t2-p1}
 \end{center}
 
@@ -70,17 +66,7 @@ de la viga) aplicada a media altura ($z = L/2$).}
 
 \begin{desarrollo}{a) Campos anal\'iticos de desplazamiento, rotaci\'on, momento y corte}
 
-\textbf{Convenci\'on y planteamiento}\\
-Tomo el eje $z$ a lo largo de la viga, con $z=0$ en el empotramiento (base) y
-$z=L$ en el extremo libre. Ac\'a hay que tener cuidado con qu\'e tipo de
-solicitaci\'on genera cada carga: $P$ es una fuerza \textbf{transversal} al
-eje de la viga, por lo que genera \textbf{flexi\'on} (corte y momento
-flector); en cambio $M$ es un momento aplicado \textbf{alrededor del eje
-longitudinal} $z$ de la viga (un ``giro de tornillo'' sobre su propio eje),
-por lo que es un \textbf{momento torsor}, no flector. Como la viga es de
-secci\'on circular, no hay acoplamiento entre flexi\'on y torsi\'on, as\'i que
-resuelvo ambos efectos por separado y despu\'es los combino solo si hiciera
-falta calcular un esfuerzo combinado.
+Para este caso lo priemro que hacemos es plantear la manera diferencial de las ecuaciones que 
 
 Para la flexi\'on uso la teor\'ia cl\'asica de vigas (Euler--Bernoulli), donde
 el desplazamiento transversal $v(z)$ (en la direcci\'on de $P$) y el giro
@@ -125,7 +111,8 @@ y el momento flector y torsor
 $$M_f(z)=\begin{cases}
 5\times10^5-1000\,z & 0\le z\le 500\ \text{mm}\\[2pt]
 0 & 500\le z\le 1000\ \text{mm}
-\end{cases}\ [\text{N}\cdot\text{mm}], \qquad T(z)=2\times10^6\ \text{[N}\cdot\text{mm]},\ \ 0\le z\le 1000\ \text{mm}$$
+\end{cases}\ [\text{N}\cdot\text{mm}]$$
+$$T(z)=2\times10^6\ \text{[N}\cdot\text{mm]},\ \ 0\le z\le 1000\ \text{mm}$$
 
 \textbf{Paso 2: Flexi\'on -- tramo $0\le z\le L/2$}\\
 Con los n\'umeros de este problema, $M_f(z)=I(z)-1.5\times10^6$ (la pendiente
@@ -158,7 +145,7 @@ Evaluando las expresiones anteriores en los puntos notables:
 $z$ [mm] & $I(z)$ [mm$^4$] & $M_f(z)$ [N$\cdot$mm] & $T(z)$ [N$\cdot$mm] & $\theta(z)$ [rad] & $v(z)$ [mm]\\
 \hline
 0    & $2.0\times10^6$ & $5.0\times10^5$ & $2.0\times10^6$ & 0 & 0\\
-500  & $1.5\times10^6$ & $0$             & $2.0\times10^6$ & $3.261\times10^{-4}$ & $0.1061$\\
+500  & $1.5\times10^6$ & $0$             & $2.0\times10^6$ & $1.6305\times10^{-4}$ & $0.1061$\\
 1000 & $1.0\times10^6$ & $0$             & $2.0\times10^6$ & $3.261\times10^{-4}$ & $0.2692$\\
 \hline
 \end{tabular}
@@ -186,3 +173,5 @@ alrededor del eje de la viga.
 \begin{desarrollo}{c) Comparaci\'on y discusi\'on}
     % TODO: comparar resultados, discutir convergencia, errores, etc.
 \end{desarrollo}
+
+
