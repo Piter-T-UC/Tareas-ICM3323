@@ -143,9 +143,9 @@ Integrando nuevamente, la deflexión crece linealmente. Imponiendo la condición
 \end{equation}
 Evaluando explícitamente en $z = 1000 \text{ mm}$:
 \begin{align*}
-    v(1000) &= 0.1061 + 0.000326 (1000 - 500) \\
-    v(1000) &= 0.1061 + 0.000326 (500) \\
-    v(1000) &= 0.2691 \text{ mm}
+    v(1000) &= 0.10612 + 0.00032608 (1000 - 500) \\
+    v(1000) &= 0.10612 + 0.00032608 (500) \\
+    v(1000) &\approx 0.2692 \text{ mm}
 \end{align*}
 
 
@@ -190,18 +190,9 @@ $\varphi(1000)=8.664\times10^{-3}$ rad $\approx 0.497^{\circ}$.
         samples=200 % Mayor cantidad de muestras para suavizar la curva logarítmica
     ]
         
-        % Tramo 1: Curvatura activa (0 <= z <= 500)
-        \addplot[domain=0:500, thick, blue] gnuplot [raw gnuplot] {
-    plot [x=0:500] (1.0/210000.0) * ( (x**2)/2.0 - 1500.0*x - 1500.0*(2000.0-x)*log(1.0 - x/2000.0) )
-};
-        
-
-        % Tramo 2: Proyección lineal por M=0 (500 < z <= 1000)
-        \addplot[
-            domain=500:1000,
-            thick,
-            blue
-        ] { 0.106117 + 0.00032608*(x - 500) };
+        % Tramo 1 (0 <= z <= 500, curvatura activa) y tramo 2 (proyeccion lineal por M=0),
+        % evaluados en problema_1.py con las mismas expresiones de arriba
+        \addplot[thick, blue] table[x=z, y=v] {T2/datos_P1/analitica.dat};
         
 
         % Marcas de transición y punto final
@@ -262,10 +253,298 @@ $\varphi(1000)=8.664\times10^{-3}$ rad $\approx 0.497^{\circ}$.
 
 \begin{desarrollo}{b) Soluci\'on por MEF}
 
+\textbf{Modelo}\\
+La viga se modela con elementos de viga 3D de dos nodos (6 GDL por nodo:
+$u,v,w,\theta_x,\theta_y,\theta_z$), usando las mismas funciones del
+Problema 2 (ver secci\'on de c\'odigo, archivo \texttt{problema\_1.py}). En
+cada elemento la inercia var\'ia linealmente entre sus nodos,
+$I(\xi)=I_i(1-\xi)+I_j\,\xi$, igual que la inercia real, por lo que la
+geometr\'ia se representa sin error. Las matrices de rigidez del elemento son:
+\begin{itemize}[itemsep=2pt]
+    \item \textbf{Flexi\'on:} funciones de forma c\'ubicas de Hermite, con la
+    integral $\int_0^{l} B^T E\,I(z)\,B\,dz$ calculada en forma exacta para
+    $I$ lineal:
+    $$\mathbf{k}_f=\frac{E}{l^3}\begin{bmatrix}
+    6a & 2lb & -6a & 2lc\\
+    2lb & l^2(3I_i+I_j) & -2lb & l^2a\\
+    -6a & -2lb & 6a & -2lc\\
+    2lc & l^2a & -2lc & l^2(I_i+3I_j)
+    \end{bmatrix},\quad a=I_i+I_j,\ b=2I_i+I_j,\ c=I_i+2I_j$$
+    (con $I_i=I_j=I$ se recupera la matriz cl\'asica $12,\,6l,\,4l^2,\,2l^2$).
+    \item \textbf{Torsi\'on:} funciones de forma lineales, lo que da
+    $\mathbf{k}_t=\frac{G\bar J}{l}\begin{bmatrix}1&-1\\-1&1\end{bmatrix}$ con
+    $\bar J=(J_i+J_j)/2$ y $J=2I$ (secci\'on circular).
+\end{itemize}
+El nodo en $z=0$ tiene sus 6 GDL restringidos, $P$ se aplica como fuerza nodal
+$-P\,\hat z$ en el nodo de $z=L/2$ y $M$ como momento torsor en el nodo de
+$z=L$. Se usa $E=210$ GPa y $G=80$ GPa.
+
+\medskip
+\textbf{Discretizaciones}\\
+Se usan $n=2,\,4,\,8$ y $16$ elementos de igual largo:
+\begin{itemize}[itemsep=2pt]
+    \item \textbf{$n=2$:} es la malla m\'as gruesa posible, porque la carga $P$
+    debe caer sobre un nodo (en $z=L/2$). Sirve para ver cu\'anto error comete
+    el MEF con el m\'inimo de elementos.
+    \item \textbf{$n=4$ y $n=8$:} al duplicar $n$ el largo de elemento $l$ se
+    reduce a la mitad, lo que permite medir la tasa de convergencia
+    $e\propto l^{p}$. $n$ siempre es par para mantener un nodo bajo $P$.
+    \item \textbf{$n=16$:} malla fina para verificar que la soluci\'on ya
+    convergi\'o. El MEF no es exacto aqu\'i porque, con $I(z)$ variable, las
+    c\'ubicas de Hermite (y las lineales en torsi\'on) no son la soluci\'on
+    exacta de la ecuaci\'on diferencial dentro de cada elemento.
+\end{itemize}
+
+\medskip
+\textbf{Reconstrucci\'on de los campos}\\
+Los campos a lo largo de la viga se obtienen de los desplazamientos nodales:
+$v(z)$ se interpola con las c\'ubicas de Hermite a partir de $(v,\theta)$ de
+cada nodo, $\theta(z)=v'(z)$ es la derivada de esa interpolaci\'on y
+$\varphi(z)$ se interpola linealmente. Los esfuerzos se calculan como
+$\mathbf{f}_e=\mathbf{k}_e\mathbf{u}_e$ en cada elemento. $M(z)$ es lineal y
+$V(z)=-dM/dz$ es constante dentro de cada elemento, porque no hay carga
+distribuida.
+
+\medskip
+\textbf{Resultados nodales}\\
+Las reacciones en el empotramiento son $R_z=1{,}000$ kN,
+$|M_y|=0{,}500$ kNm y $|M_x|=2{,}000$ kNm para todas las mallas, y coinciden
+con el equilibrio ($P$, $P\,L/2$ y $M$).
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\small\setlength{\tabcolsep}{4pt}
+\begin{tabular}{ccccccc}
+\hline
+$n$ & $v(L/2)$ [mm] & $v(L)$ [mm] & $\theta(L)$ [rad] & $\varphi(L/2)$ [rad] & $\varphi(L)$ [rad] & $M(0)$ [N$\cdot$m]\\
+\hline
+2  & 0.10600 & 0.26908 & $3.26158\times10^{-4}$ & $3.5714\times10^{-3}$ & $8.5714\times10^{-3}$ & 500.0\\
+4  & 0.10611 & 0.26915 & $3.26086\times10^{-4}$ & $3.5897\times10^{-3}$ & $8.6403\times10^{-3}$ & 500.0\\
+8  & 0.10612 & 0.26916 & $3.26081\times10^{-4}$ & $3.5945\times10^{-3}$ & $8.6583\times10^{-3}$ & 500.0\\
+16 & 0.10612 & 0.26916 & $3.26080\times10^{-4}$ & $3.5956\times10^{-3}$ & $8.6628\times10^{-3}$ & 500.0\\
+\hline
+Anal\'itica & 0.10612 & 0.26916 & $3.26080\times10^{-4}$ & $3.5960\times10^{-3}$ & $8.6643\times10^{-3}$ & 500.0\\
+\hline
+\end{tabular}
+\end{center}
+
 \end{desarrollo}
 
+%---------------------- estilos comunes de los graficos de c) ------------------
+\pgfplotsset{
+    p1ejes/.style={
+        width=14cm, height=7.5cm,
+        xlabel={Posici\'on $z$ [mm]},
+        xmin=0, xmax=1000,
+        grid=both,
+        major grid style={solid, gray!40},
+        minor grid style={dashed, gray!20},
+        minor tick num=4,
+        legend cell align=left,
+        legend style={font=\small},
+    },
+    p1an/.style={thick, black},
+    p1n2/.style={thick, red, dashed},
+    p1n4/.style={thick, orange!90!black, dashdotted},
+    p1n16/.style={thick, blue!70!black, densely dotted},
+    p1nod2/.style={only marks, mark=*, mark size=2.2pt, red},
+    p1nod4/.style={only marks, mark=square*, mark size=1.8pt, orange!90!black},
+    p1nod16/.style={only marks, mark=triangle*, mark size=1.8pt, blue!70!black},
+}
+
 \begin{desarrollo}{c) Comparaci\'on y discusi\'on}
-    % TODO: comparar resultados, discutir convergencia, errores, etc.
+
+En cada gr\'afico se superpone la soluci\'on anal\'itica de a) (l\'inea negra
+continua) con la soluci\'on MEF para $n=2$, $4$ y $16$ (la curva de $n=8$ no se
+muestra porque es indistinguible de la de $n=16$). Las marcas indican los
+nodos de cada malla.
+
+\begin{center}
+\begin{tikzpicture}
+    \begin{axis}[p1ejes,
+        title={Deflexi\'on $v(z)$},
+        ylabel={$v(z)$ [mm]},
+        ymin=0, ymax=0.3,
+        legend pos=north west]
+        \addplot[p1an] table[x=z, y=v] {T2/datos_P1/analitica.dat};
+        \addlegendentry{Anal\'itica}
+        \addplot[p1n2] table[x=z, y=v] {T2/datos_P1/mef_n2_campos.dat};
+        \addlegendentry{MEF $n=2$}
+        \addplot[p1n4] table[x=z, y=v] {T2/datos_P1/mef_n4_campos.dat};
+        \addlegendentry{MEF $n=4$}
+        \addplot[p1n16] table[x=z, y=v] {T2/datos_P1/mef_n16_campos.dat};
+        \addlegendentry{MEF $n=16$}
+        \addplot[p1nod2, forget plot] table[x=z, y=v] {T2/datos_P1/mef_n2_nodos.dat};
+        \addplot[p1nod4, forget plot] table[x=z, y=v] {T2/datos_P1/mef_n4_nodos.dat};
+        \addplot[p1nod16, forget plot] table[x=z, y=v] {T2/datos_P1/mef_n16_nodos.dat};
+        \draw[dashed, gray!70, thick] (axis cs:500,0) -- (axis cs:500,0.3);
+    \end{axis}
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}
+    \begin{axis}[p1ejes,
+        title={Rotaci\'on por flexi\'on $\theta(z)=v'(z)$},
+        ylabel={$\theta(z)$ [rad]},
+        ymin=0, ymax=3.6e-4,
+        scaled y ticks=base 10:4,
+        legend pos=south east]
+        \addplot[p1an] table[x=z, y=theta] {T2/datos_P1/analitica.dat};
+        \addlegendentry{Anal\'itica}
+        \addplot[p1n2] table[x=z, y=theta] {T2/datos_P1/mef_n2_campos.dat};
+        \addlegendentry{MEF $n=2$}
+        \addplot[p1n4] table[x=z, y=theta] {T2/datos_P1/mef_n4_campos.dat};
+        \addlegendentry{MEF $n=4$}
+        \addplot[p1n16] table[x=z, y=theta] {T2/datos_P1/mef_n16_campos.dat};
+        \addlegendentry{MEF $n=16$}
+        \addplot[p1nod2, forget plot] table[x=z, y=theta] {T2/datos_P1/mef_n2_nodos.dat};
+        \addplot[p1nod4, forget plot] table[x=z, y=theta] {T2/datos_P1/mef_n4_nodos.dat};
+        \addplot[p1nod16, forget plot] table[x=z, y=theta] {T2/datos_P1/mef_n16_nodos.dat};
+    \end{axis}
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}
+    \begin{axis}[p1ejes,
+        title={Giro por torsi\'on $\varphi(z)$},
+        ylabel={$\varphi(z)$ [rad]},
+        ymin=0, ymax=0.01,
+        scaled y ticks=false,
+        y tick label style={/pgf/number format/fixed, /pgf/number format/precision=4},
+        legend pos=north west]
+        \addplot[p1an] table[x=z, y=phi] {T2/datos_P1/analitica.dat};
+        \addlegendentry{Anal\'itica}
+        \addplot[p1n2] table[x=z, y=phi] {T2/datos_P1/mef_n2_campos.dat};
+        \addlegendentry{MEF $n=2$}
+        \addplot[p1n4] table[x=z, y=phi] {T2/datos_P1/mef_n4_campos.dat};
+        \addlegendentry{MEF $n=4$}
+        \addplot[p1n16] table[x=z, y=phi] {T2/datos_P1/mef_n16_campos.dat};
+        \addlegendentry{MEF $n=16$}
+        \addplot[p1nod2, forget plot] table[x=z, y=phi] {T2/datos_P1/mef_n2_nodos.dat};
+        \addplot[p1nod4, forget plot] table[x=z, y=phi] {T2/datos_P1/mef_n4_nodos.dat};
+        \addplot[p1nod16, forget plot] table[x=z, y=phi] {T2/datos_P1/mef_n16_nodos.dat};
+    \end{axis}
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}
+    \begin{axis}[p1ejes,
+        title={Momento flector $M_f(z)$},
+        ylabel={$M_f(z)$ [N$\cdot$m]},
+        ymin=-50, ymax=550,
+        legend pos=north east]
+        \addplot[p1an] table[x=z, y=M] {T2/datos_P1/analitica.dat};
+        \addlegendentry{Anal\'itica}
+        \addplot[p1n2, mark=*, mark options={solid}] table[x=z, y=M] {T2/datos_P1/mef_n2_esfuerzos.dat};
+        \addlegendentry{MEF $n=2$}
+        \addplot[p1n16, only marks, mark=triangle*, mark size=1.8pt] table[x=z, y=M] {T2/datos_P1/mef_n16_esfuerzos.dat};
+        \addlegendentry{MEF $n=16$}
+    \end{axis}
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}
+    \begin{axis}[p1ejes,
+        title={Esfuerzo de corte $V(z)$},
+        ylabel={$V(z)$ [N]},
+        ymin=-100, ymax=1200,
+        legend pos=north east]
+        \addplot[p1an, const plot] table[x=z, y=V] {T2/datos_P1/analitica.dat};
+        \addlegendentry{Anal\'itica}
+        \addplot[p1n2, mark=*, mark options={solid}] table[x=z, y=V] {T2/datos_P1/mef_n2_esfuerzos.dat};
+        \addlegendentry{MEF $n=2$}
+        \addplot[p1n16, only marks, mark=triangle*, mark size=1.8pt] table[x=z, y=V] {T2/datos_P1/mef_n16_esfuerzos.dat};
+        \addlegendentry{MEF $n=16$}
+    \end{axis}
+\end{tikzpicture}
+\end{center}
+
+El momento torsor es $T(z)=M=2$ kNm constante en toda la viga, tanto en la
+soluci\'on anal\'itica como en el MEF para todas las mallas.
+
+\begin{center}
+\begin{tikzpicture}
+    \begin{loglogaxis}[
+        width=11cm, height=7.5cm,
+        title={Convergencia del error relativo en $z=L$},
+        xlabel={N\'umero de elementos $n$},
+        ylabel={Error relativo},
+        xtick={2,4,8,16}, xticklabels={2,4,8,16},
+        grid=both,
+        major grid style={solid, gray!40},
+        minor grid style={dashed, gray!20},
+        legend pos=south west,
+        legend cell align=left,
+        legend style={font=\small}]
+        \addplot[thick, blue!70!black, mark=*] table[x=n, y=err_v] {T2/datos_P1/convergencia.dat};
+        \addlegendentry{$v(L)$}
+        \addplot[thick, orange!90!black, mark=square*] table[x=n, y=err_theta] {T2/datos_P1/convergencia.dat};
+        \addlegendentry{$\theta(L)$}
+        \addplot[thick, red, mark=triangle*] table[x=n, y=err_phi] {T2/datos_P1/convergencia.dat};
+        \addlegendentry{$\varphi(L)$}
+    \end{loglogaxis}
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{cccc}
+\hline
+$n$ & error $v(L)$ & error $\theta(L)$ & error $\varphi(L)$\\
+\hline
+2  & $2.88\times10^{-4}$ & $2.37\times10^{-4}$ & $1.07\times10^{-2}$\\
+4  & $1.90\times10^{-5}$ & $1.57\times10^{-5}$ & $2.78\times10^{-3}$\\
+8  & $1.21\times10^{-6}$ & $1.00\times10^{-6}$ & $7.02\times10^{-4}$\\
+16 & $7.58\times10^{-8}$ & $6.26\times10^{-8}$ & $1.76\times10^{-4}$\\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Discusi\'on}
+\begin{itemize}[itemsep=4pt]
+    \item \textbf{Momento y corte exactos en todas las mallas.} El voladizo es
+    isost\'atico y las cargas act\'uan en los nodos, as\'i que los esfuerzos
+    internos $\mathbf{f}_e=\mathbf{k}_e\mathbf{u}_e$ quedan determinados por el
+    equilibrio y no por la rigidez. Por eso $M(0)=P\,L/2=500$ N$\cdot$m y
+    $V=P=1000$ N se obtienen exactos incluso con $n=2$. Adem\'as, como $M$ es
+    lineal y $V$ constante en cada tramo, la interpolaci\'on del elemento los
+    representa sin error: el MEF coincide con la soluci\'on anal\'itica en toda
+    la viga y no solo en los nodos.
+
+    \item \textbf{Flexi\'on: convergencia de orden $l^4$ en los nodos.} Con
+    $I(z)$ variable, la curvatura exacta $M/(EI)$ no es lineal dentro de un
+    elemento y las c\'ubicas de Hermite no pueden reproducirla. Aun as\'i, el
+    error nodal es muy peque\~no con $n=2$ ($0{,}11$\,\% en $v(L/2)$ y $0{,}03$\,\% en $v(L)$), y el de $v(L)$ se divide por
+    $\approx 16$ cada vez que $n$ se duplica (pendiente $4$ en el gr\'afico
+    log-log), que es la superconvergencia nodal t\'ipica del elemento de
+    Hermite. En los gr\'aficos de $v$ y $\theta$ las curvas MEF son
+    indistinguibles de la anal\'itica. En $\theta(z)$ se nota la
+    aproximaci\'on cuadr\'atica por tramos: con $n=2$ el giro entre $0$ y $L/2$
+    es una par\'abola en vez de la curva logar\'itmica exacta.
+
+    \item \textbf{Torsi\'on: convergencia de orden $l^2$.} El elemento lineal
+    usa el promedio aritm\'etico $\bar J$, que para $J$ lineal es mayor que el
+    que da la rigidez exacta del tramo, $l\big/\!\int_0^l dz/J(z)$ (promedio
+    arm\'onico). Por eso el MEF es m\'as r\'igido y \emph{subestima} el giro:
+    $\varphi(L)$ tiene un error de $1{,}1$\,\% con $n=2$, que baja a $0{,}02$\,\%
+    con $n=16$ y se divide por $4$ cada vez que se duplica $n$.
+
+    \item \textbf{Tramo $L/2<z\le L$.} Como ah\'i $M_f=0$, ese tramo se mueve
+    como s\'olido r\'igido: $\theta$ es constante y $v$ crece linealmente. El
+    MEF lo reproduce exactamente, porque un polinomio c\'ubico contiene la
+    recta. Todo el error de flexi\'on del extremo viene del tramo
+    $0\le z\le L/2$. La torsi\'on, en cambio, act\'ua en toda la viga y
+    acumula error en todos los elementos.
+
+    \item \textbf{Elecci\'on de malla.} Para flexi\'on bastar\'ia con $n=2$ (error
+    del orden de $0{,}1$\,\%). Para la torsi\'on se necesitan al menos $n=8$ para
+    bajar del $0{,}1$\,\%. Con $n=16$ todos los campos quedan convergidos para
+    fines de dise\~no.
+\end{itemize}
+
 \end{desarrollo}
 
 
