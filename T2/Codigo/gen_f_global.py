@@ -5,7 +5,7 @@ import numpy as np
 def gen_f_global(xyz, f_nodales):
     dof_por_nodo = 6
     n_lib = len(xyz) * dof_por_nodo
-    F_global = np.zeros(n_lib)            # floats SI: N en traslacion, N*m en rotacion
+    F_global = np.zeros(n_lib)            
     for entrada in f_nodales:
         nodo = entrada[0]
         cargas = entrada[1:]              # (Fx,Fy,Fz,Mx,My,Mz)

@@ -13,13 +13,13 @@ from u_completa import U_completa
 from graficar_reticulado import graficar_reticulado
 from esfuerzos import calc_esfuerzos, calc_reacciones, esfuerzos_a_lo_largo
 from exportar_latex import informe_latex
-from diagramas import (graficar_fuerzas_elemento, graficar_tensiones_elemento,
+from diagramas import (graficar_fuerzas_barra, graficar_tensiones_barra,
                        graficar_fuerzas_3d, graficar_tensiones_3d)
+from refinar_malla import refinar
 
 
 M_Elasticidad = 206 * ureg.GPa
-nu = 0.3
-G_Cortante = M_Elasticidad / (2*(1+nu))
+G_Cortante = 80 * ureg.GPa       # dato del enunciado
 
 #Variables
 diametro=30*ureg.mm
@@ -33,6 +33,7 @@ J_p = 2 * I_x
 Largo=4
 Ancho=2
 Altura=2
+z_at = 1.4     # altura donde el atiesador se une a la columna inclinada
 
 xyz = np.array([
     [0,0,0],#base
@@ -48,44 +49,62 @@ xyz = np.array([
     [Ancho/2,0,Altura],#medios #8
     [Ancho/2,Largo,Altura],
 
+    # atiesadores: punto de cada columna inclinada a z_at -> esquina trasera del techo
+    [Ancho/2*z_at/Altura,0,z_at],#10 sobre columna 0-8
+    [Ancho/2*z_at/Altura,Largo,z_at],#11 sobre columna 3-9
+
+
 ]) * ureg.meter
 
 conectividad = np.array([
-    [0, 8], #arriba
+    [0, 10], #columna inclinada (tramo inferior)
     [1, 5],
     [2, 6],
-    [3, 9],#techo
+    [3, 11],#columna inclinada (tramo inferior)
+    #techo
     [4,8],
     [8,5],
     [5,6],
-
     [6,9],
     [9,7],
     [7,4],
+
+    [10, 8],#columna inclinada (tramo superior)
+    [11, 9],
+    [10, 4],#atiesadores laterales (caras cortas, no tapan el frente)
+    [11, 7],
+
 ], dtype=int)
 
 # da lo mismo la orientacion todos son de seccion constante
-vec_ref = np.array([[0.0, 1.0, 1.0]] * len(conectividad))
+vec_ref = np.array([[0.0, 1.0, 100.0]] * len(conectividad))
 
 apoyos = np.array([
     [0, 1, 1, 1, 1, 1, 1],   # nodo 0: empotrado (6 restricciones)
     [1, 1, 1, 1, 1, 1, 1],   # nodo 1: empotrado
     [2, 1, 1, 1, 1, 1, 1],   # nodo 2: empotrado
-    [3, 1, 1, 1, 1, 1, 1],   # nodo 2: empotrado
+    [3, 1, 1, 1, 1, 1, 1],   # nodo 3: empotrado
 ], dtype=int)
 
-densidad = 7850*ureg.kg/ureg.m**3
-g = 9.81*ureg.m/ureg.s**2
-peso_lineal = (densidad*g*Area).to(ureg.N/ureg.m)     # peso propio por metro de tubo
 
-# sin cargas nodales: (Nodo, F x,y,z ; M x,y,z)
+# Cargas puntuales
 fuerzas = []
 
+densidad = 7800*ureg.kg/ureg.m**3
+g = 9.80*ureg.m/ureg.s**2
+peso_lineal = (densidad*g*Area).to(ureg.N/ureg.m)     # peso propio por metro de tubo
 # peso propio: carga uniforme en -z global sobre todos los elementos
 # (n1, n2, [fx,fy,fz], [mx,my,mz]) -> constante y en ejes globales
 cargas_dist = [(n1, n2, np.array([0.0, 0.0, -1.0])*peso_lineal, np.zeros(3)*ureg.N)
                for n1, n2 in conectividad]
 
+# refinamiento: {indice de barra: n sub-elementos}; los nodos nuevos van al final (0-11 no cambian)
+divisiones = {6: 10,
+               9: 10}      # vigas de 4 m del techo
+xyz, conectividad, vec_ref, props, cargas_dist, barras = refinar(
+    xyz, conectividad, vec_ref, divisiones,
+    dict(Area=Area, I_x=I_x, I_y=I_y, J_p=J_p), cargas_dist)
+Area, I_x, I_y, J_p = (props[k] for k in ("Area", "I_x", "I_y", "J_p"))
 
 K_global = gen_matriz_global(xyz, conectividad, Area, I_x, I_y, J_p, vec_ref,
                                 M_Elasticidad, G_Cortante)
@@ -99,7 +118,9 @@ U = U_completa(dofs_fijos, U_red)
 print("dofs_fijos:", dofs_fijos)
 print("rank(K_reducida):", np.linalg.matrix_rank(K_red), "de", K_red.shape[0])
 print("\nDesplazamientos y giros por nodo:")
+#aqui obetengo por nodo
 U_nodos = U.reshape(len(xyz), 6)
+#para cada nodo traslaciones y rotaciones
 traslaciones = (U_nodos[:, :3] * ureg.meter).to(ureg.mm)
 rotaciones = (U_nodos[:, 3:] * ureg.radian).to(ureg.degree)
 for i in range(len(xyz)):
@@ -109,7 +130,7 @@ for i in range(len(xyz)):
             f"thx={tx: .4f}  thy={ty: .4f}  thz={tz: .4f}")
 
 fig, axes = graficar_reticulado(xyz, conectividad, U=U, apoyos=apoyos,
-                                    escala=1, titulo="paradero de Bus")
+                                    escala=5, titulo="paradero de Bus")
 plt.savefig("Paradero de Bus.png", dpi=150)
 print("\nguardado")
 
@@ -117,6 +138,8 @@ print("\nguardado")
 R_apoyos = calc_reacciones(K_global, U, F_global, dofs_fijos)
 peso_total = peso_lineal.magnitude * sum(np.linalg.norm((xyz[b] - xyz[a]).to(ureg.meter).magnitude)
                                          for a, b in conectividad)
+
+
 print(f"\npeso lineal = {peso_lineal:.3f}   peso total = {peso_total:.2f} N")
 print("Reacciones [N, N*m]:")
 for n in apoyos[:, 0]:
@@ -133,15 +156,37 @@ err = max(abs(esfuerzos_a_lo_largo(res, e, q_locales[e])[c][-1] - res[c][e, 1])
           for e in range(len(conectividad)) for c in ("V_x", "V_y", "N", "M_x", "M_y", "T"))
 print(f"error de cierre de los diagramas: {err:.2e}")
 
-# diagramas 2D por elemento (se guardan y se cierran: serian 20 ventanas)
+# verificacion de las restricciones de diseno
+S_y = 300*ureg.MPa
+delta_max = 10*ureg.mm
+desp = np.linalg.norm(traslaciones.magnitude, axis=1)
+n_d = int(np.argmax(desp))
+print(f"\ndeflexion maxima = {desp[n_d]:.2f} mm en nodo {n_d} {xyz[n_d].magnitude} m"
+      f"  (limite {delta_max:~P}) -> {'CUMPLE' if desp[n_d] < delta_max.magnitude else 'NO CUMPLE'}")
+print("tension de von Mises maxima por barra:")
+svm_barras = []
+for i, elems in enumerate(barras):
+    svm_barras.append(max(esfuerzos_a_lo_largo(res, e, q_locales[e])["sigma_vm"].max() for e in elems)/1e6)
+    a, b = conectividad[elems[0]][0], conectividad[elems[-1]][1]
+    print(f"  barra {i:2d} (nodos {a}-{b}): {svm_barras[-1]:6.2f} MPa")
+i_s = int(np.argmax(svm_barras))
+print(f"sigma_vm max = {svm_barras[i_s]:.2f} MPa en barra {i_s}  ->  FS = S_y/sigma = "
+      f"{S_y.magnitude/svm_barras[i_s]:.1f}")
+
+# fuerzas internas en N y N*m solo para este problema (diagramas.py queda en kN y kN*m)
+import diagramas
+for clave, (simb, unidad, _) in diagramas._FUERZAS.items():
+    diagramas._FUERZAS[clave] = (simb, unidad[1:], 1)
+
+# diagramas 2D por barra original, juntando sus sub-elementos (se guardan y se cierran)
 carpeta = "diagramas_P2"
 os.makedirs(carpeta, exist_ok=True)
-for e in range(len(conectividad)):
-    fig = graficar_fuerzas_elemento(res, e, q_locales, conectividad)
-    fig.savefig(os.path.join(carpeta, f"elem_{e:02d}_fuerzas.png"), dpi=150)
+for i, elems in enumerate(barras):
+    fig = graficar_fuerzas_barra(res, elems, q_locales, conectividad)
+    fig.savefig(os.path.join(carpeta, f"barra_{i:02d}_fuerzas.png"), dpi=150)
     plt.close(fig)
-    fig = graficar_tensiones_elemento(res, e, q_locales, conectividad)
-    fig.savefig(os.path.join(carpeta, f"elem_{e:02d}_tensiones.png"), dpi=150)
+    fig = graficar_tensiones_barra(res, elems, q_locales, conectividad)
+    fig.savefig(os.path.join(carpeta, f"barra_{i:02d}_tensiones.png"), dpi=150)
     plt.close(fig)
 
 # diagramas 3D sobre la estructura

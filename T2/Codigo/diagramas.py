@@ -44,11 +44,13 @@ def _xyz_m(xyz):
 
 
 # ------------------------------------------------------------------
-# 2D: un elemento, esfuerzos vs posicion z local
+# 2D: una barra (uno o mas sub-elementos consecutivos), esfuerzos vs z a lo largo
 # ------------------------------------------------------------------
-def _graficar_elemento(res, e, q_locales, conectividad, tabla, forma, titulo):
-    d = _a_lo_largo(res, e, q_locales)
-    z = d["z"]
+def _graficar_barra(res, elems, q_locales, conectividad, tabla, forma, titulo):
+    tramos = [_a_lo_largo(res, e, q_locales) for e in elems]
+    z0 = np.concatenate([[0.0], np.cumsum(res["largos"][elems])])
+    d = {c: np.concatenate([t[c] for t in tramos]) for c in tabla}
+    z = np.concatenate([t["z"] + z0[k] for k, t in enumerate(tramos)])
     fig, axes = plt.subplots(*forma, figsize=(10, 2.6*forma[0]), sharex=True)
     for ax, (clave, (simb, unidad, div)) in zip(axes.flat, tabla.items()):
         v = d[clave] / div
@@ -64,19 +66,28 @@ def _graficar_elemento(res, e, q_locales, conectividad, tabla, forma, titulo):
         ax.grid(alpha=0.3)
         ax.margins(y=0.2)
     for ax in axes[-1]:
-        ax.set_xlabel("z local [m]")
-    n1, n2 = conectividad[e]
-    fig.suptitle(f"{titulo} - elemento {e} (nodos {n1}-{n2}, L = {res['largos'][e]:.2f} m)")
+        ax.set_xlabel("z a lo largo de la barra [m]")
+    n1, n2 = conectividad[elems[0]][0], conectividad[elems[-1]][1]
+    nombre = f"elemento {elems[0]}" if len(elems) == 1 else f"{len(elems)} elementos"
+    fig.suptitle(f"{titulo} - {nombre} (nodos {n1}-{n2}, L = {z0[-1]:.2f} m)")
     fig.tight_layout()
     return fig
 
 
+def graficar_fuerzas_barra(res, elems, q_locales, conectividad):
+    return _graficar_barra(res, elems, q_locales, conectividad, _FUERZAS, (3, 2), "Fuerzas internas")
+
+
+def graficar_tensiones_barra(res, elems, q_locales, conectividad):
+    return _graficar_barra(res, elems, q_locales, conectividad, _TENSIONES, (2, 2), "Tensiones")
+
+
 def graficar_fuerzas_elemento(res, e, q_locales, conectividad):
-    return _graficar_elemento(res, e, q_locales, conectividad, _FUERZAS, (3, 2), "Fuerzas internas")
+    return graficar_fuerzas_barra(res, [e], q_locales, conectividad)
 
 
 def graficar_tensiones_elemento(res, e, q_locales, conectividad):
-    return _graficar_elemento(res, e, q_locales, conectividad, _TENSIONES, (2, 2), "Tensiones")
+    return graficar_tensiones_barra(res, [e], q_locales, conectividad)
 
 
 # ------------------------------------------------------------------
@@ -90,8 +101,6 @@ def _dibujar_barras(ax, xyz_m, conectividad, **kw):
 def graficar_fuerzas_3d(xyz, conectividad, res, q_locales=None,
                         componentes=("N", "V_x", "V_y", "T", "M_x", "M_y"),
                         titulo="Fuerzas internas"):
-    """Cada diagrama se dibuja perpendicular a la barra, en la misma direccion local
-    que exportar_latex: M_y, V_x, N y T hacia +x_L; M_x y V_y hacia +y_L."""
     xyz_m = _xyz_m(xyz)
     tam = np.ptp(xyz_m, axis=0).max()
     datos = [_a_lo_largo(res, e, q_locales) for e in range(len(conectividad))]
@@ -132,7 +141,6 @@ def graficar_fuerzas_3d(xyz, conectividad, res, q_locales=None,
 def graficar_tensiones_3d(xyz, conectividad, res, q_locales=None,
                           componentes=("sigma_N", "sigma_max", "tau_T", "sigma_vm"),
                           titulo="Tensiones"):
-    """Cada barra coloreada a lo largo segun la tension (|valor| en MPa)."""
     xyz_m = _xyz_m(xyz)
     datos = [_a_lo_largo(res, e, q_locales) for e in range(len(conectividad))]
 

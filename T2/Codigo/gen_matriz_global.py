@@ -77,7 +77,6 @@ def gen_matriz_global(xyz, conectividad, Area, I_x, I_y, J_p, vec_ref,
     # K_global mezcla unidades distintas por bloque (N/m, N, N*m): ya no es
     # representable como una sola Quantity de pint, se trabaja en floats SI.
     K_global = np.zeros((n_lib, n_lib))
-
     E = M_Elasticidad.to(ureg.pascal).magnitude
     G = G_Cortante.to(ureg.pascal).magnitude
     A, Ix, Iy, Jp = propiedades_si(num_elementos, Area, I_x, I_y, J_p)

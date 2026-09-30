@@ -13,3 +13,40 @@ anal\'itica de la parte a) y exporta los datos que se grafican en
 Lee los datos de \texttt{T2/datos\_P1/} y dibuja los diagramas de corte,
 momento flector y torsor (anal\'itica y MEF con $n=2$).
 \lstinputlisting[style=pythonstyle]{T2/Codigo/diagramas_P1.py}
+
+\subsection*{Problema 2: \texttt{Problema\_2.py}}
+Define la geometr\'ia del paradero (con atiesadores), aplica el peso propio,
+resuelve y verifica deflexi\'on y tensiones.
+\lstinputlisting[style=pythonstyle]{T2/Codigo/Problema_2.py}
+
+\subsection*{Funciones comunes (Problemas 1 y 2)}
+Las funciones de graficado (\texttt{diagramas.py},
+\texttt{graficar\_reticulado.py}, \texttt{exportar\_latex.py}) no se incluyen
+por largo.
+
+\paragraph{\texttt{gen\_matriz\_global.py}} Rigidez del elemento de viga 3D (inercia lineal por elemento) y ensamblaje.
+\lstinputlisting[style=pythonstyle]{T2/Codigo/gen_matriz_global.py}
+
+\paragraph{\texttt{matriz\_rotacion\_viga.py}} Matriz de rotaci\'on de ejes locales a globales.
+\lstinputlisting[style=pythonstyle]{T2/Codigo/matriz_rotacion_viga.py}
+
+\paragraph{\texttt{gen\_f\_distribuida.py}} Fuerzas nodales equivalentes de cargas distribuidas.
+\lstinputlisting[style=pythonstyle]{T2/Codigo/gen_f_distribuida.py}
+
+\paragraph{\texttt{gen\_f\_global.py}} Vector de cargas nodales.
+\lstinputlisting[style=pythonstyle]{T2/Codigo/gen_f_global.py}
+
+\paragraph{\texttt{restricciones.py}} GDL restringidos a partir de los apoyos.
+\lstinputlisting[style=pythonstyle]{T2/Codigo/restricciones.py}
+
+\paragraph{\texttt{sistema\_reducido.py}} Resuelve el sistema reducido.
+\lstinputlisting[style=pythonstyle]{T2/Codigo/sistema_reducido.py}
+
+\paragraph{\texttt{u\_completa.py}} Arma el vector de desplazamientos completo.
+\lstinputlisting[style=pythonstyle]{T2/Codigo/u_completa.py}
+
+\paragraph{\texttt{esfuerzos.py}} Fuerzas internas, tensiones y reacciones.
+\lstinputlisting[style=pythonstyle]{T2/Codigo/esfuerzos.py}
+
+\paragraph{\texttt{refinar\_malla.py}} Divide barras en sub-elementos.
+\lstinputlisting[style=pythonstyle]{T2/Codigo/refinar_malla.py}

@@ -10,6 +10,8 @@ _W = 0.5*np.array([5/9, 8/9, 5/9])
 ## Vector de cargas equivalentes local (12), mismo orden y convencion que k_local_viga:
 ## [U1,V1,W1,Thx1,Thy1,Thz1, U2,V2,W2,Thx2,Thy2,Thz2]
 ## q1, q2 = [fx,fy,fz,mx,my,mz] locales (floats SI) en el inicio y fin del elemento
+
+
 def f_eq_local(L, q1, q2):
     f = np.zeros(12)
     for xi, w in zip(_XI, _W):
