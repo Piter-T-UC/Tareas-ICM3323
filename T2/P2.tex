@@ -92,19 +92,48 @@ Problema 1 (archivo \texttt{Problema\_2.py}):
     (axial, dos flexiones de Hermite y torsión), llevada a ejes globales con
     $\mathbf{K}_e=\mathbf{T}^T\mathbf{k}_e\mathbf{T}$ y ensamblada en
     $\mathbf{K}$.
-    \item \textbf{Peso propio:} la carga $q$ en $-\hat z$ global se
-    proyecta a ejes locales en cada barra y se reemplaza por sus fuerzas
-    nodales equivalentes (fuerzas $q_\perp l/2$ y momentos $q_\perp l^2/12$
-    para la componente transversal, y $q_\parallel l/2$ para la axial). En
-    las barras inclinadas la carga tiene ambas componentes.
+    \item \textbf{Peso propio como cargas nodales:} el peso de cada elemento
+    se reemplaza por fuerzas y momentos concentrados en sus dos nodos, que se
+    aplican igual que cargas puntuales (archivo \texttt{cargas\_nodales.py}).
+    Para un elemento de nodos $i$--$j$, con $\mathbf{d}=\mathbf{x}_j-\mathbf{x}_i$,
+    $l=|\mathbf{d}|$ y $\mathbf{q}=(0,0,-q)$:
+    $$\mathbf{F}_i=\mathbf{F}_j=\frac{\mathbf{q}\,l}{2},\qquad
+    \mathbf{M}_i=\frac{l}{12}\,(\mathbf{d}\times\mathbf{q}),\qquad
+    \mathbf{M}_j=-\mathbf{M}_i$$
+    Cada nodo recibe la mitad del peso del elemento, y los momentos tienen
+    módulo $q_\perp l^2/12$ ($q_\perp$ es la componente del peso perpendicular
+    a la barra) alrededor del eje horizontal perpendicular a ella. En una
+    columna vertical $\mathbf{d}\times\mathbf{q}=\mathbf{0}$, así que solo hay
+    fuerza. Las cargas de todos los elementos se suman en cada nodo.
     \item \textbf{Malla:} los dos largueros de 4 m se dividen en 10
     elementos cada uno. Así se obtiene la flecha en su centro, que es donde
     se espera la deflexión máxima. Las demás barras se modelan con un
-    elemento, ya que el elemento de Hermite con fuerzas equivalentes da los
-    valores nodales exactos para carga uniforme. Los esfuerzos dentro de
-    cada elemento se reconstruyen por equilibrio del tramo, sumando la
-    carga distribuida.
+    elemento. Como toda la carga queda en los nodos, los esfuerzos se
+    calculan con $\mathbf{f}=\mathbf{k}_e\mathbf{u}_e$: dentro de cada
+    elemento el corte y la axial son constantes y el momento es lineal.
 \end{itemize}
+
+Cargas nodales resultantes en los nodos principales (los nodos 0--3 son
+apoyos y su carga pasa directo a la reacción):
+\begin{center}
+\renewcommand{\arraystretch}{1.15}
+\small
+\begin{tabular}{cccc}
+\hline
+Nodo & $F_z$ [N] & $M_x$ [N$\cdot$m] & $M_y$ [N$\cdot$m]\\
+\hline
+4, 7   & $-22.58$ & $\mp0.259$ & 2.667\\
+5, 6   & $-33.07$ & $\mp0.259$ & $-1.621$\\
+8, 9   & $-25.98$ & 0 & $-0.326$\\
+10, 11 & $-30.71$ & 0 & $-2.496$\\
+\hline
+\end{tabular}
+\end{center}
+En los 18 nodos interiores de los largueros llega $F_z=-q\cdot0.4=-7.78$ N y
+el momento es cero, porque los momentos de los dos elementos vecinos (de igual
+largo) son iguales y opuestos. La suma de todas las fuerzas nodales es
+$-434.08$ N, que es el peso total de la estructura.
+
 El modelo queda con 30 nodos y 32 elementos: 180 GDL, de los cuales 24
 están restringidos y 156 son libres. La matriz reducida tiene rango 156,
 así que la estructura es estable.
@@ -140,7 +169,7 @@ traseras del techo (nodos 4 y 7) solo se apoyaban en los tramos de 1 m que
 van a la punta de las columnas inclinadas. El larguero trasero de 4 m
 quedaba colgando de dos voladizos y su centro bajaba \textbf{15.08 mm}, lo
 que \emph{no cumple} $\delta_{max}=10$ mm. Las tensiones sí cumplían
-($\sigma_{VM}=35.6$ MPa).
+($\sigma_{VM}=34.5$ MPa).
 
 Para corregirlo sin cambiar la idea del diseño ni tapar la vista, se agregó
 un atiesador en cada cara lateral. Este apoya la esquina trasera del techo
@@ -153,12 +182,12 @@ que el atiesador se une con la columna:
 \hline
 Diseño & Largo atiesador [m] & $\delta_{max}$ [mm] & $\sigma_{VM,max}$ [MPa] & FS\\
 \hline
-Sin atiesadores & -- & 15.08 & 35.6 & 8.4\\
-$z_{at}=1.6$ m & 0.89 & 8.67 & 32.7 & 9.2\\
-$z_{at}=1.5$ m & 0.90 & 7.98 & 31.3 & 9.6\\
-$\mathbf{z_{at}=1.4}$ \textbf{m} & \textbf{0.92} & \textbf{7.36} & \textbf{29.6} & \textbf{10.2}\\
+Sin atiesadores & -- & 15.08 & 34.5 & 8.7\\
+$z_{at}=1.6$ m & 0.89 & 8.67 & 34.3 & 8.8\\
+$z_{at}=1.5$ m & 0.90 & 7.98 & 32.6 & 9.2\\
+$\mathbf{z_{at}=1.4}$ \textbf{m} & \textbf{0.92} & \textbf{7.36} & \textbf{30.7} & \textbf{9.8}\\
 $z_{at}=1.2$ m & 1.00 & 6.33 & 26.4 & 11.4\\
-$z_{at}=1.0$ m & 1.12 & 5.59 & 24.6 & 12.2\\
+$z_{at}=1.0$ m & 1.12 & 5.59 & 24.0 & 12.5\\
 \hline
 \end{tabular}
 \end{center}
@@ -190,38 +219,39 @@ $\sqrt{M_x^2+M_y^2}$. Máximos a lo largo de cada barra:
 \hline
 Barra & Nodos & Tipo & $\sigma_{VM}$ [MPa] & Barra & Nodos & Tipo & $\sigma_{VM}$ [MPa]\\
 \hline
-0 & 0--10 & col. inclinada & \textbf{29.55} & 7  & 6--9  & techo      & 6.50\\
-1 & 1--5  & col. vertical  & 18.61 & 8  & 9--7  & techo      & 6.33\\
-2 & 2--6  & col. vertical  & 18.61 & 9  & 7--4  & larguero   & 13.29\\
-3 & 3--11 & col. inclinada & \textbf{29.55} & 10 & 10--8 & col. inclinada & 15.92\\
-4 & 4--8  & techo          & 6.33  & 11 & 11--9 & col. inclinada & 15.92\\
-5 & 8--5  & techo          & 6.50  & 12 & 10--4 & atiesador  & 12.67\\
-6 & 5--6  & larguero       & 13.75 & 13 & 11--7 & atiesador  & 12.67\\
+0 & 0--10 & col. inclinada & \textbf{30.74} & 7  & 6--9  & techo      & 5.48\\
+1 & 1--5  & col. vertical  & 18.69 & 8  & 9--7  & techo      & 5.39\\
+2 & 2--6  & col. vertical  & 18.69 & 9  & 7--4  & larguero   & 13.45\\
+3 & 3--11 & col. inclinada & \textbf{30.74} & 10 & 10--8 & col. inclinada & 16.10\\
+4 & 4--8  & techo          & 5.39  & 11 & 11--9 & col. inclinada & 16.10\\
+5 & 8--5  & techo          & 5.48  & 12 & 10--4 & atiesador  & 13.33\\
+6 & 5--6  & larguero       & 13.59 & 13 & 11--7 & atiesador  & 13.33\\
 \hline
 \end{tabular}
 \end{center}
 La barra más solicitada es el tramo inferior de la columna inclinada, en su
-empotramiento:
-$$\sigma_{VM,max}=29.6\ \text{MPa}<S_y=300\ \text{MPa}\qquad\checkmark,
-\qquad FS=\frac{S_y}{\sigma_{VM,max}}=10.2$$
+extremo superior (nodos 10 y 11), donde llegan el atiesador y el tramo
+superior de la columna:
+$$\sigma_{VM,max}=30.7\ \text{MPa}<S_y=300\ \text{MPa}\qquad\checkmark,
+\qquad FS=\frac{S_y}{\sigma_{VM,max}}=9.8$$
 Las barras simétricas respecto del plano $y=2$ m dan las mismas tensiones.
 Los ejes locales se orientaron con \texttt{vec\_ref} $=\hat Z$ (o $\hat Y$ en
 las barras verticales), de modo que $x_L$ es horizontal y el peso propio
 solo carga el plano local $y_L$--$z_L$ ($V_y$, $M_x$ y $N$). La tensión axial es despreciable (máx.
-0.46 MPa): la estructura trabaja en flexión.
+0.41 MPa): la estructura trabaja en flexión.
 
 \textbf{Pandeo.} Como verificación adicional, la columna más comprimida
-lleva $N\approx118$ N en su base. Tomando conservadoramente toda la columna inclinada
+lleva $N\approx104$ N. Tomando conservadoramente toda la columna inclinada
 ($L=2.24$ m) como voladizo ($K=2$):
-$$P_{cr}=\frac{\pi^2EI}{(KL)^2}=\frac{\pi^2\cdot206\times10^9\cdot2.35\times10^{-8}}{(2\cdot2.24)^2}\approx2.4\ \text{kN}\gg118\ \text{N},$$
+$$P_{cr}=\frac{\pi^2EI}{(KL)^2}=\frac{\pi^2\cdot206\times10^9\cdot2.35\times10^{-8}}{(2\cdot2.24)^2}\approx2.4\ \text{kN}\gg104\ \text{N},$$
 así que el pandeo no controla el diseño.
 
 \begin{center}
 \includegraphics[width=\linewidth]{T2/figuras_P2/tensiones_3d.png}
 \captionof{figure}{Tensiones sobre la estructura: normal por axial, normal
 máxima, corte por torsión y von Mises. El color se asigna con el promedio
-de cada segmento, por eso el máximo del gráfico (28.9 MPa) es algo menor que
-el valor puntual en el empotramiento (29.6 MPa).}
+de cada segmento, por eso el máximo del gráfico (30.0 MPa) es algo menor que
+el valor puntual en los nodos 10 y 11 (30.7 MPa).}
 \label{fig:t2-p2-tensiones}
 \end{center}
 
@@ -234,16 +264,18 @@ el valor puntual en el empotramiento (29.6 MPa).}
 \begin{center}
 \includegraphics[width=0.85\linewidth]{T2/figuras_P2/barra_03_fuerzas.png}
 \captionof{figure}{Fuerzas internas en la barra crítica (tramo inferior de
-la columna inclinada, nodos 3--11). El momento flector es máximo en el
-empotramiento ($z=0$).}
+la columna inclinada, nodos 3--11). Como la carga está en los nodos, $N$ y
+los cortes son constantes y los momentos lineales. El máximo de
+$|M_x|+|M_y|$ está en el extremo superior ($z=L$).}
 \label{fig:t2-p2-critica}
 \end{center}
 
 \begin{center}
 \includegraphics[width=0.85\linewidth]{T2/figuras_P2/barra_09_fuerzas.png}
 \captionof{figure}{Fuerzas internas en el larguero trasero (nodos 7--4).
-Con la carga distribuida el corte varía linealmente y el momento en forma
-parabólica.}
+Con el peso aplicado en los 11 nodos, el corte baja en escalones de
+$q\cdot0.4=7.78$ N en cada nodo y el momento es una poligonal que pasa
+por sus valores nodales.}
 \label{fig:t2-p2-larguero}
 \end{center}
 \end{desarrollo}
@@ -251,8 +283,8 @@ parabólica.}
 \begin{desarrollo}{Conclusión}
 El diseño propuesto cubre $2\times4$ m a 2 m de altura con 22.3 m de tubo
 Ø30$\times$3 (44 kg). Cumple ambas restricciones:
-$\delta_{max}=7.36$ mm $<10$ mm y $\sigma_{VM,max}=29.6$ MPa $<300$ MPa
-(FS $=10.2$). La restricción que controla es la deflexión y no la
+$\delta_{max}=7.36$ mm $<10$ mm y $\sigma_{VM,max}=30.7$ MPa $<300$ MPa
+(FS $=9.8$). La restricción que controla es la deflexión y no la
 resistencia, por lo que para este tubo el diseño se rige por rigidez. Los
 atiesadores laterales de 0.92 m fueron la clave: redujeron la flecha
 máxima en un 51\,\% (de 15.1 a 7.4 mm) agregando solo 1.8 m de tubo, y sin

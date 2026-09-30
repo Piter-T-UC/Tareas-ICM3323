@@ -1,6 +1,15 @@
 import numpy as np
 
-from gen_f_distribuida import _buscar_elemento
+
+
+## Busca el elemento (n1,n2) en la conectividad; invertido=True si esta guardado como (n2,n1)
+def _buscar_elemento(conectividad, n1, n2):
+    for e, (a, b) in enumerate(conectividad):
+        if (a, b) == (n1, n2):
+            return e, False
+        if (a, b) == (n2, n1):
+            return e, True
+    raise ValueError(f"No existe un elemento entre los nodos {n1} y {n2}")
 
 
 ## Divide barras en sub-elementos iguales.

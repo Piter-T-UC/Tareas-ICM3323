@@ -7,7 +7,7 @@ from gen_matriz_global import propiedades_si, geometria_elemento, k_local_viga
 #aqui tenemos el calculo de los esfuerzos respecto a U
 def calc_esfuerzos(xyz, conectividad, U, Area, I_x, I_y, J_p, vec_ref,
                    M_Elasticidad=206*ureg.GPa, G_Cortante=206*ureg.GPa/(2*(1+0.3)),
-                   c_x=None, c_y=None, r_t=None, f_eq_locales=None):
+                   c_x=None, c_y=None, r_t=None):
     num_elementos = len(conectividad)
     E = M_Elasticidad.to(ureg.pascal).magnitude
     G = G_Cortante.to(ureg.pascal).magnitude
@@ -29,9 +29,7 @@ def calc_esfuerzos(xyz, conectividad, U, Area, I_x, I_y, J_p, vec_ref,
         L, R, T_v = geometria_elemento(xyz, n1, n2, vec_ref[e])
         dofs = [6*n1 + k for k in range(6)] + [6*n2 + k for k in range(6)]
         u_L = T_v @ U[dofs]                           # global -> local
-        f_L = k_local_viga(E, G, A[e], Ix[e], Iy[e], Jp[e], L) @ u_L
-        if f_eq_locales is not None:                  # resta fuerzas de empotramiento (cargas distribuidas)
-            f_L = f_L - f_eq_locales[e]
+        f_L = k_local_viga(E, G, A[e], Ix[e], Iy[e], Jp[e], L) @ u_L   # cargas solo en los nodos
 
         largos[e] = L
         rot[e] = R
@@ -67,26 +65,18 @@ def calc_esfuerzos(xyz, conectividad, U, Area, I_x, I_y, J_p, vec_ref,
 
 
 ## Esfuerzos a lo largo del elemento e (z local de 0 a L), por equilibrio del tramo [0, z]
-## partiendo de los esfuerzos en el nodo inicial. q_local = (2, 6) carga local
-## [fx,fy,fz,mx,my,mz] al inicio y fin (lineal entre ambos); None si no hay carga.
-def esfuerzos_a_lo_largo(res, e, q_local=None, n_pts=41):
+## partiendo de los esfuerzos en el nodo inicial. Todas las cargas estan en los nodos,
+## asi que dentro del elemento V, N y T son constantes y M es lineal.
+def esfuerzos_a_lo_largo(res, e, n_pts=41):
     L = res["largos"][e]
     z = np.linspace(0, L, n_pts)
     xi = z / L
-    if q_local is None:
-        q_local = np.zeros((2, 6))
-    q1 = q_local[0]
-    d = (q_local[1] - q_local[0]) / L                 # pendiente de la carga
-    int_q = np.outer(z, q1) + np.outer(z**2/2, d)       # int_0^z q ds
-    int_zq = np.outer(z**2/2, q1) + np.outer(z**3/6, d) # int_0^z (z - s) q ds
+    uno = np.ones_like(z)
 
     Vx0, Vy0, N0, Mx0, My0, T0 = (res[c][e, 0] for c in ("V_x", "V_y", "N", "M_x", "M_y", "T"))
-    Vx = Vx0 - int_q[:, 0]
-    Vy = Vy0 - int_q[:, 1]
-    N = N0 - int_q[:, 2]
-    Mx = Mx0 + z*Vy0 - int_zq[:, 1] - int_q[:, 3]
-    My = My0 - z*Vx0 + int_zq[:, 0] - int_q[:, 4]
-    T = T0 - int_q[:, 5]
+    Vx, Vy, N, T = Vx0*uno, Vy0*uno, N0*uno, T0*uno
+    Mx = Mx0 + z*Vy0
+    My = My0 - z*Vx0
 
     # propiedades de seccion interpoladas linealmente (igual que en la rigidez)
     def _lin(clave):

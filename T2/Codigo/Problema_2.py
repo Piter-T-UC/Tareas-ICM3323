@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from unidades import ureg
 from gen_matriz_global import gen_matriz_global
 from gen_f_global import gen_f_global
-from gen_f_distribuida import gen_f_distribuida
+from cargas_nodales import cargas_nodales_equivalentes
 from restricciones import Restriciones
 from sistema_reducido import Sist_red
 from u_completa import U_completa
@@ -90,30 +90,29 @@ apoyos = np.array([
 ], dtype=int)
 
 
-# Cargas puntuales
-fuerzas = []
-
 densidad = 7800*ureg.kg/ureg.m**3
 g = 9.80*ureg.m/ureg.s**2
 peso_lineal = (densidad*g*Area).to(ureg.N/ureg.m)     # peso propio por metro de tubo
-# peso propio: carga uniforme en -z global sobre todos los elementos
-# (n1, n2, [fx,fy,fz], [mx,my,mz]) -> constante y en ejes globales
-cargas_dist = [(n1, n2, np.array([0.0, 0.0, -1.0])*peso_lineal, np.zeros(3)*ureg.N)
-               for n1, n2 in conectividad]
-
 # refinamiento: {indice de barra: n sub-elementos}; los nodos nuevos van al final (0-11 no cambian)
 divisiones = {6: 10,
                9: 10}      # vigas de 4 m del techo
-xyz, conectividad, vec_ref, props, cargas_dist, barras = refinar(
+xyz, conectividad, vec_ref, props, _, barras = refinar(
     xyz, conectividad, vec_ref, divisiones,
-    dict(Area=Area, I_x=I_x, I_y=I_y, J_p=J_p), cargas_dist)
+    dict(Area=Area, I_x=I_x, I_y=I_y, J_p=J_p))
 Area, I_x, I_y, J_p = (props[k] for k in ("Area", "I_x", "I_y", "J_p"))
 
 K_global = gen_matriz_global(xyz, conectividad, Area, I_x, I_y, J_p, vec_ref,
                                 M_Elasticidad, G_Cortante)
 
-F_dist, f_eq_locales, q_locales = gen_f_distribuida(xyz, conectividad, vec_ref, cargas_dist)
-F_global = gen_f_global(xyz, fuerzas) + F_dist
+# peso propio como cargas nodales equivalentes: por elemento qL/2 en cada nodo (vertical)
+# y momentos +-(L/12)(d x q); se aplican igual que cargas puntuales
+fuerzas = cargas_nodales_equivalentes(xyz, conectividad, peso_lineal)
+F_global = gen_f_global(xyz, fuerzas)
+print("Cargas nodales equivalentes del peso propio (nodos 4-11) [N, N*m]:")
+for nodo, *c in fuerzas:
+    if 4 <= nodo <= 11:
+        print(f"  nodo {nodo:2d}: " + "  ".join(f"{v.magnitude: 8.4f}" for v in c))
+print(f"  suma Fz (todos los nodos) = {F_global[2::6].sum():.2f} N")
 dofs_fijos = Restriciones(apoyos)
 U_red, K_red, F_red = Sist_red(K_global, F_global, dofs_fijos)
 U = U_completa(dofs_fijos, U_red)
@@ -149,13 +148,12 @@ for n in apoyos[:, 0]:
     print(f"  nodo {n}: " + "  ".join(f"{v: .3f}" for v in R_apoyos[n]))
 print("sum R (x, y, z) =", np.round(R_apoyos[:, :3].sum(axis=0), 4), "N")
 
-# esfuerzos internos (restando las fuerzas de empotramiento de la carga distribuida)
+# esfuerzos internos: f = k u (todas las cargas estan en los nodos)
 res = calc_esfuerzos(xyz, conectividad, U, Area, I_x, I_y, J_p, vec_ref,
-                     M_Elasticidad, G_Cortante, c_x=radio, c_y=radio, r_t=radio,
-                     f_eq_locales=f_eq_locales)
+                     M_Elasticidad, G_Cortante, c_x=radio, c_y=radio, r_t=radio)
 
 # chequeo: el equilibrio a lo largo de la barra debe llegar a los valores del nodo final
-err = max(abs(esfuerzos_a_lo_largo(res, e, q_locales[e])[c][-1] - res[c][e, 1])
+err = max(abs(esfuerzos_a_lo_largo(res, e)[c][-1] - res[c][e, 1])
           for e in range(len(conectividad)) for c in ("V_x", "V_y", "N", "M_x", "M_y", "T"))
 print(f"error de cierre de los diagramas: {err:.2e}")
 
@@ -169,7 +167,7 @@ print(f"\ndeflexion maxima = {desp[n_d]:.2f} mm en nodo {n_d} {xyz[n_d].magnitud
 print("tension de von Mises maxima por barra:")
 svm_barras = []
 for i, elems in enumerate(barras):
-    svm_barras.append(max(esfuerzos_a_lo_largo(res, e, q_locales[e])["sigma_vm"].max() for e in elems)/1e6)
+    svm_barras.append(max(esfuerzos_a_lo_largo(res, e)["sigma_vm"].max() for e in elems)/1e6)
     a, b = conectividad[elems[0]][0], conectividad[elems[-1]][1]
     print(f"  barra {i:2d} (nodos {a}-{b}): {svm_barras[-1]:6.2f} MPa")
 i_s = int(np.argmax(svm_barras))
@@ -185,17 +183,17 @@ for clave, (simb, unidad, _) in diagramas._FUERZAS.items():
 carpeta = "diagramas_P2"
 os.makedirs(carpeta, exist_ok=True)
 for i, elems in enumerate(barras):
-    fig = graficar_fuerzas_barra(res, elems, q_locales, conectividad)
+    fig = graficar_fuerzas_barra(res, elems, conectividad)
     fig.savefig(os.path.join(carpeta, f"barra_{i:02d}_fuerzas.png"), dpi=150)
     plt.close(fig)
-    fig = graficar_tensiones_barra(res, elems, q_locales, conectividad)
+    fig = graficar_tensiones_barra(res, elems, conectividad)
     fig.savefig(os.path.join(carpeta, f"barra_{i:02d}_tensiones.png"), dpi=150)
     plt.close(fig)
 
 # diagramas 3D sobre la estructura
-fig = graficar_fuerzas_3d(xyz, conectividad, res, q_locales, titulo="Paradero - fuerzas internas")
+fig = graficar_fuerzas_3d(xyz, conectividad, res, titulo="Paradero - fuerzas internas")
 fig.savefig(os.path.join(carpeta, "fuerzas_3d.png"), dpi=150)
-fig = graficar_tensiones_3d(xyz, conectividad, res, q_locales, titulo="Paradero - tensiones")
+fig = graficar_tensiones_3d(xyz, conectividad, res, titulo="Paradero - tensiones")
 fig.savefig(os.path.join(carpeta, "tensiones_3d.png"), dpi=150)
 print(f"diagramas guardados en {carpeta}/")
 plt.show()

@@ -12,8 +12,8 @@ from igualar_ejes_3d import _igualar_ejes_3d
 # ==================================================================
 # DIAGRAMAS DE FUERZAS INTERNAS Y TENSIONES (matplotlib)
 # ==================================================================
-# "res" es la salida de calc_esfuerzos() y "q_locales" la tercera salida de
-# gen_f_distribuida() (None si no hay cargas distribuidas).
+# "res" es la salida de calc_esfuerzos(). Las cargas estan todas en los nodos, asi que
+# dentro de cada elemento V, N y T son constantes y M es lineal.
 
 # componente: (titulo, unidad, divisor desde SI)
 _FUERZAS = {"N": ("N", "kN", 1e3), "V_x": ("V_x", "kN", 1e3), "V_y": ("V_y", "kN", 1e3),
@@ -27,13 +27,9 @@ _COLOR = "#d65f28"
 _CMAP = ListedColormap(plt.get_cmap("Oranges")(np.linspace(0.3, 1.0, 256)))
 
 
-def _q(q_locales, e):
-    return None if q_locales is None else q_locales[e]
-
-
-def _a_lo_largo(res, e, q_locales):
+def _a_lo_largo(res, e):
     # limpia el ruido de redondeo (~1e-16) para que no aparezca en los ejes
-    d = esfuerzos_a_lo_largo(res, e, _q(q_locales, e))
+    d = esfuerzos_a_lo_largo(res, e)
     for clave in list(_FUERZAS) + list(_TENSIONES):
         d[clave][np.abs(d[clave]) < 1e-9] = 0.0
     return d
@@ -46,8 +42,8 @@ def _xyz_m(xyz):
 # ------------------------------------------------------------------
 # 2D: una barra (uno o mas sub-elementos consecutivos), esfuerzos vs z a lo largo
 # ------------------------------------------------------------------
-def _graficar_barra(res, elems, q_locales, conectividad, tabla, forma, titulo):
-    tramos = [_a_lo_largo(res, e, q_locales) for e in elems]
+def _graficar_barra(res, elems, conectividad, tabla, forma, titulo):
+    tramos = [_a_lo_largo(res, e) for e in elems]
     z0 = np.concatenate([[0.0], np.cumsum(res["largos"][elems])])
     d = {c: np.concatenate([t[c] for t in tramos]) for c in tabla}
     z = np.concatenate([t["z"] + z0[k] for k, t in enumerate(tramos)])
@@ -74,20 +70,20 @@ def _graficar_barra(res, elems, q_locales, conectividad, tabla, forma, titulo):
     return fig
 
 
-def graficar_fuerzas_barra(res, elems, q_locales, conectividad):
-    return _graficar_barra(res, elems, q_locales, conectividad, _FUERZAS, (3, 2), "Fuerzas internas")
+def graficar_fuerzas_barra(res, elems, conectividad):
+    return _graficar_barra(res, elems, conectividad, _FUERZAS, (3, 2), "Fuerzas internas")
 
 
-def graficar_tensiones_barra(res, elems, q_locales, conectividad):
-    return _graficar_barra(res, elems, q_locales, conectividad, _TENSIONES, (2, 2), "Tensiones")
+def graficar_tensiones_barra(res, elems, conectividad):
+    return _graficar_barra(res, elems, conectividad, _TENSIONES, (2, 2), "Tensiones")
 
 
-def graficar_fuerzas_elemento(res, e, q_locales, conectividad):
-    return graficar_fuerzas_barra(res, [e], q_locales, conectividad)
+def graficar_fuerzas_elemento(res, e, conectividad):
+    return graficar_fuerzas_barra(res, [e], conectividad)
 
 
-def graficar_tensiones_elemento(res, e, q_locales, conectividad):
-    return graficar_tensiones_barra(res, [e], q_locales, conectividad)
+def graficar_tensiones_elemento(res, e, conectividad):
+    return graficar_tensiones_barra(res, [e], conectividad)
 
 
 # ------------------------------------------------------------------
@@ -98,12 +94,12 @@ def _dibujar_barras(ax, xyz_m, conectividad, **kw):
         ax.plot(*np.array([xyz_m[n1], xyz_m[n2]]).T, **kw)
 
 
-def graficar_fuerzas_3d(xyz, conectividad, res, q_locales=None,
+def graficar_fuerzas_3d(xyz, conectividad, res,
                         componentes=("N", "V_x", "V_y", "T", "M_x", "M_y"),
                         titulo="Fuerzas internas"):
     xyz_m = _xyz_m(xyz)
     tam = np.ptp(xyz_m, axis=0).max()
-    datos = [_a_lo_largo(res, e, q_locales) for e in range(len(conectividad))]
+    datos = [_a_lo_largo(res, e) for e in range(len(conectividad))]
 
     n_col = min(3, len(componentes))
     n_fil = int(np.ceil(len(componentes) / n_col))
@@ -138,11 +134,11 @@ def graficar_fuerzas_3d(xyz, conectividad, res, q_locales=None,
     return fig
 
 
-def graficar_tensiones_3d(xyz, conectividad, res, q_locales=None,
+def graficar_tensiones_3d(xyz, conectividad, res,
                           componentes=("sigma_N", "sigma_max", "tau_T", "sigma_vm"),
                           titulo="Tensiones"):
     xyz_m = _xyz_m(xyz)
-    datos = [_a_lo_largo(res, e, q_locales) for e in range(len(conectividad))]
+    datos = [_a_lo_largo(res, e) for e in range(len(conectividad))]
 
     n_col = min(2, len(componentes))
     n_fil = int(np.ceil(len(componentes) / n_col))
