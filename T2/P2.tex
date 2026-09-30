@@ -140,7 +140,7 @@ traseras del techo (nodos 4 y 7) solo se apoyaban en los tramos de 1 m que
 van a la punta de las columnas inclinadas. El larguero trasero de 4 m
 quedaba colgando de dos voladizos y su centro bajaba \textbf{15.08 mm}, lo
 que \emph{no cumple} $\delta_{max}=10$ mm. Las tensiones sí cumplían
-($\sigma_{VM}=35.8$ MPa).
+($\sigma_{VM}=35.6$ MPa).
 
 Para corregirlo sin cambiar la idea del diseño ni tapar la vista, se agregó
 un atiesador en cada cara lateral. Este apoya la esquina trasera del techo
@@ -153,12 +153,12 @@ que el atiesador se une con la columna:
 \hline
 Diseño & Largo atiesador [m] & $\delta_{max}$ [mm] & $\sigma_{VM,max}$ [MPa] & FS\\
 \hline
-Sin atiesadores & -- & 15.08 & 35.8 & 8.4\\
-$z_{at}=1.6$ m & 0.89 & 8.67 & 33.0 & 9.1\\
-$z_{at}=1.5$ m & 0.90 & 7.98 & 31.5 & 9.5\\
-$\mathbf{z_{at}=1.4}$ \textbf{m} & \textbf{0.92} & \textbf{7.36} & \textbf{29.8} & \textbf{10.1}\\
-$z_{at}=1.2$ m & 1.00 & 6.33 & 26.7 & 11.3\\
-$z_{at}=1.0$ m & 1.12 & 5.59 & 24.9 & 12.0\\
+Sin atiesadores & -- & 15.08 & 35.6 & 8.4\\
+$z_{at}=1.6$ m & 0.89 & 8.67 & 32.7 & 9.2\\
+$z_{at}=1.5$ m & 0.90 & 7.98 & 31.3 & 9.6\\
+$\mathbf{z_{at}=1.4}$ \textbf{m} & \textbf{0.92} & \textbf{7.36} & \textbf{29.6} & \textbf{10.2}\\
+$z_{at}=1.2$ m & 1.00 & 6.33 & 26.4 & 11.4\\
+$z_{at}=1.0$ m & 1.12 & 5.59 & 24.6 & 12.2\\
 \hline
 \end{tabular}
 \end{center}
@@ -190,23 +190,24 @@ $\sqrt{M_x^2+M_y^2}$. Máximos a lo largo de cada barra:
 \hline
 Barra & Nodos & Tipo & $\sigma_{VM}$ [MPa] & Barra & Nodos & Tipo & $\sigma_{VM}$ [MPa]\\
 \hline
-0 & 0--10 & col. inclinada & 29.27 & 7  & 6--9  & techo      & 6.44\\
+0 & 0--10 & col. inclinada & \textbf{29.55} & 7  & 6--9  & techo      & 6.50\\
 1 & 1--5  & col. vertical  & 18.61 & 8  & 9--7  & techo      & 6.33\\
 2 & 2--6  & col. vertical  & 18.61 & 9  & 7--4  & larguero   & 13.29\\
-3 & 3--11 & col. inclinada & \textbf{29.81} & 10 & 10--8 & col. inclinada & 15.75\\
-4 & 4--8  & techo          & 6.33  & 11 & 11--9 & col. inclinada & 16.08\\
-5 & 8--5  & techo          & 6.56  & 12 & 10--4 & atiesador  & 12.75\\
-6 & 5--6  & larguero       & 13.75 & 13 & 11--7 & atiesador  & 12.59\\
+3 & 3--11 & col. inclinada & \textbf{29.55} & 10 & 10--8 & col. inclinada & 15.92\\
+4 & 4--8  & techo          & 6.33  & 11 & 11--9 & col. inclinada & 15.92\\
+5 & 8--5  & techo          & 6.50  & 12 & 10--4 & atiesador  & 12.67\\
+6 & 5--6  & larguero       & 13.75 & 13 & 11--7 & atiesador  & 12.67\\
 \hline
 \end{tabular}
 \end{center}
 La barra más solicitada es el tramo inferior de la columna inclinada, en su
 empotramiento:
-$$\sigma_{VM,max}=29.8\ \text{MPa}<S_y=300\ \text{MPa}\qquad\checkmark,
-\qquad FS=\frac{S_y}{\sigma_{VM,max}}=10.1$$
-La pequeña diferencia entre las barras 0 y 3 (29.27 y 29.81 MPa) se debe al
-criterio conservador $|M_x|+|M_y|$, que depende de cómo quedan orientados
-los ejes locales de cada barra. La tensión axial es despreciable (máx.
+$$\sigma_{VM,max}=29.6\ \text{MPa}<S_y=300\ \text{MPa}\qquad\checkmark,
+\qquad FS=\frac{S_y}{\sigma_{VM,max}}=10.2$$
+Las barras simétricas respecto del plano $y=2$ m dan las mismas tensiones.
+Los ejes locales se orientaron con \texttt{vec\_ref} $=\hat Z$ (o $\hat Y$ en
+las barras verticales), de modo que $x_L$ es horizontal y el peso propio
+solo carga el plano local $y_L$--$z_L$ ($V_y$, $M_x$ y $N$). La tensión axial es despreciable (máx.
 0.46 MPa): la estructura trabaja en flexión.
 
 \textbf{Pandeo.} Como verificación adicional, la columna más comprimida
@@ -219,8 +220,8 @@ así que el pandeo no controla el diseño.
 \includegraphics[width=\linewidth]{T2/figuras_P2/tensiones_3d.png}
 \captionof{figure}{Tensiones sobre la estructura: normal por axial, normal
 máxima, corte por torsión y von Mises. El color se asigna con el promedio
-de cada segmento, por eso el máximo del gráfico (29.2 MPa) es algo menor que
-el valor puntual en el empotramiento (29.8 MPa).}
+de cada segmento, por eso el máximo del gráfico (28.9 MPa) es algo menor que
+el valor puntual en el empotramiento (29.6 MPa).}
 \label{fig:t2-p2-tensiones}
 \end{center}
 
@@ -250,8 +251,8 @@ parabólica.}
 \begin{desarrollo}{Conclusión}
 El diseño propuesto cubre $2\times4$ m a 2 m de altura con 22.3 m de tubo
 Ø30$\times$3 (44 kg). Cumple ambas restricciones:
-$\delta_{max}=7.36$ mm $<10$ mm y $\sigma_{VM,max}=29.8$ MPa $<300$ MPa
-(FS $=10.1$). La restricción que controla es la deflexión y no la
+$\delta_{max}=7.36$ mm $<10$ mm y $\sigma_{VM,max}=29.6$ MPa $<300$ MPa
+(FS $=10.2$). La restricción que controla es la deflexión y no la
 resistencia, por lo que para este tubo el diseño se rige por rigidez. Los
 atiesadores laterales de 0.92 m fueron la clave: redujeron la flecha
 máxima en un 51\,\% (de 15.1 a 7.4 mm) agregando solo 1.8 m de tubo, y sin

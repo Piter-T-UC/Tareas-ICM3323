@@ -76,8 +76,11 @@ conectividad = np.array([
 
 ], dtype=int)
 
-# da lo mismo la orientacion todos son de seccion constante
-vec_ref = np.array([[0.0, 1.0, 100.0]] * len(conectividad))
+# vec_ref = Z global: x_L = Z x z_L queda horizontal y el peso propio cae solo en el
+# plano local y_L-z_L (V_y, M_x, N). En barras verticales Z es paralelo -> se usa Y.
+d = (xyz[conectividad[:, 1]] - xyz[conectividad[:, 0]]).magnitude
+vertical = np.hypot(d[:, 0], d[:, 1]) < 1e-9
+vec_ref = np.where(vertical[:, None], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0])
 
 apoyos = np.array([
     [0, 1, 1, 1, 1, 1, 1],   # nodo 0: empotrado (6 restricciones)
