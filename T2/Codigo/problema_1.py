@@ -8,6 +8,7 @@ from restricciones import Restriciones
 from sistema_reducido import Sist_red
 from u_completa import U_completa
 from esfuerzos import calc_esfuerzos, calc_reacciones
+from exportar_latex import ecuacion_latex
 
 
 
@@ -67,7 +68,8 @@ def resolver(n_elem):
     res = calc_esfuerzos(xyz, conectividad, U, Area, I_x, I_y, J_p, vec_ref,
                          M_Elasticidad, G_Cortante)
     R_apoyos = calc_reacciones(K_global, U, F_global, dofs_fijos)
-    return xs, U.reshape(len(xyz), 6), res, R_apoyos
+    dofs_libres = np.setdiff1d(np.arange(6*len(xyz)), dofs_fijos)
+    return xs, U.reshape(len(xyz), 6), res, R_apoyos, (K_red, F_red, dofs_libres)
 
 
 # ------------------------------------------------------------------
@@ -156,7 +158,7 @@ convergencia = []
 print("\n  n    v(L/2) [mm]   v(L) [mm]   theta(L) [rad]   phi(L/2) [rad]   phi(L) [rad]"
       "   M(0) [N*m]   V(0) [N]")
 for n in mallas:
-    xs, U_nodos, res, R_apoyos = resolver(n)
+    xs, U_nodos, res, R_apoyos, sist_red = resolver(n)
     campos, nodos = campos_mef(xs, U_nodos)
     esf = esfuerzos_mef(xs, res)
     guardar(f"mef_n{n}_campos.dat", campos, ["z", "v", "theta", "phi"])
@@ -173,6 +175,12 @@ for n in mallas:
         print(f"       Reacciones: Rz = {R_apoyos[0, 2]/1e3:.3f} kN   My = {R_apoyos[0, 4]/1e3:.3f} kN*m"
               f"   Mx = {R_apoyos[0, 3]/1e3:.3f} kN*m"
               f"   (teorico: {P:.1f}, P*a = {(P*a_P).to(kNm):.1f}, M = {M:.1f})")
+        # los GDL se desacoplan: solo flexion en X-Z (u_z, theta_y) y torsion (theta_x) tienen carga
+        K_red, F_red, dofs_libres = sist_red
+        idx = np.nonzero(np.isin(dofs_libres % 6, (2, 3, 4)))[0]
+        print("\n       Sistema reducido (u_z, theta_x, theta_y) (SI):")
+        print(ecuacion_latex(K_red[np.ix_(idx, idx)], F_red[idx], dofs_libres[idx]))
+        print()
 
 guardar("convergencia.dat", np.array(convergencia), ["n", "err_v", "err_theta", "err_phi"])
 print("\nError relativo en z = L:")

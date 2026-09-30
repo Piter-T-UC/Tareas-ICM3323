@@ -53,6 +53,46 @@ def _sci(v):
     return rf"{m}\times 10^{{{int(x)}}}"
 
 
+def _bmatrix(A, cifras=4):
+    """Matriz o vector como bmatrix, sacando de factor comun la potencia de 10
+    del menor termino no nulo. Devuelve (factor, lineas)."""
+    A = np.atleast_2d(np.asarray(A, float))
+    tol = 1e-12*np.abs(A).max() if A.size else 0.0
+    nz = np.abs(A[np.abs(A) > tol])
+    p = int(np.floor(np.log10(nz.min()))) if nz.size else 0
+    As = A/10.0**p
+    filas = [" & ".join("0" if abs(v) < tol/10.0**p else f"{v:.{cifras}g}" for v in f)
+             for f in As]
+    factor = rf"10^{{{p}}}" if p else ""
+    return factor, [r"\begin{bmatrix}", " \\\\\n".join(filas), r"\end{bmatrix}"]
+
+
+def _aviso_cols(n):
+    return [rf"% requiere \setcounter{{MaxMatrixCols}}{{{n}}} en el preambulo"] if n > 10 else []
+
+
+def matriz_latex(K, nombre=r"\mathbf{K}_{\mathrm{red}}", cifras=4):
+    """Si tiene mas de 10 columnas, amsmath necesita \\setcounter{MaxMatrixCols}{n}."""
+    factor, cuerpo = _bmatrix(K, cifras)
+    return "\n".join(_aviso_cols(np.shape(K)[1]) + [r"\[", rf"{nombre} = {factor}"]
+                     + cuerpo + [r"\]"])
+
+
+_GDL = ("u_{x", "u_{y", "u_{z", r"\theta_{x", r"\theta_{y", r"\theta_{z")
+
+
+def ecuacion_latex(K, F, dofs_libres, cifras=4, primer_nodo=1):
+    """Sistema reducido K u = F completo; u con los nombres de los GDL libres
+    (6 por nodo: u_x, u_y, u_z, theta_x, theta_y, theta_z). Los nodos se
+    rotulan desde primer_nodo (1 para que coincida con el enunciado)."""
+    fK, cK = _bmatrix(K, cifras)
+    fF, cF = _bmatrix(np.reshape(F, (-1, 1)), cifras)
+    u = [rf"{_GDL[d % 6]}{d // 6 + primer_nodo}}}" for d in dofs_libres]
+    cu = [r"\begin{bmatrix}", " \\\\\n".join(u), r"\end{bmatrix}"]
+    return "\n".join(_aviso_cols(np.shape(K)[1]) + [r"\[", fK] + cK + cu
+                     + ["=", fF] + cF + [r"\]"])
+
+
 def _c(p):
     return f"({p[0]:.4f},{p[1]:.4f},{p[2]:.4f})"
 
