@@ -128,3 +128,94 @@ def graficar_reticulado(xyz, conectividad, U=None, apoyos=None, escala=None, tit
     fig.suptitle(titulo)
     plt.tight_layout()
     return fig, axes
+
+
+def graficar_deflexion_vertical(xyz, conectividad, U, apoyos=None, escala=None,
+                                titulo="Deflexion vertical", cmap="turbo"):
+    # deformada cubica coloreada segun la deflexion vertical (z en 3D, y en 2D), en mm
+    from matplotlib import cm, colors
+    from matplotlib.collections import LineCollection
+    from mpl_toolkits.mplot3d.art3d import Line3DCollection
+
+    xyz_m = xyz.magnitude if hasattr(xyz, "magnitude") else np.asarray(xyz, dtype=float)
+    U_m = U.magnitude if hasattr(U, "magnitude") else np.asarray(U, dtype=float)
+    num_nodos, dim = xyz_m.shape
+    es_3d = (dim == 3)
+    U_nodos = U_m.reshape(num_nodos, U_m.size // num_nodos)
+    despl = U_nodos[:, :dim]
+    rot = None
+    if es_3d and U_nodos.shape[1] == 6:
+        rot = U_nodos[:, 3:6]
+    elif not es_3d and U_nodos.shape[1] == 3:
+        rot = np.column_stack([np.zeros(num_nodos), np.zeros(num_nodos), U_nodos[:, 2]])
+    if escala is None:
+        tam = np.ptp(xyz_m, axis=0).max()
+        max_despl = np.abs(despl).max()
+        escala = 0.1 * tam / max_despl if max_despl > 1e-12 else 1.0
+
+    # por elemento: curva deformada y deflexion vertical en cada punto (escala 1 -> valor real)
+    segs, vals, picos = [], [], []
+    for n1, n2 in conectividad:
+        c = _curva_elemento(xyz_m, despl, rot, n1, n2, escala)
+        base = _curva_elemento(xyz_m, despl, rot, n1, n2, 0.0)
+        v = (c[:, -1] - base[:, -1]) / escala * 1e3          # m -> mm
+        segs += [c[i:i+2] for i in range(len(c) - 1)]
+        vals += list((v[:-1] + v[1:]) / 2)
+        picos.append((c, v))
+    vals = np.array(vals)
+
+    # si hay deflexiones de ambos signos, el cero queda al centro del mapa de colores
+    v_min, v_max = vals.min(), vals.max()
+    if v_min < 0 < v_max:
+        norma = colors.TwoSlopeNorm(vcenter=0.0, vmin=v_min, vmax=v_max)
+    else:
+        norma = colors.Normalize(v_min, v_max if v_max > v_min else v_min + 1e-12)
+
+    subplot_kw = {'projection': '3d'} if es_3d else {}
+    fig, ax = plt.subplots(figsize=(8, 6), subplot_kw=subplot_kw)
+
+    # estructura original tenue
+    for n1, n2 in conectividad:
+        ax.plot(*xyz_m[[n1, n2]].T, color='lightgray', linewidth=1, linestyle='--')
+
+    Col = Line3DCollection if es_3d else LineCollection
+    lc = Col(segs, cmap=cmap, norm=norma, linewidth=4)
+    lc.set_array(vals)
+    if es_3d:
+        ax.add_collection3d(lc)
+    else:
+        ax.add_collection(lc)
+
+    # apoyos
+    if apoyos is not None:
+        for entrada in apoyos:
+            ax.plot(*xyz_m[entrada[0]][:, None], marker='^', color='black', markersize=11)
+
+    # rotulo en la deflexion maxima (en valor absoluto)
+    c_max, v_e = max(picos, key=lambda p: np.abs(p[1]).max())
+    i = int(np.argmax(np.abs(v_e)))
+    ax.plot(*c_max[i][:, None], marker='o', color='black', markersize=5)
+    etiqueta = f"  {v_e[i]:.2f} mm"
+    if es_3d:
+        ax.text(*c_max[i], etiqueta, fontsize=9, weight='bold')
+    else:
+        ax.annotate(etiqueta, c_max[i], fontsize=9, weight='bold')
+
+    eje_v = 'z' if es_3d else 'y'
+    fig.colorbar(cm.ScalarMappable(norm=norma, cmap=cmap), ax=ax, shrink=0.7, pad=0.1,
+                 label=f"$u_{eje_v}$ [mm]")
+    ax.set_title(f"Deflexion vertical $u_{eje_v}$ (escala x{escala:.0f}, "
+                 f"máx $|u_{eje_v}|$ = {abs(v_e[i]):.2f} mm)", fontsize=10)
+    ax.set_xlabel('x [m]'); ax.set_ylabel('y [m]')
+    coords_lim = np.vstack([xyz_m] + [c for c, _ in picos])
+    if es_3d:
+        ax.set_zlabel('z [m]')
+        _igualar_ejes_3d(ax, coords_lim)
+    else:
+        ax.set_aspect('equal', adjustable='datalim')
+        ax.autoscale_view()
+        ax.grid(alpha=0.3)
+
+    fig.suptitle(titulo)
+    plt.tight_layout()
+    return fig, ax

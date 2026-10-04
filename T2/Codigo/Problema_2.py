@@ -10,7 +10,7 @@ from cargas_nodales import cargas_nodales_equivalentes
 from restricciones import Restriciones
 from sistema_reducido import Sist_red
 from u_completa import U_completa
-from graficar_reticulado import graficar_reticulado
+from graficar_reticulado import graficar_reticulado, graficar_deflexion_vertical
 from esfuerzos import calc_esfuerzos, calc_reacciones, esfuerzos_a_lo_largo
 from exportar_latex import informe_latex
 from diagramas import (graficar_fuerzas_barra, graficar_tensiones_barra,
@@ -134,6 +134,9 @@ for i in range(len(xyz)):
 fig, axes = graficar_reticulado(xyz, conectividad, U=U, apoyos=apoyos,
                                     escala=5, titulo="paradero de Bus")
 plt.savefig("Paradero de Bus.png", dpi=150)
+fig, _ = graficar_deflexion_vertical(xyz, conectividad, U, apoyos=apoyos, escala=5,
+                                     titulo="Paradero de Bus")
+fig.savefig("Paradero de Bus - deflexion vertical.png", dpi=150)
 print("\nguardado")
 
 # reacciones y equilibrio: sum Rz debe igualar el peso total

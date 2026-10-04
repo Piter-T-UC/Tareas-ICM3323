@@ -1,8 +1,12 @@
 \newpage
-\section{Codigo}
+\section*{Código}
 
-En esta ocasion decidi explicar el codigo por partes, por eso mismo lo hice funcion cada uno por separado
-hay algunas que no estan explicados en texto fuera porque son cortas y/o se repiten de la entrega pasada como todo de la generación de la matriz de rigidez, o reducir/ resolver el sistema. Lo nuevo (cargas distribuidas y tensiones internas fuera de axial)
+En esta ocasión decidí explicar el código por partes; por eso mismo separé cada
+parte en su propia función. Algunas no se explican en el texto porque son cortas
+y/o se repiten de la entrega pasada, como la generación de la matriz de rigidez o
+reducir y resolver el sistema. Lo nuevo de esta entrega son las cargas
+distribuidas (peso propio como cargas nodales equivalentes) y el cálculo de los
+esfuerzos internos y tensiones más allá del axial.
 \subsection{Funciones}
 
 Las funciones de graficado (\texttt{diagramas.py},
@@ -31,7 +35,7 @@ por largo.
 \lstinputlisting[style=pythonstyle]{T2/Codigo/u_completa.py}
 
 \paragraph{\texttt{esfuerzos.py}} Fuerzas internas, tensiones y reacciones.\\
-En este caso es la funcion mas compleja por ende la que mas explicare, por ende el archivo \texttt{esfuerzos.py} toma los desplazamientos nodales $\mathbf{U}$ que salen de resolver el sistema y calcula los esfuerzos internos, las tensiones y las reacciones de la estructura. La función \texttt{calc\_esfuerzos} recorre los elementos uno por uno. Para cada elemento obtiene su largo y su matriz de rotación, extrae de $\mathbf{U}$ los 12 grados de libertad de sus dos nodos y los pasa a ejes locales. Luego multiplica esos desplazamientos locales por la matriz de rigidez local de la viga, $\mathbf{f}_L = \mathbf{k}_L\,\mathbf{u}_L$, y obtiene las fuerzas en los extremos: cortes $V_x$ y $V_y$, axial $N$, momentos $M_x$ y $M_y$ y torsión $T$. A las del nodo inicial les cambia el signo para que sigan la convención de esfuerzo interno, y además limpia el ruido numérico. Con esos esfuerzos calcula las deformaciones de la sección (deformación axial $\varepsilon = N/EA$, curvaturas $\kappa = M/EI$ y giro por unidad de largo $T/GJ$). También calcula las tensiones: la normal $\sigma_N = N/A$ y la máxima en la fibra extrema,
+Es la función más compleja, por lo que es la que más explicaré. El archivo \texttt{esfuerzos.py} toma los desplazamientos nodales $\mathbf{U}$ que salen de resolver el sistema y calcula los esfuerzos internos, las tensiones y las reacciones de la estructura. La función \texttt{calc\_esfuerzos} recorre los elementos uno por uno. Para cada elemento obtiene su largo y su matriz de rotación, extrae de $\mathbf{U}$ los 12 grados de libertad de sus dos nodos y los pasa a ejes locales. Luego multiplica esos desplazamientos locales por la matriz de rigidez local de la viga, $\mathbf{f}_L = \mathbf{k}_L\,\mathbf{u}_L$, y obtiene las fuerzas en los extremos: cortes $V_x$ y $V_y$, axial $N$, momentos $M_x$ y $M_y$ y torsión $T$. A las del nodo inicial les cambia el signo para que sigan la convención de esfuerzo interno, y además limpia el ruido numérico. Con esos esfuerzos calcula las deformaciones de la sección (deformación axial $\varepsilon = N/EA$, curvaturas $\kappa = M/EI$ y giro por unidad de largo $T/GJ$). También calcula las tensiones: la normal $\sigma_N = N/A$ y la máxima en la fibra extrema,
 \[
 \sigma_{\max} = \frac{|N|}{A} + \frac{|M_x|\,c_y}{I_x} + \frac{|M_y|\,c_x}{I_y}.
 \]
@@ -40,7 +44,7 @@ Esta suma de valores absolutos es exacta en secciones con esquinas y conservador
 En el Problema 2 el peso propio entra como cargas nodales equivalentes. Por eso el momento lineal que da \texttt{esfuerzos\_a\_lo\_largo} es una aproximación por tramos del momento real, que sería parabólico. Esa aproximación mejora al refinar la malla, como se hace en las vigas de 4~m.
 \lstinputlisting[style=pythonstyle]{T2/Codigo/esfuerzos.py}
 
-\paragraph{\texttt{refinar\_malla.py}} Divide barras en sub-elementos. (esta funcion es completa IA, lo que hace es evitarme tener que editar la xyz y conectividad cada vez que quiera ser mas exacto)
+\paragraph{\texttt{refinar\_malla.py}} Divide barras en sub-elementos. (esta función está hecha completamente con IA; lo que hace es evitarme tener que editar \texttt{xyz} y la conectividad cada vez que quiero refinar la malla)
 \lstinputlisting[style=pythonstyle]{T2/Codigo/refinar_malla.py}
 
 \subsection*{Problema 1: \texttt{problema\_1.py}}
@@ -51,7 +55,7 @@ anal\'itica de la parte a) y exporta los datos que se grafican en
 
 \subsection*{Problema 1: \texttt{diagramas\_P1.py}}
 Lee los datos de \texttt{T2/datos\_P1/} y dibuja los diagramas de corte,
-momento flector y torsor (anal\'itica y MEF con $n=2$). Aqui me apoye bastante de claude  para poder graficar todo y que me lo ordene en carpetas 
+momento flector y torsor (anal\'itica y MEF con $n=2$). Aquí me apoyé bastante en Claude para graficar todo y ordenarlo en carpetas.
 \lstinputlisting[style=pythonstyle]{T2/Codigo/diagramas_P1.py}
 
 \subsection*{Problema 2: \texttt{Problema\_2.py}}

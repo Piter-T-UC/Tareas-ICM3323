@@ -51,7 +51,8 @@ $2\times4$ m (ejes $x$ e $y$) a $h=2$ m de altura. Se compone de:
     planos laterales $y=0$ e $y=4$ m, por lo que no tapan la vista frontal
     ni la trasera del paradero.
 \end{itemize}
-A los 4 nodos base se le coloca empotramiento, de esta manera restringo los movimientos y los giros
+A los 4 nodos de la base se les coloca empotramiento; de esta manera se restringen sus
+desplazamientos y giros.
 
 
 \begin{center}
@@ -105,7 +106,12 @@ Problema 1 (archivo \texttt{Problema\_2.py}):
     a la barra) alrededor del eje horizontal perpendicular a ella. En una
     columna vertical $\mathbf{d}\times\mathbf{q}=\mathbf{0}$, así que solo hay
     fuerza. Las cargas de todos los elementos se suman en cada nodo.
-    \item \textbf{Malla:} En este caso para los elementos mas largos donde es probable que la deflexión sea mayor, se añadieron nodos, de esta manera se puede ser mas fiel al diagrama de momento y corte que le corresponde, al ser una carga constante
+    \item \textbf{Malla:} los dos largueros de 4 m, que son las barras más
+    largas y donde se espera la mayor deflexión, se dividieron en 10 elementos
+    de 0.4 m cada uno. Así el momento, que con carga uniforme es parabólico,
+    queda bien representado por la poligonal de sus valores nodales, y el corte
+    por los escalones en cada nodo. El resto de las barras se modela con un
+    elemento por barra.
     
 \end{itemize}
 
@@ -162,22 +168,31 @@ atiesadores.
 \begin{desarrollo}{Iteración de diseño: atiesadores}
 La primera versión del diseño no tenía atiesadores. En ella las esquinas
 traseras del techo (nodos 4 y 7) solo se apoyaban en los tramos de 1 m que
-van a la punta de las columnas inclinadas, basicamente en voladizo. por ende se incluyeron estos atiezadores. Este apoya la esquina delantera del techo directamente sobre la columna inclinada.
-Tambien se probaron en otros lugares pero no cambiaba mucho.
+van a la punta de las columnas inclinadas, básicamente en voladizo. Con ese
+diseño la deflexión máxima era de 15.08 mm en el centro del larguero trasero,
+sobre el límite de 10 mm. Por ende se incluyeron los atiesadores, que apoyan la
+esquina trasera del techo directamente sobre la columna inclinada; con ellos la
+deflexión máxima baja a 7.36 mm. También se probaron en otros lugares, pero no
+cambiaba mucho.
 \end{desarrollo}
 
 \begin{desarrollo}{Resultados y verificación}
 \textbf{Deflexión.} La deflexión máxima es
-$$\delta_{max}=7.31\ \text{mm}<10\ \text{mm}\qquad$$
-y ocurre en el centro del larguero delantero, $(0,2,2)$ m
-(Figura~\ref{fig:t2-p2-deformada}), que es la barra más larga con los
-apoyos más flexibles.
+$$\delta_{max}=|\mathbf{u}|_{max}=7.36\ \text{mm}<10\ \text{mm}$$
+y ocurre en el centro del larguero trasero, $(0,2,2)$ m
+(Figuras~\ref{fig:t2-p2-deformada} y \ref{fig:t2-p2-deflexion}), que es la
+barra más larga con los apoyos más flexibles. Casi todo el desplazamiento es
+vertical ($u_z=-7.31$ mm); el resto ($u_x=0.88$ mm) viene de que el techo
+completo se desplaza levemente en $x$.
 
 \textbf{Tensiones.} En cada punto se usa la tensión normal máxima en la
-fibra extrema, $\sigma=|N|/A+(\sqrt{M_x^2+M_y^2})\,r_e/I$, y la tensión de corte
-por torsión, $\tau=|T|\,r_e/J$. Con ellas se calcula la tensión de von Mises
-$\sigma_{VM}=\sqrt{\sigma^2+3\tau^2}$(no se toma en cuenta el corte por flexion porque es despreciable y para paredes delgadas es media compleja la formula).
-$\sqrt{M_x^2+M_y^2}$. Máximos a lo largo de cada barra:
+fibra extrema, $\sigma=|N|/A+|M_x|\,r_e/I+|M_y|\,r_e/I$, y la tensión de corte
+por torsión, $\tau=|T|\,r_e/J$. Sumar los dos momentos por separado es
+conservador en una sección circular (el valor exacto usa
+$\sqrt{M_x^2+M_y^2}$), así que el resultado queda del lado de la seguridad.
+Con ellas se calcula la tensión de von Mises $\sigma_{VM}=\sqrt{\sigma^2+3\tau^2}$
+(no se toma en cuenta el corte por flexión porque es despreciable y en
+paredes delgadas su fórmula es más compleja). Máximos a lo largo de cada barra:
 \begin{center}
 \renewcommand{\arraystretch}{1.15}
 \small
@@ -200,11 +215,11 @@ extremo superior (nodos 10 y 11), donde llegan el atiesador y el tramo
 superior de la columna:
 $$\sigma_{VM,max}=30.7\ \text{MPa}<S_y=300\ \text{MPa}\qquad,
 \qquad FS=\frac{S_y}{\sigma_{VM,max}}=9.8$$
-Las barras son simétricas respecto del plano $y=2$ m dan las mismas tensiones.
+Las barras simétricas respecto del plano $y=2$ m dan las mismas tensiones.
 Los ejes locales se orientaron con \texttt{vec\_ref} $=(0,0,1)$ (o $(0,1,0)$ en
 las barras verticales), de modo que $x_L$ es horizontal y el peso propio
 solo carga el plano local $y_L$--$z_L$ ($V_y$, $M_x$ y $N$). La tensión axial es despreciable (máx.
-0.41 MPa): la estructura trabaja en casi en su totalida bajo flexion.
+0.41 MPa): la estructura trabaja casi en su totalidad a flexión.
 
 
 \begin{center}
@@ -218,7 +233,8 @@ el valor puntual en los nodos 10 y 11 (30.7 MPa).}
 
 \begin{center}
 \includegraphics[width=\linewidth]{T2/figuras_P2/fuerzas_3d.png}
-\captionof{figure}{Fuerzas internas en locales sobre la estructura.}
+\captionof{figure}{Fuerzas internas, en los ejes locales de cada barra,
+dibujadas sobre la estructura.}
 \label{fig:t2-p2-fuerzas}
 \end{center}
 
@@ -240,15 +256,17 @@ por sus valores nodales, que asemeja una parábola.}
 \end{center}
 \begin{center}
 \includegraphics[width=0.85\linewidth]{T2/figuras_P2/Paradero de Bus - deflexion vertical.png}
-\captionof{figure}{Deflexion en toda la estructura}
-\label{fig:t2-p2-larguero}
+\captionof{figure}{Deflexión vertical $u_z$ en toda la estructura: deformada
+amplificada 5 veces y coloreada según $u_z$ (en mm). El punto negro marca el
+máximo, $-7.31$ mm, en el centro del larguero trasero.}
+\label{fig:t2-p2-deflexion}
 \end{center}
 \end{desarrollo}
 
 \begin{desarrollo}{Conclusión}
 El diseño propuesto cubre $2\times4$ m a 2 m de altura con 22.3 m de tubo
 Ø30$\times$3 (44 kg). Cumple ambas restricciones:
-$\delta_{max}=7.31$ mm $<10$ mm y $\sigma_{VM,max}=30.7$ MPa $<300$ MPa
+$\delta_{max}=7.36$ mm $<10$ mm y $\sigma_{VM,max}=30.7$ MPa $<300$ MPa
 (FS $=9.8$). La restricción que controla es la deflexión y no la
 resistencia, por lo que para este tubo el diseño se rige por rigidez. Los
 atiesadores laterales de 0.92 m fueron la clave: redujeron la flecha

@@ -123,7 +123,7 @@ superpuestos con la solución MEF.
 
 \textbf{Modelo}\\
 La viga se modela con elementos de viga 3D de dos nodos (6 GDL por nodo:
-$u_x,u_y,u_z,\theta_x,\theta_y,\theta_z$), en este caso se decidio crear solo 1 sistema de funciones en python para resolver, en este caso se utiliza la matriz para el caso de inercia linealmente variable. Para este problema es necesario usar minimo 2 elementos cada uno de $L/2$ por la posicion de las fuerzas y momentos.
+$u_x,u_y,u_z,\theta_x,\theta_y,\theta_z$), en este caso se decidió crear un solo sistema de funciones en Python para resolver ambos problemas, y se utiliza la matriz para el caso de inercia linealmente variable.
 \begin{itemize}[itemsep=2pt]
     \item \textbf{Flexión:} funciones de forma cúbicas con la
     integral $\int_0^{l} B^T E\,I(z)\,B\,dz$ calculada en forma exacta para
@@ -139,7 +139,7 @@ $u_x,u_y,u_z,\theta_x,\theta_y,\theta_z$), en este caso se decidio crear solo 1 
     $\mathbf{k}_t=\frac{G\bar J}{l}\begin{bmatrix}1&-1\\-1&1\end{bmatrix}$ con
     $\bar J=(J_i+J_j)/2$ y $J=2I$.
 \end{itemize}
-El nodo 1 ($z=0$) tiene sus 6 GDL restringidos al ser un empotramiento
+El nodo 1 ($z=0$) tiene sus 6 GDL restringidos al ser un empotramiento.
 
 \textbf{Sistema reducido para $n=2$}\\
 Con dos elementos de $l=0.5$ m hay 3 nodos y 18 GDL, de los cuales quedan 12
@@ -169,11 +169,22 @@ u_{z2} \\ \theta_{x2} \\ \theta_{y2} \\ u_{z3} \\ \theta_{x3} \\ \theta_{y3}
 Se puede verificar que la flexión y torsión no se acoplan entre sí (los ceros
 de la matriz), igual que en la solución analítica.
 
-Para mas adelante lo que se hizo fue discretizar en multiplos de 2 para que asi la aplicacion d eP calzara con el punto de aplicación
+\textbf{Elección de las discretizaciones}\\
+Se usan $n=2,4,8$ y $16$ elementos de igual largo:
+\begin{itemize}[itemsep=2pt]
+    \item $n=2$ es la malla mínima: para aplicar $P$ en un nodo hace falta un
+    nodo en $z=L/2$, y el momento $M$ ya cae en el nodo del extremo libre.
+    \item $n=4$ y $n=8$ se obtienen duplicando el número de elementos. Así
+    $z=L/2$ sigue siendo un nodo en todas las mallas y, como el tamaño del
+    elemento se reduce a la mitad en cada paso, la razón entre errores
+    sucesivos entrega directamente el orden de convergencia (ver c)).
+    \item $n=16$ se usa para confirmar la convergencia, en particular la de la
+    torsión, que converge más lento que la flexión.
+\end{itemize}
 
-\textbf{Reconstrucción de los deformaqciones}\\
+\textbf{Reconstrucción de los campos}\\
 Las deformaciones a lo largo de la viga se obtienen de los desplazamientos nodales:
-$v=-u_z$ se interpola con las funciones cubicas a partir de
+$v=-u_z$ se interpola con las funciones cúbicas a partir de
 $(v,\theta)$ de cada nodo (con $\theta=\theta_y=dv/dz$),
 $\theta(z)=v'(z)$ es la derivada de esa interpolación y $\varphi=\theta_x$
 se interpola linealmente. Los esfuerzos se calculan como
@@ -363,19 +374,19 @@ $n$ & error $v(L)$ & error $\theta(L)$ & error $\varphi(L)$ & razón $e_{n/2}/e_
     interpolación del elemento los representa sin error: el MEF coincide con
     la solución analítica en toda la viga y no solo en los nodos.
 
-    \item \textbf{Flexión} Con $I(z)$ variable, la curvatura exacta $M_f/(EI)$ no es lineal dentro de un elemento y las funciones cubicas no pueden reproducirla (tiene parte logaritmica). Aun así, el error nodal es muy pequeño con $n=2$ ($0.11$\,\% en $v(L/2)$ y $0.03$\,\%
+    \item \textbf{Flexión.} Con $I(z)$ variable, la curvatura exacta $M_f/(EI)$ no es lineal dentro de un elemento y las funciones cúbicas no pueden reproducirla (tiene parte logarítmica). Aun así, el error nodal es muy pequeño con $n=2$ ($0.11$\,\% en $v(L/2)$ y $0.03$\,\%
     en $v(L)$), y se divide por $\approx 16=2^4$ cada vez que $n$ se duplica
     (pendiente cercana a $4$ en el gráfico log-log). En los gráficos de $v$ y $\theta$ las
     curvas MEF son prácticamente indistinguibles de la analítica.
 
-    \item \textbf{Torsión} El elemento lineal
+    \item \textbf{Torsión.} El elemento lineal
     usa el promedio aritmético $\bar J$, que para $J$ lineal es mayor que el
     que da la rigidez exacta del tramo, $l\big/\!\int_0^l dz/J(z)$ (promedio
     armónico). Por eso el MEF es más rígido y \emph{subestima} el giro:
     $\varphi(L)$ tiene un error de $1.1$\,\% con $n=2$, que baja a $0.02$\,\%
     con $n=16$ y se divide por $\approx 4=2^2$ cada vez que se duplica $n$.
 
-    \item \textbf{Error en flexion y torsion} Como ahí $M_f=0$, ese tramo se mueve
+    \item \textbf{Tramo $L/2\le z\le L$.} Como ahí $M_f=0$, ese tramo se mueve
     como sólido rígido: $\theta$ es constante y $v$ crece linealmente. El
     MEF lo reproduce exactamente, porque un polinomio cúbico contiene la
     recta. Todo el error de flexión del extremo viene del tramo
