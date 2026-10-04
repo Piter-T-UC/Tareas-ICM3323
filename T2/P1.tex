@@ -57,59 +57,48 @@ $z=L/2$ y momento torsor $M$ en el extremo libre.}
 
 \begin{desarrollo}{a) Campos analíticos de desplazamiento, rotación, momento y corte}
 
-\textbf{Hipótesis y convención de signos}\\
-Se usa la teoría de Euler--Bernoulli para la flexión y la teoría de
-Saint-Venant para la torsión de una sección circular. Se toma $z$ desde el
-empotramiento, $v(z)$ positiva en el sentido de $P$ (hacia abajo),
-$\theta(z)=v'(z)$, $M_f=E\,I\,v''$ y $V=-dM_f/dz$. Con esto las ecuaciones
-de gobierno son
-$$E\,I(z)\,v''(z) = M_f(z), \qquad G\,J(z)\,\varphi'(z) = T(z)$$
-donde $\varphi$ es el giro por torsión. La inercia se puede escribir como
-$$I(z)=I_0-\frac{I_1}{L}\,z=\frac{I_1}{L}\,(z_0-z),\qquad
-z_0=\frac{L\,I_0}{I_1}=2L=2000\ \text{mm}$$
-y, como la sección es circular, $J(z)=I_x+I_y=2I(z)$. El empotramiento impone
-$$v(0)=0,\qquad \theta(0)=0,\qquad \varphi(0)=0.$$
+\textbf{1. Ecuaciones de Gobierno y Parámetros}
+\begin{align*}
+    E\,I(z)\,v''(z) &= M_f(z) & G\,J(z)\,\varphi'(z) &= T(z) & \text{C.B.: } v(0) &= \theta(0) = \varphi(0) = 0
+\end{align*}
+Propiedades geométricas ($L=1000\text{ mm}$, $I_0=2\cdot 10^6\text{ mm}^4$, $I_1=10^6\text{ mm}^4$, $z_0 = 2000\text{ mm}$):
+\begin{align*}
+    I(z) &= I_0 - \frac{I_1}{L}z = 1000(2000 - z)\ \text{[mm$^4$]} & J(z) &= 2I(z) = 2000(2000 - z)\ \text{[mm$^4$]}
+\end{align*}
 
-\textbf{Esfuerzos internos}\\
-La viga es isostática, así que los esfuerzos salen solo del equilibrio. El
-momento $M$ actúa según el eje $z$, por lo que es torsor y no aporta corte ni
-flexión. Cortando en $z$ y mirando hacia el extremo libre ($a=L/2$):
-$$V(z)=\begin{cases}P & 0\le z<a\\ 0 & a<z\le L\end{cases},\qquad
-M_f(z)=\begin{cases}P\,(a-z) & 0\le z\le a\\ 0 & a\le z\le L\end{cases},\qquad
-T(z)=M\quad 0\le z\le L$$
-Numéricamente: $V=1000$ N, $M_f(0)=P\,L/2=500$ N$\cdot$m y $T=2000$ N$\cdot$m.
+\textbf{2. Esfuerzos Internos ($P=1000\text{ N}$, $a=500\text{ mm}$, $M=2\cdot 10^6\text{ N}\cdot\text{mm}$)}
+$$V(z)=\begin{cases} 1000\text{ N} & 0\le z < 500 \\ 0 & 500 < z \le 1000 \end{cases} \qquad
+M_f(z)=\begin{cases} 1000(500-z)\text{ N}\cdot\text{mm} & 0\le z\le 500 \\ 0 & 500\le z\le 1000 \end{cases}$$
+$$T(z) = 2\cdot 10^6\text{ N}\cdot\text{mm} \quad (0\le z\le 1000)$$
 
-\textbf{Flexión, tramo $0\le z\le a$}\\
-Reemplazando $M_f$ e $I$:
-$$v''(z)=\frac{P\,(a-z)}{E\,I(z)}=k\,\frac{a-z}{z_0-z}
-=k\left(1-\frac{z_0-a}{z_0-z}\right),\qquad k=\frac{P\,L}{E\,I_1}$$
-Integrando dos veces con $\theta(0)=0$ y $v(0)=0$:
-\begin{align}
-\theta(z)&=k\left[z+(z_0-a)\ln\!\left(1-\frac{z}{z_0}\right)\right]\\
-v(z)&=k\left[\frac{z^2}{2}-(z_0-a)\,z-(z_0-a)(z_0-z)\ln\!\left(1-\frac{z}{z_0}\right)\right]
-\end{align}
-Con los datos ($E=210\,000$ MPa, $I_1=10^6$ mm$^4$, $L=1000$ mm, $P=1000$ N)
-queda $k=1/210\,000$ mm$^{-1}$ y $z_0-a=1500$ mm:
-\begin{align}
-\theta(z)&=\frac{1}{210\,000}\left[z+1500\ln\!\left(1-\frac{z}{2000}\right)\right]\ \text{[rad]}\\
-v(z)&=\frac{1}{210\,000}\left[\frac{z^2}{2}-1500\,z-1500\,(2000-z)\ln\!\left(1-\frac{z}{2000}\right)\right]\ \text{[mm]}
-\end{align}
-y en $z=a=500$ mm
-$$\theta_a=\theta(500)=3.2608\times10^{-4}\ \text{rad},\qquad v_a=v(500)=0.10612\ \text{mm}.$$
+\textbf{3. Flexión: Tramo $0 \le z \le 500\text{ mm}$ ($E = 210\,000\text{ MPa}$)}
+\begin{align*}
+    v''(z) &= \frac{M_f(z)}{E\,I(z)} = \frac{1000(500-z)}{210\,000 \cdot 1000(2000-z)} = \frac{1}{210\,000}\left(\frac{500-z}{2000-z}\right) = \frac{1}{210\,000}\left(1 - \frac{1500}{2000-z}\right) \\[8pt]
+    \theta(z) &= \int v''(z)\,dz = \frac{1}{210\,000}\Big[z + 1500\ln(2000-z)\Big] + C_1 \\
+    \theta(0) &= 0 \implies C_1 = -\frac{1500\ln(2000)}{210\,000} \implies \theta(z) = \frac{1}{210\,000}\left[z + 1500\ln\!\left(1-\frac{z}{2000}\right)\right]\ \text{[rad]} \\[8pt]
+    v(z) &= \int \theta(z)\,dz = \frac{1}{210\,000}\left[\frac{z^2}{2} - 1500z - 1500(2000-z)\ln\!\left(1-\frac{z}{2000}\right)\right] + C_2 \\
+    v(0) &= 0 \implies C_2 = 0 \implies v(z) = \frac{1}{210\,000}\left[\frac{z^2}{2} - 1500z - 1500(2000-z)\ln\!\left(1-\frac{z}{2000}\right)\right]\ \text{[mm]}
+\end{align*}
+Evaluación en el límite del tramo ($z = 500\text{ mm}$):
+\begin{align*}
+    \theta(500) &= \frac{1}{210\,000}\Big[500 + 1500\ln(0.75)\Big] = 3.2608\times 10^{-4}\ \text{rad} \\
+    v(500) &= \frac{1}{210\,000}\Big[\frac{500^2}{2} - 1500(500) - 1500(1500)\ln(0.75)\Big] = 0.10612\ \text{mm}
+\end{align*}
 
-\textbf{Flexión, tramo $a\le z\le L$}\\
-Aquí $M_f=0$, entonces $v''=0$: el tramo no se curva y se mueve como sólido
-rígido. Imponiendo continuidad de $v$ y $\theta$ en $z=a$:
-$$\theta(z)=\theta_a,\qquad v(z)=v_a+\theta_a\,(z-a)$$
-y en el extremo libre $v(L)=0.10612+3.2608\times10^{-4}\cdot 500=0.26916$ mm.
+\textbf{4. Flexión: Tramo $500 \le z \le 1000\text{ mm}$}
+\begin{align*}
+    v''(z) &= 0 \implies \theta(z) = \theta(500) = 3.2608\times 10^{-4}\ \text{rad} \\
+    v(z) &= v(500) + \theta(500)(z - 500) = 0.10612 + 3.2608\times 10^{-4}(z - 500)\ \text{[mm]} \\
+    v(1000) &= 0.10612 + 3.2608\times 10^{-4}(500) = 0.26916\ \text{mm}
+\end{align*}
 
-\textbf{Torsión, $0\le z\le L$}\\
-Como $T=M$ es constante y $J=2I=\frac{2I_1}{L}(z_0-z)$:
-$$\varphi'(z)=\frac{M\,L}{2\,G\,I_1}\,\frac{1}{z_0-z}
-\quad\Longrightarrow\quad
-\varphi(z)=\frac{M\,L}{2\,G\,I_1}\ln\!\left(\frac{z_0}{z_0-z}\right)
-=0.0125\ln\!\left(\frac{2000}{2000-z}\right)\ \text{[rad]}$$
-
+\textbf{5. Torsión: Tramo $0 \le z \le 1000\text{ mm}$ ($G = 80\,000\text{ MPa}$)}
+\begin{align*}
+    \varphi'(z) &= \frac{T(z)}{G\,J(z)} = \frac{2\cdot 10^6}{80\,000 \cdot 2000(2000-z)} = \frac{0.0125}{2000-z} \\[6pt]
+    \varphi(z) &= \int \frac{0.0125}{2000-z}\,dz = -0.0125\ln(2000-z) + C_3 \\
+    \varphi(0) &= 0 \implies C_3 = 0.0125\ln(2000) \implies \varphi(z) = 0.0125\ln\!\left(\frac{2000}{2000-z}\right)\ \text{[rad]} \\[6pt]
+    \varphi(1000) &= 0.0125\ln\!\left(\frac{2000}{1000}\right) = 0.0125\ln(2) = 8.6643\times 10^{-3}\ \text{rad}
+\end{align*}
 \textbf{Resumen numérico}
 \begin{center}
 \renewcommand{\arraystretch}{1.2}
@@ -134,15 +123,9 @@ superpuestos con la solución MEF.
 
 \textbf{Modelo}\\
 La viga se modela con elementos de viga 3D de dos nodos (6 GDL por nodo:
-$u_x,u_y,u_z,\theta_x,\theta_y,\theta_z$), reutilizando las funciones del
-Problema 2 (archivo \texttt{problema\_1.py}). La viga va según $x$ global
-(el $z$ de la parte a), $P$ se aplica como fuerza nodal $-P\,\hat z$ y $M$
-como momento según $\hat x$. En cada elemento la inercia varía linealmente
-entre sus nodos, $I(\xi)=I_i(1-\xi)+I_j\,\xi$, igual que la inercia real,
-por lo que la geometría se representa sin error. Las rigideces del elemento
-son:
+$u_x,u_y,u_z,\theta_x,\theta_y,\theta_z$), en este caso se decidio crear solo 1 sistema de funciones en python para resolver, en este caso se utiliza la matriz para el caso de inercia linealmente variable. Para este problema es necesario usar minimo 2 elementos cada uno de $L/2$ por la posicion de las fuerzas y momentos.
 \begin{itemize}[itemsep=2pt]
-    \item \textbf{Flexión:} funciones de forma cúbicas de Hermite, con la
+    \item \textbf{Flexión:} funciones de forma cúbicas con la
     integral $\int_0^{l} B^T E\,I(z)\,B\,dz$ calculada en forma exacta para
     $I$ lineal:
     $$\mathbf{k}_f=\frac{E}{l^3}\begin{bmatrix}
@@ -156,7 +139,7 @@ son:
     $\mathbf{k}_t=\frac{G\bar J}{l}\begin{bmatrix}1&-1\\-1&1\end{bmatrix}$ con
     $\bar J=(J_i+J_j)/2$ y $J=2I$.
 \end{itemize}
-El nodo 1 ($z=0$) tiene sus 6 GDL restringidos.
+El nodo 1 ($z=0$) tiene sus 6 GDL restringidos al ser un empotramiento
 
 \textbf{Sistema reducido para $n=2$}\\
 Con dos elementos de $l=0.5$ m hay 3 nodos y 18 GDL, de los cuales quedan 12
