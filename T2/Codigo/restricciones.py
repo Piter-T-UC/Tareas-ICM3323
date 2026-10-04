@@ -1,6 +1,4 @@
-# ------------------------------------------------------------------
-# 3. RESTRICCIONES -- generalizado (infiere dim de la forma de "apoyos")
-# ------------------------------------------------------------------
+
 def Restriciones(apoyos):
     dim = apoyos.shape[1] - 1         # cada fila es [nodo, r1, r2, ...]
     dofs_fijos = []

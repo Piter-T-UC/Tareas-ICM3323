@@ -144,8 +144,8 @@ El nodo 1 ($z=0$) tiene sus 6 GDL restringidos al ser un empotramiento
 \textbf{Sistema reducido para $n=2$}\\
 Con dos elementos de $l=0.5$ m hay 3 nodos y 18 GDL, de los cuales quedan 12
 libres (nodos 2 y 3). Como la viga es recta y las cargas solo actúan en el
-plano $x$--$z$ y en torsión, los GDL $u_x,u_y,\theta_z$ quedan desacoplados
-y sin carga, por lo que valen cero. Basta con resolver el sistema de los GDL
+plano $x$--$z$ y en torsión, los grados de libertad $u_x,u_y,\theta_z$ quedan desacoplados
+y sin carga, por lo que valen cero. Basta con resolver el sistema de los
 $u_z,\theta_x,\theta_y$ (unidades SI: N, m, rad):
 \[
 10^{5}
@@ -166,29 +166,14 @@ u_{z2} \\ \theta_{x2} \\ \theta_{y2} \\ u_{z3} \\ \theta_{x3} \\ \theta_{y3}
 -1 \\ 0 \\ 0 \\ 0 \\ 2 \\ 0
 \end{bmatrix}
 \]
-Se verifica, por ejemplo, la torsión: $K_{\theta_{x2}\theta_{x2}}=
-G(\bar J_1+\bar J_2)/l=80\times10^9\,(3.5+2.5)\times10^{-6}/0.5=9.6\times10^5$
-N$\cdot$m/rad. Además, flexión y torsión no se acoplan entre sí (los ceros
+Se puede verificar que la flexión y torsión no se acoplan entre sí (los ceros
 de la matriz), igual que en la solución analítica.
 
-\textbf{Discretizaciones}\\
-Se usan $n=2,\,4,\,8$ y $16$ elementos de igual largo:
-\begin{itemize}[itemsep=2pt]
-    \item \textbf{$n=2$:} es la malla más gruesa posible, porque la carga $P$
-    debe caer sobre un nodo (en $z=L/2$). Sirve para ver cuánto error comete
-    el MEF con el mínimo de elementos.
-    \item \textbf{$n=4$ y $n=8$:} al duplicar $n$ el largo de elemento $l$ se
-    reduce a la mitad, lo que permite medir la tasa de convergencia
-    $e\propto l^{p}$. $n$ siempre es par para mantener un nodo bajo $P$.
-    \item \textbf{$n=16$:} malla fina para verificar que la solución ya
-    convergió. El MEF no es exacto aquí porque, con $I(z)$ variable, las
-    cúbicas de Hermite (y las lineales en torsión) no son la solución
-    exacta de la ecuación diferencial dentro de cada elemento.
-\end{itemize}
+Para mas adelante lo que se hizo fue discretizar en multiplos de 2 para que asi la aplicacion d eP calzara con el punto de aplicación
 
-\textbf{Reconstrucción de los campos}\\
-Los campos a lo largo de la viga se obtienen de los desplazamientos nodales:
-$v=-u_z$ se interpola con las cúbicas de Hermite a partir de
+\textbf{Reconstrucción de los deformaqciones}\\
+Las deformaciones a lo largo de la viga se obtienen de los desplazamientos nodales:
+$v=-u_z$ se interpola con las funciones cubicas a partir de
 $(v,\theta)$ de cada nodo (con $\theta=\theta_y=dv/dz$),
 $\theta(z)=v'(z)$ es la derivada de esa interpolación y $\varphi=\theta_x$
 se interpola linealmente. Los esfuerzos se calculan como
@@ -376,26 +361,21 @@ $n$ & error $v(L)$ & error $\theta(L)$ & error $\varphi(L)$ & razón $e_{n/2}/e_
     $V=P=1000$ N y $T=M=2000$ N$\cdot$m se obtienen exactos incluso con $n=2$.
     Además, como $M_f$ es lineal y $V$ y $T$ son constantes en cada tramo, la
     interpolación del elemento los representa sin error: el MEF coincide con
-    la solución analítica en toda la viga y no solo en los nodos
-    (Figura~\ref{fig:t2-p1-VMT}).
+    la solución analítica en toda la viga y no solo en los nodos.
 
-    \item \textbf{Flexión: convergencia de orden $l^4$ en los nodos.} Con
-    $I(z)$ variable, la curvatura exacta $M_f/(EI)$ no es lineal dentro de un
-    elemento y las cúbicas de Hermite no pueden reproducirla. Aun así, el
-    error nodal es muy pequeño con $n=2$ ($0.11$\,\% en $v(L/2)$ y $0.03$\,\%
+    \item \textbf{Flexión} Con $I(z)$ variable, la curvatura exacta $M_f/(EI)$ no es lineal dentro de un elemento y las funciones cubicas no pueden reproducirla (tiene parte logaritmica). Aun así, el error nodal es muy pequeño con $n=2$ ($0.11$\,\% en $v(L/2)$ y $0.03$\,\%
     en $v(L)$), y se divide por $\approx 16=2^4$ cada vez que $n$ se duplica
-    (pendiente $4$ en el gráfico log-log), que es la superconvergencia nodal
-    típica del elemento de Hermite. En los gráficos de $v$ y $\theta$ las
+    (pendiente cercana a $4$ en el gráfico log-log). En los gráficos de $v$ y $\theta$ las
     curvas MEF son prácticamente indistinguibles de la analítica.
 
-    \item \textbf{Torsión: convergencia de orden $l^2$.} El elemento lineal
+    \item \textbf{Torsión} El elemento lineal
     usa el promedio aritmético $\bar J$, que para $J$ lineal es mayor que el
     que da la rigidez exacta del tramo, $l\big/\!\int_0^l dz/J(z)$ (promedio
     armónico). Por eso el MEF es más rígido y \emph{subestima} el giro:
     $\varphi(L)$ tiene un error de $1.1$\,\% con $n=2$, que baja a $0.02$\,\%
     con $n=16$ y se divide por $\approx 4=2^2$ cada vez que se duplica $n$.
 
-    \item \textbf{Tramo $L/2<z\le L$.} Como ahí $M_f=0$, ese tramo se mueve
+    \item \textbf{Error en flexion y torsion} Como ahí $M_f=0$, ese tramo se mueve
     como sólido rígido: $\theta$ es constante y $v$ crece linealmente. El
     MEF lo reproduce exactamente, porque un polinomio cúbico contiene la
     recta. Todo el error de flexión del extremo viene del tramo
@@ -404,8 +384,7 @@ $n$ & error $v(L)$ & error $\theta(L)$ & error $\varphi(L)$ & razón $e_{n/2}/e_
 
     \item \textbf{Elección de malla.} Para flexión bastaría con $n=2$ (error
     del orden de $0.1$\,\%). Para la torsión se necesita al menos $n=8$ para
-    bajar del $0.1$\,\%. Con $n=16$ todos los campos quedan convergidos para
-    fines de diseño.
+    bajar del $0.1$\,\%.
 \end{itemize}
 
 \end{desarrollo}

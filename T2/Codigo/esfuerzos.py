@@ -6,13 +6,13 @@ from gen_matriz_global import propiedades_si, geometria_elemento, k_local_viga
 
 #aqui tenemos el calculo de los esfuerzos respecto a U
 def calc_esfuerzos(xyz, conectividad, U, Area, I_x, I_y, J_p, vec_ref,
-                   M_Elasticidad=206*ureg.GPa, G_Cortante=206*ureg.GPa/(2*(1+0.3)),
+                   M_Elasticidad=206*ureg.GPa, G_Cortante=80*ureg.GPa,
                    c_x=None, c_y=None, r_t=None):
     num_elementos = len(conectividad)
     E = M_Elasticidad.to(ureg.pascal).magnitude
     G = G_Cortante.to(ureg.pascal).magnitude
     A, Ix, Iy, Jp = propiedades_si(num_elementos, Area, I_x, I_y, J_p)
-
+## de aqui a abajo me ayudo claude para poder hacerlo ordenado
     def _dist(d):
         if d is None:
             return np.full((num_elementos, 2), np.nan)
@@ -37,7 +37,7 @@ def calc_esfuerzos(xyz, conectividad, U, Area, I_x, I_y, J_p, vec_ref,
         internas[e, 0] = -f_L[:6]
         internas[e, 1] = f_L[6:]
 
-    # limpia el ruido de redondeo (1e-15 relativo) para que no aparezca en diagramas
+    # limpia el ruido de redondeo (1e-15 relativo) para que no aparezca en diagramas aqui me 
     internas[np.abs(internas) < 1e-10*np.abs(internas).max(initial=0)] = 0.0
     Vx, Vy, N, Mx, My, T = np.moveaxis(internas, 2, 0)   # cada uno (n_elementos, 2)
 
@@ -47,10 +47,9 @@ def calc_esfuerzos(xyz, conectividad, U, Area, I_x, I_y, J_p, vec_ref,
     kap_y = My / (E*Iy)
     tw = T / (G*Jp)                    # giro por unidad de largo
 
-    # tensiones: sigma en la fibra mas alejada (suma de valores absolutos:
-    # exacto en secciones con esquinas, conservador en secciones circulares)
+    # tensiones: sigma en la fibra mas alejada
     sigma_N = N / A
-    sigma_max = np.abs(sigma_N) + np.abs(Mx)*cy/Ix + np.abs(My)*cx/Iy
+    sigma_max = np.abs(sigma_N) + np.abs(Mx)*cy/Ix + np.abs(My)*cx/Iy # Aqui aplico con valor absoluto porque es mas conservador en caso que la seccion no sea circular.
     tau_T = np.abs(T)*rt/Jp
     sigma_vm = np.sqrt(sigma_max**2 + 3*tau_T**2)
 
@@ -65,8 +64,7 @@ def calc_esfuerzos(xyz, conectividad, U, Area, I_x, I_y, J_p, vec_ref,
 
 
 ## Esfuerzos a lo largo del elemento e (z local de 0 a L), por equilibrio del tramo [0, z]
-## partiendo de los esfuerzos en el nodo inicial. Todas las cargas estan en los nodos,
-## asi que dentro del elemento V, N y T son constantes y M es lineal.
+#aqui me ayudo un poco claude para poder evaluar los momentos en distintos puntos.
 def esfuerzos_a_lo_largo(res, e, n_pts=41):
     L = res["largos"][e]
     z = np.linspace(0, L, n_pts)

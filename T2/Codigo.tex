@@ -2,24 +2,9 @@
 \section{Codigo}
 
 En esta ocasion decidi explicar el codigo por partes, por eso mismo lo hice funcion cada uno por separado
+hay algunas que no estan explicados en texto fuera porque son cortas y/o se repiten de la entrega pasada como todo de la generación de la matriz de rigidez, o reducir/ resolver el sistema. Lo nuevo (cargas distribuidas y tensiones internas fuera de axial)
+\subsection{Funciones}
 
-\subsection*{Problema 1: \texttt{problema\_1.py}}
-Resuelve el voladizo con $n=2,4,8,16$ elementos, eval\'ua la soluci\'on
-anal\'itica de la parte a) y exporta los datos que se grafican en
-\texttt{T2/datos\_P1/}.
-\lstinputlisting[style=pythonstyle]{T2/Codigo/problema_1.py}
-
-\subsection*{Problema 1: \texttt{diagramas\_P1.py}}
-Lee los datos de \texttt{T2/datos\_P1/} y dibuja los diagramas de corte,
-momento flector y torsor (anal\'itica y MEF con $n=2$).
-\lstinputlisting[style=pythonstyle]{T2/Codigo/diagramas_P1.py}
-
-\subsection*{Problema 2: \texttt{Problema\_2.py}}
-Define la geometr\'ia del paradero (con atiesadores), aplica el peso propio,
-resuelve y verifica deflexi\'on y tensiones.
-\lstinputlisting[style=pythonstyle]{T2/Codigo/Problema_2.py}
-
-\subsection*{Funciones comunes (Problemas 1 y 2)}
 Las funciones de graficado (\texttt{diagramas.py},
 \texttt{graficar\_reticulado.py}, \texttt{exportar\_latex.py}) no se incluyen
 por largo.
@@ -45,8 +30,33 @@ por largo.
 \paragraph{\texttt{u\_completa.py}} Arma el vector de desplazamientos completo.
 \lstinputlisting[style=pythonstyle]{T2/Codigo/u_completa.py}
 
-\paragraph{\texttt{esfuerzos.py}} Fuerzas internas, tensiones y reacciones.
+\paragraph{\texttt{esfuerzos.py}} Fuerzas internas, tensiones y reacciones.\\
+En este caso es la funcion mas compleja por ende la que mas explicare, por ende el archivo \texttt{esfuerzos.py} toma los desplazamientos nodales $\mathbf{U}$ que salen de resolver el sistema y calcula los esfuerzos internos, las tensiones y las reacciones de la estructura. La función \texttt{calc\_esfuerzos} recorre los elementos uno por uno. Para cada elemento obtiene su largo y su matriz de rotación, extrae de $\mathbf{U}$ los 12 grados de libertad de sus dos nodos y los pasa a ejes locales. Luego multiplica esos desplazamientos locales por la matriz de rigidez local de la viga, $\mathbf{f}_L = \mathbf{k}_L\,\mathbf{u}_L$, y obtiene las fuerzas en los extremos: cortes $V_x$ y $V_y$, axial $N$, momentos $M_x$ y $M_y$ y torsión $T$. A las del nodo inicial les cambia el signo para que sigan la convención de esfuerzo interno, y además limpia el ruido numérico. Con esos esfuerzos calcula las deformaciones de la sección (deformación axial $\varepsilon = N/EA$, curvaturas $\kappa = M/EI$ y giro por unidad de largo $T/GJ$). También calcula las tensiones: la normal $\sigma_N = N/A$ y la máxima en la fibra extrema,
+\[
+\sigma_{\max} = \frac{|N|}{A} + \frac{|M_x|\,c_y}{I_x} + \frac{|M_y|\,c_x}{I_y}.
+\]
+Esta suma de valores absolutos es exacta en secciones con esquinas y conservadora en secciones circulares. A eso agrega el corte por torsión $\tau_T = |T|\,r/J$ y la tensión de von Mises $\sigma_{VM} = \sqrt{\sigma_{\max}^2 + 3\tau_T^2}$. La función \texttt{esfuerzos\_a\_lo\_largo} arma los diagramas dentro de un elemento: parte de los esfuerzos del nodo inicial y aplica equilibrio del tramo $[0, z]$. Como no hay cargas entre los nodos, $V$, $N$ y $T$ quedan constantes y los momentos varían linealmente, $M_x(z) = M_{x,0} + z\,V_y$ y $M_y(z) = M_{y,0} - z\,V_x$. Con esos valores recalcula las tensiones en cada punto. Por último, \texttt{calc\_reacciones} obtiene las reacciones como $\mathbf{R} = \mathbf{K}\,\mathbf{U} - \mathbf{F}$ y deja solo los grados de libertad restringidos. Así se puede comprobar el equilibrio contra el peso total.
+
+En el Problema 2 el peso propio entra como cargas nodales equivalentes. Por eso el momento lineal que da \texttt{esfuerzos\_a\_lo\_largo} es una aproximación por tramos del momento real, que sería parabólico. Esa aproximación mejora al refinar la malla, como se hace en las vigas de 4~m.
 \lstinputlisting[style=pythonstyle]{T2/Codigo/esfuerzos.py}
 
-\paragraph{\texttt{refinar\_malla.py}} Divide barras en sub-elementos.
+\paragraph{\texttt{refinar\_malla.py}} Divide barras en sub-elementos. (esta funcion es completa IA, lo que hace es evitarme tener que editar la xyz y conectividad cada vez que quiera ser mas exacto)
 \lstinputlisting[style=pythonstyle]{T2/Codigo/refinar_malla.py}
+
+\subsection*{Problema 1: \texttt{problema\_1.py}}
+Resuelve el voladizo con $n=2,4,8,16$ elementos, eval\'ua la soluci\'on
+anal\'itica de la parte a) y exporta los datos que se grafican en
+\texttt{T2/datos\_P1/}.
+\lstinputlisting[style=pythonstyle]{T2/Codigo/problema_1.py}
+
+\subsection*{Problema 1: \texttt{diagramas\_P1.py}}
+Lee los datos de \texttt{T2/datos\_P1/} y dibuja los diagramas de corte,
+momento flector y torsor (anal\'itica y MEF con $n=2$). Aqui me apoye bastante de claude  para poder graficar todo y que me lo ordene en carpetas 
+\lstinputlisting[style=pythonstyle]{T2/Codigo/diagramas_P1.py}
+
+\subsection*{Problema 2: \texttt{Problema\_2.py}}
+Define la geometr\'ia del paradero (con atiesadores), aplica el peso propio,
+resuelve y verifica deflexi\'on y tensiones.
+\lstinputlisting[style=pythonstyle]{T2/Codigo/Problema_2.py}
+
+
