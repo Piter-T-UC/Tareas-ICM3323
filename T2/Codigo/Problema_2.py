@@ -163,9 +163,9 @@ print(f"error de cierre de los diagramas: {err:.2e}")
 # verificacion de las restricciones de diseno
 S_y = 300*ureg.MPa
 delta_max = 10*ureg.mm
-desp = np.linalg.norm(traslaciones.magnitude, axis=1)
+desp = np.abs(traslaciones.magnitude[:, 2])     # deflexion vertical |u_z|
 n_d = int(np.argmax(desp))
-print(f"\ndeflexion maxima = {desp[n_d]:.2f} mm en nodo {n_d} {xyz[n_d].magnitude} m"
+print(f"\ndeflexion vertical maxima = {desp[n_d]:.2f} mm en nodo {n_d} {xyz[n_d].magnitude} m"
       f"  (limite {delta_max:~P}) -> {'CUMPLE' if desp[n_d] < delta_max.magnitude else 'NO CUMPLE'}")
 print("tension de von Mises maxima por barra:")
 svm_barras = []
