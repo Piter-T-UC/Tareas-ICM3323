@@ -1,0 +1,66 @@
+%---------------------- Problema ---------------------------------
+\section*{Problema}
+
+\begin{enunciado}{Problema (6 puntos)}
+    \begin{enumerate}[label=\alph*), itemsep=4pt]
+        \item Calcular mediante el m\'etodo de elementos finitos los campos de
+        las diferentes variables correspondientes al problema del apartado 35
+        del libro \textit{``Theory of Elasticity''} de S.P.~Timoshenko y
+        J.N.~Goodier (todos los par\'ametros son de libre elecci\'on):
+        \textit{``The Effect of Circular Holes on Stress Distributions in
+        Plates''} (figura 52).
+        \item Comparar y discutir los resultados obtenidos en a) con los
+        correspondientes a la soluci\'on anal\'itica del mencionado apartado.
+        \item Comparar y discutir los resultados obtenidos en a) con el
+        proporcionado por un programa comercial de elementos finitos.
+    \end{enumerate}
+\end{enunciado}
+
+\begin{figure}[!htbp]
+\centering
+\begin{tikzpicture}[>=latex, scale=1.1]
+    % --- Datos geometricos (solo para el dibujo) ---
+    \def\Lplaca{9}      % largo de la placa
+    \def\dplaca{3}      % ancho de la placa (d)
+    \def\rag{0.6}    % radio del agujero (r)
+    \pgfmathsetmacro{\xc}{\Lplaca/2}
+    \pgfmathsetmacro{\yc}{\dplaca/2}
+
+    % placa con agujero
+    \draw[thick, fill=black!5, even odd rule]
+        (0,0) rectangle (\Lplaca,\dplaca)
+        (\xc,\yc) circle (\rag);
+
+    % ejes de simetria
+    \draw[dashed, thin, gray] (-0.2,\yc) -- (\Lplaca+0.2,\yc);
+    \draw[dashed, thin, gray] (\xc,-0.3) -- (\xc,\dplaca+0.3);
+
+    % traccion uniforme S en ambos extremos
+    \foreach \y in {0.25,0.75,...,2.75}{
+        \draw[-{Latex[length=2mm]}, thick] (0,\y) -- (-0.8,\y);
+        \draw[-{Latex[length=2mm]}, thick] (\Lplaca,\y) -- (\Lplaca+0.8,\y);
+    }
+    \node at (-1.2,\yc) {\Large $S$};
+    \node at (\Lplaca+1.2,\yc) {\Large $S$};
+
+    % puntos m (borde de la placa) y n (borde del agujero)
+    \fill (\xc,\dplaca) circle (1.6pt) node[above=3pt] {$m$};
+    \fill (\xc,\yc+\rag) circle (1.6pt) node[above left=1pt] {$n$};
+
+    % cota 2r
+    \draw[<->, thin] (\xc+1.1,\yc-\rag) -- (\xc+1.1,\yc+\rag)
+        node[midway, fill=black!5, inner sep=2pt] {$2r$};
+    \draw[thin] (\xc,\yc-\rag) -- (\xc+1.25,\yc-\rag);
+    \draw[thin] (\xc,\yc+\rag) -- (\xc+1.25,\yc+\rag);
+
+    % cota d
+    \draw[<->, thick] (\Lplaca+2.0,0) -- (\Lplaca+2.0,\dplaca)
+        node[midway, fill=white, inner sep=2pt] {$d$};
+    \draw[thin] (\Lplaca+0.1,0) -- (\Lplaca+2.2,0);
+    \draw[thin] (\Lplaca+0.1,\dplaca) -- (\Lplaca+2.2,\dplaca);
+\end{tikzpicture}
+\caption{Placa de ancho $d$ con un agujero circular de di\'ametro $2r$ en su
+eje de simetr\'ia, sometida a tracci\'on uniforme $S$ en sus extremos
+(Timoshenko \& Goodier, Fig.~52).}
+\label{fig:t3-placa}
+\end{figure}
