@@ -380,22 +380,20 @@ $n$ & error $v(L)$ & error $\theta(L)$ & error $\varphi(L)$ & razón $e_{n/2}/e_
     curvas MEF son prácticamente indistinguibles de la analítica.
 
     \item \textbf{Torsión.} El elemento lineal
-    usa el promedio aritmético $\bar J$, que para $J$ lineal es mayor que el
-    que da la rigidez exacta del tramo, $l\big/\!\int_0^l dz/J(z)$ (promedio
-    armónico). Por eso el MEF es más rígido y \emph{subestima} el giro:
+    usa el promedio aritmético $\bar J$. Por eso el MEF es más rígido y \emph{subestima} el giro:
     $\varphi(L)$ tiene un error de $1.1$\,\% con $n=2$, que baja a $0.02$\,\%
     con $n=16$ y se divide por $\approx 4=2^2$ cada vez que se duplica $n$.
 
     \item \textbf{Tramo $L/2\le z\le L$.} Como ahí $M_f=0$, ese tramo se mueve
     como sólido rígido: $\theta$ es constante y $v$ crece linealmente. El
-    MEF lo reproduce exactamente, porque un polinomio cúbico contiene la
+    MEF lo reproduce exactamente, porque un polinomio cúbico contiene law
     recta. Todo el error de flexión del extremo viene del tramo
-    $0\le z\le L/2$. La torsión, en cambio, actúa en toda la viga y
-    acumula error en todos los elementos.
+    $0\le z\le L/2$. La torsión, en cambio, actúa en toda la viga por ende el error va en toda ella.
 
     \item \textbf{Elección de malla.} Para flexión bastaría con $n=2$ (error
     del orden de $0.1$\,\%). Para la torsión se necesita al menos $n=8$ para
-    bajar del $0.1$\,\%.
+    bajar del $0.1$\,\%. Por eso es importante tener conociemiento de como deberia ser la forma y no solo ver los resultados del programa.
+    
 \end{itemize}
 
 \end{desarrollo}
