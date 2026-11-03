@@ -1,0 +1,208 @@
+%======================================================================
+% b) Comparacion con la solucion analitica
+%======================================================================
+\newpage
+\section*{b) Comparaci\'on con la soluci\'on anal\'itica}
+
+%----------------------------------------------------------------------
+\begin{desarrollo}{1. Soluci\'on de Kirsch (Timoshenko \& Goodier, \S35)}
+
+Se considera una placa \textbf{infinita} con un agujero circular de radio $a$,
+sometida a una tracci\'on uniforme $S$ en la direcci\'on $x$. Por el principio
+de Saint-Venant, el agujero solo perturba el campo cerca de \'el; en un c\'irculo
+conc\'entrico de radio $b\gg a$ las tensiones son las de la placa sin agujero,
+escritas en polares:
+\[
+(\sigma_r)_{r=b}=S\cos^2\theta=\tfrac12 S\,(1+\cos2\theta),
+\qquad
+(\tau_{r\theta})_{r=b}=-\tfrac12 S\sin2\theta .
+\]
+El anillo $a\le r\le b$ se resuelve superponiendo dos partes:
+
+\textbf{Parte 1: presi\'on uniforme.} La componente constante $\tfrac12 S$ es un
+problema de cilindro de pared gruesa (Lam\'e) con presi\'on exterior. Con
+$b\to\infty$:
+\[
+\sigma_r=\tfrac{S}{2}\left(1-\tfrac{a^2}{r^2}\right),\qquad
+\sigma_\theta=\tfrac{S}{2}\left(1+\tfrac{a^2}{r^2}\right),\qquad
+\tau_{r\theta}=0 .
+\]
+
+\textbf{Parte 2: carga en $\cos2\theta$.} La parte
+$\tfrac12 S\cos2\theta$, $-\tfrac12 S\sin2\theta$ se obtiene de una funci\'on de
+tensiones $\phi=f(r)\cos2\theta$. Al imponer la compatibilidad
+$\nabla^4\phi=0$ queda una ecuaci\'on de Euler para $f(r)$, cuya soluci\'on
+general es
+\[
+f(r)=A\,r^2+B\,r^4+\frac{C}{r^2}+D ,
+\]
+y las tensiones son
+\begin{align*}
+\sigma_r&=\frac1r\frac{\partial\phi}{\partial r}+\frac1{r^2}\frac{\partial^2\phi}{\partial\theta^2}
+=-\left(2A+\frac{6C}{r^4}+\frac{4D}{r^2}\right)\cos2\theta,\\
+\sigma_\theta&=\frac{\partial^2\phi}{\partial r^2}
+=\left(2A+12Br^2+\frac{6C}{r^4}\right)\cos2\theta,\\
+\tau_{r\theta}&=-\frac{\partial}{\partial r}\left(\frac1r\frac{\partial\phi}{\partial\theta}\right)
+=\left(2A+6Br^2-\frac{6C}{r^4}-\frac{2D}{r^2}\right)\sin2\theta .
+\end{align*}
+Las 4 constantes salen de imponer las tracciones en $r=b$ y borde libre en
+$r=a$ ($\sigma_r=\tau_{r\theta}=0$). Con $a/b\to0$ (placa infinita):
+\[
+A=-\frac S4,\qquad B=0,\qquad C=-\frac{a^4}{4}S,\qquad D=\frac{a^2}{2}S .
+\]
+
+\textbf{Resultado (ec.~61 de Timoshenko).} Sumando las dos partes:
+\begin{align*}
+\sigma_r&=\frac S2\left(1-\frac{a^2}{r^2}\right)+\frac S2\left(1+\frac{3a^4}{r^4}-\frac{4a^2}{r^2}\right)\cos2\theta,\\
+\sigma_\theta&=\frac S2\left(1+\frac{a^2}{r^2}\right)-\frac S2\left(1+\frac{3a^4}{r^4}\right)\cos2\theta,\\
+\tau_{r\theta}&=-\frac S2\left(1-\frac{3a^4}{r^4}+\frac{2a^2}{r^2}\right)\sin2\theta .
+\end{align*}
+
+\textbf{Consecuencias importantes.}
+\begin{itemize}[itemsep=3pt]
+  \item En el borde del agujero ($r=a$): $\sigma_r=\tau_{r\theta}=0$ y
+  $\sigma_\theta=S-2S\cos2\theta$.
+  \item El m\'aximo es $\sigma_\theta=3S$ en $\theta=\pm\pi/2$ (punto B): el
+  factor de concentraci\'on de tensiones de la placa infinita es $K_t=3$.
+  \item En $\theta=0,\pi$ (punto A) $\sigma_\theta=-S$: hay \textbf{compresi\'on}
+  tangencial aunque la placa est\'e traccionada.
+  \item En la secci\'on $\theta=\pi/2$ (eje $y$):
+  $\sigma_\theta=\tfrac S2\left(2+\tfrac{a^2}{r^2}+3\tfrac{a^4}{r^4}\right)$, que
+  baja muy r\'apido a $S$; en $r=2a$ ya vale $1.22\,S$. El efecto del agujero
+  es \emph{localizado}.
+\end{itemize}
+
+\textbf{Desplazamientos.} Integrando las deformaciones (con $G=E/2(1+\nu)$ y
+$\kappa=(3-\nu)/(1+\nu)$ en tensi\'on plana, $\kappa=3-4\nu$ en deformaci\'on
+plana), y eligiendo el movimiento r\'igido para que se cumpla la simetr\'ia:
+\begin{align*}
+u_r&=\frac{S}{8Gr}\left[(\kappa-1)\,r^2+2a^2+2\left(r^2+(\kappa+1)\,a^2-\frac{a^4}{r^2}\right)\cos2\theta\right],\\
+u_\theta&=-\frac{S}{8Gr}\;2\left(r^2+(\kappa-1)\,a^2+\frac{a^4}{r^2}\right)\sin2\theta .
+\end{align*}
+Estas expresiones cumplen $u_y=0$ en $\theta=0$ y $u_x=0$ en $\theta=\pi/2$, las
+mismas condiciones de simetr\'ia del modelo de MEF.
+
+\textbf{Paso a cartesianas.} El MEF entrega $\sigma_{xx},\sigma_{yy},\tau_{xy}$,
+as\'i que la soluci\'on anal\'itica se rota con $c=\cos\theta$, $s=\sin\theta$:
+\[
+\sigma_{xx}=\sigma_rc^2+\sigma_\theta s^2-2\tau_{r\theta}sc,\quad
+\sigma_{yy}=\sigma_rs^2+\sigma_\theta c^2+2\tau_{r\theta}sc,\quad
+\tau_{xy}=(\sigma_r-\sigma_\theta)sc+\tau_{r\theta}(c^2-s^2),
+\]
+y $u_x=u_rc-u_\theta s$, $u_y=u_rs+u_\theta c$. Todo esto est\'a programado en
+\texttt{kirsch.py} y \texttt{solucion\_kirsch.py}.
+
+\begin{center}
+\figuraT{T3/figuras/kirsch_campos.png}{0.95}{Campos anal\'iticos de Kirsch ($\sigma_{xx}$, $\sigma_{yy}$, $\tau_{xy}$, von Mises) alrededor del agujero (\texttt{kirsch\_campos.png}).}
+
+\vspace{6pt}
+\figuraT{T3/figuras/kirsch_cortes.png}{0.9}{Cortes anal\'iticos: $\sigma_\theta$ en el borde del agujero en funci\'on de $\theta$ y $\sigma_{xx}$ a lo largo del eje $y$ (\texttt{kirsch\_cortes.png}).}
+\end{center}
+\end{desarrollo}
+
+%----------------------------------------------------------------------
+\begin{desarrollo}{2. Comparaci\'on en los puntos de control}
+
+Los valores anal\'iticos se calcularon con \texttt{kirsch.py} para
+$S=100$ MPa, $a=10$ mm, $L=50$ mm, $E=200$ GPa y $\nu=0.3$ (tensi\'on plana).
+El error es $e=(\text{MEF}-\text{Kirsch})/\text{Kirsch}$; donde el valor anal\'itico
+es cero o muy peque\~no conviene comparar la diferencia absoluta en vez del
+error relativo.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{}llcccc@{}}
+\toprule
+Punto & Variable & Kirsch & MEF malla 1 & MEF malla 2 & error malla 2\\
+\midrule
+\multirow{2}{*}{A $(a,0)$}
+  & $u_x$ [mm] & $0.01500$ & \pend & \pend & \pend\\
+  & $\sigma_{yy}$ [MPa] & $-100.0$ & \pend & \pend & \pend\\
+\midrule
+\multirow{2}{*}{B $(0,a)$}
+  & $u_y$ [mm] & $-0.00500$ & \pend & \pend & \pend\\
+  & $\sigma_{xx}$ [MPa] & $300.0$ & \pend & \pend & \pend\\
+\midrule
+\multirow{2}{*}{C $(L,0)$}
+  & $u_x$ [mm] & $0.02762$ & \pend & \pend & \pend\\
+  & $\sigma_{xx}$ [MPa] & $90.24$ & \pend & \pend & \pend\\
+\midrule
+\multirow{2}{*}{D $(0,L)$}
+  & $u_y$ [mm] & $-0.00882$ & \pend & \pend & \pend\\
+  & $\sigma_{xx}$ [MPa] & $102.24$ & \pend & \pend & \pend\\
+\midrule
+& $K_t=\sigma_{xx}(B)/S$ & $3.00$ & \pend & \pend & \pend\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\figuraT{T3/figuras/comparacion_borde_agujero.png}{0.75}{$\sigma_\theta(\theta)$ en el borde del agujero ($r=a$): curva de Kirsch y valores nodales del MEF (malla 1 y malla 2).}
+
+\vspace{6pt}
+\figuraT{T3/figuras/comparacion_eje_y.png}{0.75}{$\sigma_{xx}$ a lo largo del eje $y$ ($x=0$, de B a D): Kirsch y MEF.}
+
+\vspace{6pt}
+\figuraT{T3/figuras/convergencia_Kt.png}{0.6}{Convergencia de $K_t=\sigma_{xx}(B)/S$ con el n\'umero de GDL.}
+\end{center}
+\end{desarrollo}
+
+%----------------------------------------------------------------------
+\begin{desarrollo}{3. ¿Por qu\'e el MEF no tiene que dar exactamente Kirsch?}
+
+La comparaci\'on no es entre dos soluciones del \emph{mismo} problema. Hay dos
+fuentes de diferencia, y conviene separarlas:
+
+\textbf{(i) Error de discretizaci\'on del MEF.} Es el que baja al refinar la
+malla: los desplazamientos son polinomios cuadr\'aticos por elemento, las
+tensiones salen de derivarlos (un orden menos de precisi\'on) y se promedian en
+los nodos. Se mide comparando la malla 1 con la malla 2.
+
+\textbf{(ii) Diferencia de modelo: placa finita contra placa infinita.} Kirsch
+supone una placa infinita, mientras que el modelo tiene ancho $d=100$ mm y la
+carga aplicada a solo $L=5a$ del centro del agujero.
+\begin{itemize}[itemsep=3pt]
+  \item \textbf{Ancho finito.} Como la carga total tiene que pasar por la
+  secci\'on neta ($d-2r$ en vez de $d$), la tensi\'on media en la secci\'on del
+  agujero sube y $K_t$ supera 3. Este es exactamente el caso de la Fig.~52:
+  Howland encontr\'o, para $2r=d/2$, $\sigma_\theta=4.3S$ en $n$ y $0.75S$ en el
+  borde $m$. Para $2r/d=0.2$, la aproximaci\'on de Heywood (recopilada en
+  Peterson's \emph{Stress Concentration Factors}),
+  \[
+  K_t \approx \frac{2+(1-\lambda)^3}{1-\lambda},\qquad \lambda=\frac{2r}{d}=0.2
+  \quad\Longrightarrow\quad K_t\approx3.14 ,
+  \]
+  da un valor de referencia para la placa de ancho finito, referido a la
+  tensi\'on bruta $S$.
+  \item \textbf{Largo finito.} Kirsch dice que en $x=L$ la tensi\'on no es
+  uniforme: $\sigma_{xx}=90.2$ MPa en C y $102.2$ MPa en D. El modelo, en
+  cambio, impone $S=100$ MPa uniforme en todo ese borde. Por eso en C y D el MEF
+  \emph{no puede} coincidir con Kirsch, por fina que sea la malla, y la
+  diferencia en el borde se propaga un poco hacia el agujero. Con $L=5a$ el borde
+  cargado est\'a relativamente cerca; un modelo m\'as largo
+  ($L=10a$ o m\'as) reducir\'ia este efecto.
+  \item \textbf{Borde libre $y=L$.} En la placa infinita hay tensiones
+  $\sigma_{yy}\ne0$ en $y=L$ (en D, $\sigma_{yy}=5.76$ MPa); en el modelo ese
+  borde est\'a libre y obliga a $\sigma_{yy}=0$.
+\end{itemize}
+
+\begin{pendiente}[Sugerencia para aislar el error del MEF]
+Repetir el c\'alculo aplicando en los bordes $x=L$ e $y=L$ las tracciones
+\emph{exactas} de Kirsch, $\bar{\mathbf{t}}=\bm\sigma_{\text{Kirsch}}\,\mathbf{n}$,
+en vez de $S$ uniforme. Ya est\'a todo lo necesario en el c\'odigo:
+\texttt{kirsch\_tracciones(x, y, nx, ny, S, a)} en \texttt{solucion\_kirsch.py}
+y \texttt{cargas\_en(xy, conectividad, en, q)} en \texttt{mallador.py}, que
+acepta una funci\'on \texttt{q(x, y, nx, ny)}. As\'i el problema discreto
+corresponde \emph{exactamente} al de Kirsch recortado, y cualquier diferencia que
+quede es error de discretizaci\'on puro (deber\'ia tender a cero al refinar).
+\end{pendiente}
+
+\begin{pendiente}[Por completar: discusi\'on]
+Discutir con los n\'umeros de la tabla: cu\'anto difiere $K_t$ del MEF de 3 y
+de 3.14, cu\'anto de esa diferencia baja al refinar (discretizaci\'on) y cu\'anto
+queda (placa finita), por qu\'e en el punto A el MEF da $|\sigma_{yy}|>S$, por qu\'e
+los desplazamientos del MEF salen mayores que los de Kirsch (¿la placa finita, con
+menos material alrededor del agujero, es m\'as flexible que la infinita?), y si el
+resultado cumple la cota de 6\,\% que da Timoshenko para $d\ge4\,(2r)$.
+\end{pendiente}
+\end{desarrollo}

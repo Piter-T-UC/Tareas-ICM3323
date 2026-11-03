@@ -20,6 +20,9 @@
 \usepackage{titlesec}
 \usepackage{caption}
 \usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{bm}
 %================================================================
 % Paleta de colores
 %================================================================
@@ -60,7 +63,9 @@
         {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
         {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
         {ñ}{{\~n}}1 {Ñ}{{\~N}}1 {ü}{{\"u}}1 {Ü}{{\"U}}1
-        {¿}{{?`}}1 {¡}{{!`}}1 {·}{{$\cdot$}}1,
+        {¿}{{?`}}1 {¡}{{!`}}1 {·}{{$\cdot$}}1
+        {°}{{$^\circ$}}1 {µ}{{$\mu$}}1 {×}{{$\times$}}1 {⊥}{{$\perp$}}1
+        {-}{{-\allowbreak}}1,  % deja partir las lineas largas de guiones
 }
 
 \setcounter{MaxMatrixCols}{12} 
@@ -99,6 +104,42 @@
   boxrule=0.8pt, arc=1.5mm,
   top=10pt, bottom=10pt, left=9pt, right=9pt
 }
+
+%================================================================
+% Espacios para completar (Tarea 3)
+%================================================================
+\definecolor{pendcolor}{RGB}{190,120,20}  % ambar, para lo que falta
+
+% Caja de lo que falta escribir (analisis, discusion, valores).
+% Uso: \begin{pendiente} ... \end{pendiente}   -> borrarla cuando se complete
+\newtcolorbox{pendiente}[1][Por completar]{
+  enhanced, breakable,
+  colback=pendcolor!6, colframe=pendcolor,
+  coltitle=white, fonttitle=\bfseries\small, fontupper=\small,
+  title={#1}, boxrule=0.6pt, arc=1mm, borderline={0.4pt}{0pt}{pendcolor,dashed},
+  top=5pt, bottom=5pt, left=7pt, right=7pt
+}
+
+% Figura que se completa sola: si el archivo existe lo inserta, si no deja un
+% recuadro con lo que va ahi y el nombre de archivo esperado.
+% Uso: \figuraT{ruta/archivo.png}{ancho (fraccion de \linewidth)}{que debe mostrar}
+\newcommand{\figuraT}[3]{%
+  \IfFileExists{#1}{%
+    \includegraphics[width=#2\linewidth]{#1}%
+  }{%
+    \begin{tikzpicture}
+      \draw[pendcolor, dashed, thick, rounded corners=2pt, fill=pendcolor!4]
+        (0,0) rectangle (#2\linewidth, 5.5cm);
+      \node[text width=#2\linewidth-1cm, align=center, font=\small, text=pendcolor!80!black]
+        at (#2\linewidth/2, 2.75cm)
+        {\textbf{Figura pendiente}\\[3pt] #3\\[6pt]
+         {\scriptsize archivo esperado: \texttt{\detokenize{#1}}}};
+    \end{tikzpicture}%
+  }%
+}
+
+% Celda de tabla por completar
+\newcommand{\pend}{\textcolor{pendcolor}{\textbf{?}}}
 
 \newcommand{\dnode}[5]{\coordinate (#1) at ({#2 + (\amp*#4)/1000},{#3 + (\amp*#5)/1000});}
 

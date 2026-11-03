@@ -1,0 +1,58 @@
+\newpage
+\section*{C\'odigo}
+
+El c\'odigo est\'a ordenado por etapas, una carpeta por etapa, y cada problema
+(\texttt{problema\_2.py}, \texttt{problema\_3.py}) solo define los datos y llama
+a las funciones en orden. Las funciones de graficado
+(\texttt{etapa5\_graficar/}), la lectura de mallas desde archivo y la malla de
+prueba no se incluyen por largo; est\'an en la carpeta \texttt{T3/Codigo} del
+repositorio. Reducir y resolver el sistema es igual que en las entregas
+anteriores.
+
+\subsection*{Etapa 1: malla}
+
+\paragraph{\texttt{etapa1\_malla/elementos.py}} Cat\'alogo de elementos (T3, T6, Q4, Q8, Q9), lados y validaci\'on de la malla.
+\lstinputlisting[style=pythonstyle]{T3/Codigo/etapa1_malla/elementos.py}
+
+\paragraph{\texttt{etapa1\_malla/mallador.py}} Mallador por bloques con interpolaci\'on transfinita y graduaci\'on geom\'etrica.
+\lstinputlisting[style=pythonstyle]{T3/Codigo/etapa1_malla/mallador.py}
+
+\paragraph{\texttt{etapa1\_malla/cargas.py}} Cargas distribuidas por lado.
+\lstinputlisting[style=pythonstyle]{T3/Codigo/etapa1_malla/cargas.py}
+
+\subsection*{Etapa 2: interpolaci\'on}
+
+\paragraph{\texttt{etapa2\_interpolacion/funciones\_forma.py}} Funciones de forma y sus derivadas naturales.
+\lstinputlisting[style=pythonstyle]{T3/Codigo/etapa2_interpolacion/funciones_forma.py}
+
+\subsection*{Etapa 3: matrices}
+
+\paragraph{\texttt{etapa3\_matrices/matriz\_D.py}} Matriz constitutiva en tensi\'on o deformaci\'on plana.
+\lstinputlisting[style=pythonstyle]{T3/Codigo/etapa3_matrices/matriz_D.py}
+
+\paragraph{\texttt{etapa3\_matrices/matriz\_B.py}} Jacobiano y matriz $\mathbf{B}$ en un punto $(\xi,\eta)$.
+\lstinputlisting[style=pythonstyle]{T3/Codigo/etapa3_matrices/matriz_B.py}
+
+\paragraph{\texttt{etapa3\_matrices/puntos\_gauss.py}} Puntos y pesos de Gauss en 1D y en el elemento de referencia.
+\lstinputlisting[style=pythonstyle]{T3/Codigo/etapa3_matrices/puntos_gauss.py}
+
+\paragraph{\texttt{etapa3\_matrices/gen\_matriz\_global.py}} Rigidez del elemento con Gauss y ensamble.
+\lstinputlisting[style=pythonstyle]{T3/Codigo/etapa3_matrices/gen_matriz_global.py}
+
+\paragraph{\texttt{etapa3\_matrices/gen\_f\_distribuida.py}} Fuerzas nodales equivalentes de las cargas en los lados.
+\lstinputlisting[style=pythonstyle]{T3/Codigo/etapa3_matrices/gen_f_distribuida.py}
+
+\subsection*{Etapa 4: resolver y tensiones}
+
+\paragraph{\texttt{etapa4\_resolver/tensiones.py}} Tensiones nodales promediadas y von Mises.
+\lstinputlisting[style=pythonstyle]{T3/Codigo/etapa4_resolver/tensiones.py}
+
+\subsection*{Soluci\'on anal\'itica}
+
+\paragraph{\texttt{kirsch.py}} Soluci\'on de Kirsch en polares y cartesianas, desplazamientos y verificaci\'on.
+\lstinputlisting[style=pythonstyle]{T3/Codigo/kirsch.py}
+
+\subsection*{Problema}
+
+\paragraph{\texttt{problema\_3.py}} Placa con agujero, 1/4 por simetr\'ia, malla 2 (192 Q9).
+\lstinputlisting[style=pythonstyle]{T3/Codigo/problema_3.py}

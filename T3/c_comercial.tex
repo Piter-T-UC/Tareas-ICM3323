@@ -1,0 +1,139 @@
+%======================================================================
+% c) Comparacion con un programa comercial
+%======================================================================
+\newpage
+\section*{c) Comparaci\'on con un programa comercial de elementos finitos}
+
+%----------------------------------------------------------------------
+\begin{desarrollo}{1. Programa y tipo de an\'alisis}
+
+Como programa comercial us\'e \textbf{Autodesk Inventor Nastran} (solver
+Autodesk Nastran), con un an\'alisis \emph{est\'atico lineal}. A diferencia de
+mi c\'odigo, el programa parte de la pieza CAD (\texttt{parte1.ipt}), genera la
+malla autom\'aticamente y entrega los campos ya post-procesados.
+
+Hay dos formas razonables de modelar la placa en un programa comercial:
+\begin{itemize}[itemsep=3pt]
+  \item \textbf{Elementos 2D (placa/l\'amina) en la superficie media}, con
+  espesor $t$. Con carga solo en el plano, una l\'amina trabaja como membrana y
+  el resultado es equivalente a tensi\'on plana. Es lo m\'as comparable con mi
+  c\'odigo. Los elementos t\'ipicos de Nastran son \texttt{CQUAD8} (cuadril\'atero
+  de 8 nodos, \emph{serend\'ipito}, el Q8 de mi c\'odigo) y \texttt{CTRIA6}
+  (tri\'angulo de 6 nodos, el T6).
+  \item \textbf{Elementos s\'olidos 3D} (tetraedros de 10 nodos) en todo el
+  volumen de la pieza. No necesita la hip\'otesis de tensi\'on plana, pero tiene
+  muchos m\'as GDL y la tensi\'on puede variar un poco a trav\'es del espesor.
+\end{itemize}
+
+\textbf{Ojo con los GDL de las l\'aminas.} Los elementos de l\'amina de Nastran
+tienen 6 GDL por nodo (3 traslaciones y 3 rotaciones), no 2 como en elasticidad
+plana. Con carga en el plano los GDL fuera del plano no trabajan, pero hay que
+restringirlos (o al menos uno por cuerpo) para que la rigidez no quede singular.
+\end{desarrollo}
+
+%----------------------------------------------------------------------
+\begin{desarrollo}{2. Modelo en el programa comercial}
+
+Para que la comparaci\'on sea justa, el modelo comercial debe resolver
+\emph{el mismo problema} que el apartado a): misma geometr\'ia, material,
+espesor, condiciones de borde y carga. As\'i las diferencias que queden se
+deben solo a la malla y al tipo de elemento.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+& Mi c\'odigo (apartado a) & Inventor Nastran\\
+\midrule
+Geometr\'ia modelada & 1/4 de placa, $L=50$ mm, $a=10$ mm & \pend\\
+Espesor $t$ & $10$ mm & \pend\\
+Material & $E=200$ GPa, $\nu=0.3$ & \pend\\
+Tipo de elemento & Q9 (elasticidad plana) & \pend\\
+Elementos / nodos / GDL & 192 / 825 / 1650 & \pend\\
+Condiciones de borde & simetr\'ia en $x=0$ e $y=0$ & \pend\\
+Carga & $S=100$ MPa en $x=L$ & \pend\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{pendiente}[Por completar: descripci\'on del modelo]
+Explicar c\'omo se arm\'o el modelo: geometr\'ia (placa completa o 1/4), tipo de
+idealizaci\'on (l\'amina en la superficie media o s\'olido), control de malla
+alrededor del agujero, c\'omo se impusieron la simetr\'ia o los apoyos y c\'omo
+se aplic\'o la tracci\'on $S$ (como presi\'on sobre la cara del borde o como
+fuerza total $S\,t\,L$ repartida).
+\end{pendiente}
+
+\begin{center}
+\figuraT{T3/figuras/nastran_malla.png}{0.48}{Malla del programa comercial, con detalle del refinamiento junto al agujero.}\hfill
+\figuraT{T3/figuras/nastran_cb.png}{0.48}{Condiciones de borde y carga en el programa comercial.}
+\end{center}
+\end{desarrollo}
+
+%----------------------------------------------------------------------
+\begin{desarrollo}{3. Resultados del programa comercial}
+
+\begin{center}
+\figuraT{T3/figuras/nastran_sxx.png}{0.48}{$\sigma_{xx}$ (en Nastran, componente normal en la direcci\'on de la carga).}\hfill
+\figuraT{T3/figuras/nastran_syy.png}{0.48}{$\sigma_{yy}$.}
+
+\vspace{6pt}
+\figuraT{T3/figuras/nastran_vonmises.png}{0.48}{Tensi\'on de von Mises.}\hfill
+\figuraT{T3/figuras/nastran_desplazamiento.png}{0.48}{Desplazamiento (deformada amplificada).}
+\end{center}
+
+\begin{pendiente}
+Ojo con la convenci\'on de ejes del programa: si la placa qued\'o en otro plano
+(por ejemplo $xz$ en vez de $xy$), indicar qu\'e componente de Nastran corresponde
+a $\sigma_{xx}$ y $\sigma_{yy}$ de este informe. Indicar tambi\'en si las tensiones
+mostradas son en las esquinas de los elementos, en el centroide o promediadas en
+los nodos, porque eso cambia el valor m\'aximo en el borde del agujero.
+\end{pendiente}
+\end{desarrollo}
+
+%----------------------------------------------------------------------
+\begin{desarrollo}{4. Comparaci\'on: Kirsch, MEF propio y programa comercial}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Variable & Kirsch (placa infinita) & MEF propio (malla 2) & Inventor Nastran\\
+\midrule
+$\sigma_{xx}(B)$ [MPa] & $300.0$ & \pend & \pend\\
+$\sigma_{yy}(A)$ [MPa] & $-100.0$ & \pend & \pend\\
+$K_t=\sigma_{xx}(B)/S$ & $3.00$ & \pend & \pend\\
+$u_x(C)$ [mm] & $0.02762$ & \pend & \pend\\
+$u_y(D)$ [mm] & $-0.00882$ & \pend & \pend\\
+$\sigma_{VM,\max}$ [MPa] & $300.0$ & \pend & \pend\\
+GDL & -- & 1650 & \pend\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Qu\'e esperar.} Si los dos modelos de MEF resuelven el mismo problema
+(misma placa finita, mismas condiciones de borde), deber\'ian parecerse
+\emph{entre s\'i} m\'as que a Kirsch, porque los dos tienen el efecto de ancho y
+largo finitos discutido en b). Las diferencias entre mi c\'odigo y Nastran vienen
+de:
+\begin{itemize}[itemsep=3pt]
+  \item \textbf{Tipo de elemento}: Q9 (lagrangiano, 9 nodos) contra
+  \texttt{CQUAD8}/\texttt{CTRIA6} (serend\'ipito, 8 nodos). Los dos son
+  cuadr\'aticos y deber\'ian converger a lo mismo.
+  \item \textbf{Malla}: la m\'ia es estructurada y graduada a mano; la del
+  programa es autom\'atica, no estructurada y en general con muchos m\'as
+  elementos.
+  \item \textbf{Post-proceso de tensiones}: yo eval\'uo $\bm\sigma$ en los nodos
+  y promedio entre elementos; el programa puede mostrar valores en las esquinas,
+  en los centroides o suavizados, y el m\'aximo en el borde del agujero depende de
+  eso.
+\end{itemize}
+
+\begin{pendiente}[Por completar: discusi\'on]
+Comparar los tres resultados: diferencia de $K_t$ entre el MEF propio y Nastran,
+si esa diferencia es menor que la diferencia de ambos con Kirsch (lo esperable),
+qu\'e ventajas tiene el programa comercial (mallado autom\'atico, post-proceso,
+geometr\'ia CAD) y qu\'e ventajas tiene el c\'odigo propio (control total del
+modelo, saber exactamente qu\'e se integra y c\'omo se calculan las tensiones).
+\end{pendiente}
+\end{desarrollo}

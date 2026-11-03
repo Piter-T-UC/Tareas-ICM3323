@@ -1,0 +1,432 @@
+%======================================================================
+% a) Solucion por MEF
+%======================================================================
+\newpage
+\section*{a) Soluci\'on por el m\'etodo de elementos finitos}
+
+En esta tarea el problema deja de ser unidimensional: ya no hay barras ni vigas
+cuyo campo depende solo de la coordenada axial, sino una placa en la que los
+desplazamientos $u_x(x,y)$ y $u_y(x,y)$ y las tres tensiones
+$\sigma_{xx},\sigma_{yy},\tau_{xy}$ var\'ian en todo el plano. Para resolverlo
+escrib\'i un c\'odigo de elasticidad plana en Python, ordenado por etapas igual
+que en las tareas anteriores (malla $\to$ interpolaci\'on $\to$ matrices $\to$
+resolver $\to$ graficar), con elementos isoparam\'etricos T3, T6, Q4, Q8 y Q9.
+El problema de Kirsch se resolvi\'o con elementos \textbf{Q9}.
+
+%----------------------------------------------------------------------
+\begin{desarrollo}{1. Par\'ametros elegidos y modelo}
+
+El enunciado deja todos los par\'ametros libres. Eleg\'i valores de una placa de
+acero t\'ipica, con un agujero suficientemente peque\~no respecto al ancho para
+que la soluci\'on de placa infinita sea una buena referencia:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{}llc@{}}
+\toprule
+Par\'ametro & S\'imbolo & Valor \\
+\midrule
+Tracci\'on aplicada & $S$ & $100$ MPa \\
+Radio del agujero & $r = a$ & $10$ mm \\
+Semiancho y semilargo de la placa & $L$ & $50$ mm \\
+Ancho total & $d = 2L$ & $100$ mm \\
+Espesor & $t$ & $10$ mm \\
+M\'odulo de Young & $E$ & $200$ GPa \\
+Coeficiente de Poisson & $\nu$ & $0.3$ \\
+Estado & -- & tensi\'on plana \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{¿Por qu\'e estas dimensiones?} Timoshenko indica que si el ancho de la
+placa no es menor que cuatro di\'ametros del agujero, el error de usar la
+soluci\'on de placa infinita para $(\sigma_\theta)_{\max}$ no supera el 6\,\%.
+Aqu\'i $d/(2r) = 100/20 = 5 \ge 4$, as\'i que la comparaci\'on del apartado b)
+tiene sentido.
+
+\textbf{Tensi\'on plana.} La placa es delgada ($t \ll d$) y no tiene cargas
+fuera del plano, as\'i que $\sigma_{zz}=\tau_{xz}=\tau_{yz}=0$. Adem\'as, para
+este problema las tensiones en el plano de la soluci\'on de Kirsch son las mismas
+en tensi\'on plana y en deformaci\'on plana (Timoshenko, p.~96); lo que cambia
+son los desplazamientos y la tensi\'on $\sigma_{zz}=\nu(\sigma_r+\sigma_\theta)$
+que aparece en deformaci\'on plana. El c\'odigo acepta los dos casos
+(\texttt{estado} en \texttt{matriz\_D}).
+
+\textbf{Simetr\'ia: se modela 1/4 de placa.} La geometr\'ia y la carga son
+sim\'etricas respecto a los ejes $x$ e $y$. Sobre un eje de simetr\'ia el
+desplazamiento normal a ese eje es nulo y el tangencial queda libre:
+\[
+y = 0:\; u_y = 0, \qquad\qquad x = 0:\; u_x = 0 .
+\]
+Estas dos condiciones eliminan tambi\'en los movimientos de cuerpo r\'igido (las
+dos traslaciones y la rotaci\'on), as\'i que no hace falta ning\'un apoyo extra.
+El resto del contorno se trata as\'i: en $x=L$ se aplica la tracci\'on uniforme
+$\bar{\mathbf{t}}=(S,0)$; el borde $y=L$ y el borde del agujero $r=a$ quedan libres
+($\bar{\mathbf{t}}=\mathbf{0}$).
+
+\begin{center}
+\begin{tikzpicture}[>=latex, scale=0.95]
+    \def\Lq{5}   % L
+    \def\aq{1}   % a
+    % cuarto de placa
+    \draw[thick, fill=black!5]
+        (\aq,0) -- (\Lq,0) -- (\Lq,\Lq) -- (0,\Lq) -- (0,\aq)
+        arc[start angle=90, end angle=0, radius=\aq] -- cycle;
+    % apoyos deslizantes en y = 0 (u_y = 0)
+    \foreach \x in {1.4,2.2,...,4.8}{
+        \draw (\x,-0.13) circle (0.12);
+    }
+    \draw[thick] (\aq-0.1,-0.27) -- (\Lq+0.1,-0.27);
+    \foreach \x in {1.0,1.3,...,5.0}{\draw (\x,-0.27) -- (\x-0.15,-0.45);}
+    % apoyos deslizantes en x = 0 (u_x = 0)
+    \foreach \y in {1.4,2.2,...,4.8}{
+        \draw (-0.13,\y) circle (0.12);
+    }
+    \draw[thick] (-0.27,\aq-0.1) -- (-0.27,\Lq+0.1);
+    \foreach \y in {1.0,1.3,...,5.0}{\draw (-0.27,\y) -- (-0.45,\y-0.15);}
+    % carga S en x = L
+    \foreach \y in {0.25,0.75,...,4.75}{
+        \draw[-{Latex[length=2mm]}, thick, red!70!black] (\Lq,\y) -- (\Lq+0.8,\y);
+    }
+    \node[red!70!black] at (\Lq+1.25,\Lq/2) {\large $S$};
+    % ejes
+    \draw[-{Latex[length=2mm]}, gray] (0,0) -- (1.9,0) node[below right=-1pt] {$x$};
+    \draw[-{Latex[length=2mm]}, gray] (0,0) -- (0,1.9) node[above left=-1pt] {$y$};
+    % puntos de control
+    \foreach \p/\pos/\lab in {{(\aq,0)}/above right/A, {(0,\aq)}/above right/B,
+                              {(\Lq,0)}/above left/C, {(0,\Lq)}/below right/D}{
+        \fill[ucred] \p circle (2pt) node[\pos=1pt, text=ucred] {\small\lab};
+    }
+    % cotas
+    \draw[<->, thin] (0,0) -- ({\aq*cos(45)},{\aq*sin(45)});
+    \node at (0.25,0.55) {\small $a$};
+    \draw[<->, thin] (0,-0.8) -- (\Lq,-0.8) node[midway, fill=white, inner sep=1.5pt] {\small $L$};
+    \draw[<->, thin] (-0.8,0) -- (-0.8,\Lq) node[midway, fill=white, inner sep=1.5pt] {\small $L$};
+    % etiquetas de borde
+    \node[font=\scriptsize, align=center] at (2.6,\Lq+0.3) {borde libre};
+    \node[font=\scriptsize, align=center, rotate=-45] at (1.05,1.05) {libre};
+\end{tikzpicture}
+
+\vspace{2pt}
+{\small Modelo de 1/4 de placa: apoyos deslizantes por simetr\'ia en $x=0$ y
+$y=0$, tracci\'on $S$ en $x=L$ y puntos de control A, B, C y D.}
+\end{center}
+
+Los cuatro puntos de control son los que se usan para comparar con la soluci\'on
+anal\'itica: \textbf{A} $=(a,0)$ y \textbf{B} $=(0,a)$ en el borde del agujero
+(puntos $p$/$q$ y $n$/$m$ de Timoshenko), y \textbf{C} $=(L,0)$ y
+\textbf{D} $=(0,L)$ en el contorno exterior.
+\end{desarrollo}
+
+%----------------------------------------------------------------------
+\begin{desarrollo}{2. Ecuaciones de gobierno y forma d\'ebil}
+
+El problema de elasticidad plana es, en forma fuerte:
+\[
+\underbrace{\nabla\cdot\bm\sigma + \mathbf{b} = \mathbf{0}}_{\text{equilibrio}},
+\qquad
+\underbrace{\bm\varepsilon = \tfrac12\left(\nabla\mathbf{u} + \nabla\mathbf{u}^T\right)}_{\text{cinem\'atica}},
+\qquad
+\underbrace{\bm\sigma = \mathbf{D}\,\bm\varepsilon}_{\text{constitutiva}},
+\]
+con $\mathbf{u}=\bar{\mathbf{u}}$ en el borde con desplazamiento impuesto y
+$\bm\sigma\mathbf{n}=\bar{\mathbf{t}}$ en el borde con tracci\'on impuesta. En
+notaci\'on de Voigt,
+$\bm\sigma=[\sigma_{xx},\sigma_{yy},\tau_{xy}]^T$ y
+$\bm\varepsilon=[\varepsilon_{xx},\varepsilon_{yy},\gamma_{xy}]^T$
+(con $\gamma_{xy}=2\varepsilon_{xy}$, deformaci\'on ingenieril), y la matriz
+constitutiva de un material is\'otropo en tensi\'on plana es
+\[
+\mathbf{D} = \frac{E}{1-\nu^2}
+\begin{bmatrix} 1 & \nu & 0\\ \nu & 1 & 0\\ 0 & 0 & \frac{1-\nu}{2} \end{bmatrix}
+= \begin{bmatrix} 219.78 & 65.93 & 0\\ 65.93 & 219.78 & 0\\ 0 & 0 & 76.92 \end{bmatrix}\ \text{GPa}
+\]
+(en deformaci\'on plana:
+$\mathbf{D}=\frac{E}{(1+\nu)(1-2\nu)}\left[\begin{smallmatrix}1-\nu & \nu & 0\\ \nu & 1-\nu & 0\\ 0 & 0 & \frac{1-2\nu}{2}\end{smallmatrix}\right]$).
+
+Igual que con barras y vigas, el MEF no resuelve la forma fuerte sino el
+\textbf{principio de trabajos virtuales}: para todo desplazamiento virtual
+$\delta\mathbf{u}$ admisible,
+\[
+\int_A \delta\bm\varepsilon^T\,\bm\sigma\; t\,dA
+= \int_A \delta\mathbf{u}^T\,\mathbf{b}\; t\,dA
++ \int_{\Gamma_t} \delta\mathbf{u}^T\,\bar{\mathbf{t}}\; t\,ds .
+\]
+Al interpolar en cada elemento $\mathbf{u}=\mathbf{N}\,\mathbf{u}^{(e)}$ y
+$\bm\varepsilon=\mathbf{B}\,\mathbf{u}^{(e)}$, y como $\delta\mathbf{u}^{(e)}$
+es arbitrario, se llega al sistema $\mathbf{K}\,\mathbf{U}=\mathbf{F}$ con las
+integrales elementales
+\[
+\mathbf{K}^{(e)} = \int_{A^{(e)}} \mathbf{B}^T\mathbf{D}\,\mathbf{B}\;t\,dA ,
+\qquad
+\mathbf{f}^{(e)}_q = \int_{\Gamma^{(e)}} \mathbf{N}^T\,\mathbf{q}\;ds ,
+\quad \mathbf{q}=\bar{\mathbf{t}}\,t\ \text{[N/m]} .
+\]
+En este problema no hay fuerzas de cuerpo ($\mathbf{b}=\mathbf{0}$): la \'unica
+carga es la tracci\'on $S$ en $x=L$.
+\end{desarrollo}
+
+%----------------------------------------------------------------------
+\begin{desarrollo}{3. El elemento Q9 isoparam\'etrico}
+
+El Q9 tiene 9 nodos: 4 esquinas, 4 nodos a mitad de lado y 1 nodo central,
+numerados en sentido antihorario (esquinas $\to$ medios $\to$ centro). Cada
+nodo tiene 2 GDL ($u_x,u_y$), as\'i que el elemento tiene 18.
+
+\textbf{Funciones de forma.} En el cuadrado de referencia
+$(\xi,\eta)\in[-1,1]^2$ cada funci\'on es el producto de dos polinomios de
+Lagrange cuadr\'aticos 1D con nodos en $-1,0,1$:
+\[
+N_k(\xi,\eta)=\ell_i(\xi)\,\ell_j(\eta),\qquad
+\ell_{-1}(s)=\tfrac{s(s-1)}{2},\quad \ell_0(s)=1-s^2,\quad \ell_{1}(s)=\tfrac{s(s+1)}{2},
+\]
+donde $(\xi_k,\eta_k)=(i,j)$ son las coordenadas naturales del nodo $k$. Por
+construcci\'on $N_k=1$ en su nodo y $0$ en los otros 8, y
+$\sum_k N_k = 1$ (reproduce movimientos r\'igidos). El Q9 contiene el polinomio
+cuadr\'atico completo, por lo que (en elementos no distorsionados) puede
+representar exactamente un estado de deformaci\'on lineal.
+
+\textbf{Mapeo isoparam\'etrico.} Las mismas funciones interpolan la geometr\'ia
+y el desplazamiento:
+\[
+\mathbf{x}(\xi,\eta)=\sum_{k=0}^{8}N_k(\xi,\eta)\,\mathbf{x}_k,
+\qquad
+\mathbf{u}(\xi,\eta)=\sum_{k=0}^{8}N_k(\xi,\eta)\,\mathbf{u}_k .
+\]
+Esto es clave en Kirsch: como los lados son cuadr\'aticos, los elementos que
+tocan el agujero tienen un lado \textbf{curvo} (una par\'abola que pasa por 3
+puntos del arco $r=a$), y el contorno del agujero queda bien representado
+incluso con pocos elementos.
+
+\textbf{Jacobiano y matriz B.} Las deformaciones necesitan derivadas respecto a
+$x$ e $y$, pero $N_k$ est\'a escrita en $(\xi,\eta)$. Con la regla de la cadena,
+\[
+\mathbf{J}=
+\begin{bmatrix}
+\partial x/\partial\xi & \partial y/\partial\xi\\
+\partial x/\partial\eta & \partial y/\partial\eta
+\end{bmatrix}
+=\frac{\partial\mathbf{N}}{\partial(\xi,\eta)}\;\mathbf{x}^{(e)},
+\qquad
+\begin{bmatrix}\partial N_k/\partial x\\ \partial N_k/\partial y\end{bmatrix}
+=\mathbf{J}^{-1}
+\begin{bmatrix}\partial N_k/\partial \xi\\ \partial N_k/\partial \eta\end{bmatrix},
+\qquad dA=\det\mathbf{J}\;d\xi\,d\eta ,
+\]
+y con esas derivadas se arma $\mathbf{B}$ ($3\times18$):
+\[
+\mathbf{B}=
+\begin{bmatrix}
+\frac{\partial N_0}{\partial x} & 0 & \cdots & \frac{\partial N_8}{\partial x} & 0\\[3pt]
+0 & \frac{\partial N_0}{\partial y} & \cdots & 0 & \frac{\partial N_8}{\partial y}\\[3pt]
+\frac{\partial N_0}{\partial y} & \frac{\partial N_0}{\partial x} & \cdots & \frac{\partial N_8}{\partial y} & \frac{\partial N_8}{\partial x}
+\end{bmatrix},
+\qquad \bm\varepsilon=\mathbf{B}\,\mathbf{u}^{(e)} .
+\]
+Si $\det\mathbf{J}\le 0$ en alg\'un punto el elemento est\'a invertido (nodos
+en sentido horario) o demasiado distorsionado; el c\'odigo lo revisa y se
+detiene (\texttt{jacobiano} en \texttt{matriz\_B.py}).
+
+\textbf{Verificaci\'on del c\'odigo.} Antes de resolver Kirsch arm\'e una malla
+de prueba que mezcla los 5 tipos de elemento (problema 1 del c\'odigo), para
+revisar la numeraci\'on, la orientaci\'on y las cargas distribuidas.
+
+\begin{center}
+\figuraT{T3/figuras/malla_problema_1.png}{0.85}{Malla de prueba con elementos T3, T6, Q4, Q8 y Q9 (\texttt{problema\_1.py}).}
+\end{center}
+
+\begin{pendiente}
+Comentar qu\'e se revis\'o con la malla de prueba (y con \texttt{verificar\_elemento.py}):
+por ejemplo, que $\sum_k N_k=1$, que $\mathbf{K}^{(e)}$ de un elemento libre tiene
+exactamente 3 valores propios nulos (2 traslaciones y 1 rotaci\'on) o un
+\emph{patch test} con tensi\'on uniforme.
+\end{pendiente}
+\end{desarrollo}
+
+%----------------------------------------------------------------------
+\begin{desarrollo}{4. Integraci\'on num\'erica de Gauss}
+
+Como los elementos de la malla son curvos, $\mathbf{J}$ var\'ia dentro del
+elemento y el integrando de $\mathbf{K}^{(e)}$ es un cociente de polinomios: no
+tiene una primitiva razonable. Por eso se integra con cuadratura de
+Gauss--Legendre en el cuadrado de referencia:
+\[
+\mathbf{K}^{(e)}
+=\int_{-1}^{1}\!\!\int_{-1}^{1}\mathbf{B}^T\mathbf{D}\,\mathbf{B}\;t\,\det\mathbf{J}\;d\xi\,d\eta
+\;\approx\;\sum_{i=1}^{9} w_i\;\mathbf{B}_i^T\mathbf{D}\,\mathbf{B}_i\;t\,\det\mathbf{J}_i ,
+\]
+con la regla $3\times3$: puntos $\xi,\eta\in\{-\sqrt{3/5},\,0,\,\sqrt{3/5}\}$ y
+pesos $w_i=w_aw_b\in\{\tfrac{25}{81},\tfrac{40}{81},\tfrac{64}{81}\}$ (que suman
+4, el \'area del cuadrado de referencia).
+
+\textbf{¿Por qu\'e $3\times3$?} En un Q9 rectangular el integrando es un
+polinomio de grado 4 en cada variable, y una regla de $n$ puntos es exacta hasta
+grado $2n-1$, as\'i que se necesitan $n=3$ puntos (integraci\'on completa). Con
+$2\times2$ aparecen 3 \emph{modos espurios}: campos de desplazamiento que s\'i
+deforman el elemento pero cuya deformaci\'on es nula justo en los 4 puntos de
+Gauss, as\'i que la rigidez los ve como si no costaran energ\'ia (modos de
+\emph{reloj de arena}). En elementos curvos la regla $3\times3$ ya no es exacta,
+pero su error es mucho menor que el error de discretizaci\'on de la malla.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Elemento & grado de $N$ & puntos de Gauss & comentario\\
+\midrule
+T3 & 1 & 1 & $\mathbf{B}$ constante\\
+T6 & 2 & 3 & exacto\\
+Q4 & $(1,1)$ & $2\times2$ & exacto si es paralelogramo\\
+Q8 & $(2,2)$ incompleto & $3\times3$ & con $2\times2$ queda 1 modo espurio\\
+Q9 & $(2,2)$ & $3\times3$ & con $2\times2$ quedan 3 modos espurios\\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{desarrollo}
+
+%----------------------------------------------------------------------
+\begin{desarrollo}{5. Carga distribuida: fuerzas nodales equivalentes}
+
+La tracci\'on $S$ en $x=L$ no se puede repartir ``a ojo'' entre los nodos: hay
+que usar las fuerzas nodales \textbf{consistentes} con la interpolaci\'on. Cada
+lado del Q9 tiene 3 nodos, y sobre \'el se integra con Gauss 1D en
+$s\in[0,1]$:
+\[
+\mathbf{f}_i=\int_{\Gamma^{(e)}}N_i\,\mathbf{q}\;ds
+=\int_0^1 N_i(s)\,\mathbf{q}(s)\left\lVert\frac{d\mathbf{x}}{ds}\right\rVert ds,
+\]
+con las funciones de forma del lado (nodo inicial, medio y final)
+\[
+N_{1}=(1-s)(1-2s),\qquad N_{2}=4s(1-s),\qquad N_{3}=s(2s-1).
+\]
+Para un lado recto de largo $\ell$ con carga constante $q=S\,t$ queda
+\[
+\mathbf{f}=q\,\ell\left(\tfrac16,\ \tfrac46,\ \tfrac16\right),
+\]
+es decir, el nodo del medio se lleva \textbf{cuatro veces} lo que se lleva cada
+esquina (no la mitad y la mitad, como en un elemento lineal). Como control, la
+suma de todas las fuerzas en $x=L$ debe ser la resultante:
+\[
+\sum F_x = S\,t\,L = 100\ \text{MPa}\cdot 10\ \text{mm}\cdot 50\ \text{mm} = 50\ \text{kN},
+\]
+que es exactamente lo que entrega el c\'odigo para las dos mallas.
+
+\begin{center}
+\figuraT{T3/figuras/fuerzas_nodales_problema_2.png}{0.75}{Fuerzas nodales equivalentes de $S$ en $x=L$ (\texttt{fuerzas\_nodales\_problema\_2.png}).}
+\end{center}
+\end{desarrollo}
+
+%----------------------------------------------------------------------
+\begin{desarrollo}{6. Mallado}
+
+La malla se genera con un mallador por bloques (\texttt{mallador.py}). El cuarto
+de placa se divide en dos bloques de 4 lados separados por la diagonal $y=x$:
+\begin{itemize}[itemsep=2pt]
+  \item bloque 1: desde el arco $r=a$ entre $0^\circ$ y $45^\circ$ hasta el borde $x=L$;
+  \item bloque 2: desde el arco $r=a$ entre $45^\circ$ y $90^\circ$ hasta el borde $y=L$.
+\end{itemize}
+Cada bloque se malla de forma estructurada con interpolaci\'on transfinita
+(Coons) y despu\'es se juntan fundiendo los nodos repetidos de la diagonal. En
+la direcci\'on radial los elementos crecen en progresi\'on geom\'etrica
+(raz\'on 3 entre el \'ultimo y el primero): son peque\~nos junto al agujero, donde
+el gradiente de tensiones es grande, y grandes lejos de \'el, donde el campo es
+casi uniforme.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Malla & \shortstack{divisiones por bloque\\(radial $\times$ angular)} & elementos Q9 & nodos & GDL\\
+\midrule
+Malla 1 (\texttt{problema\_2}) & $6\times4$ & 48 & 221 & 442\\
+Malla 2 (\texttt{problema\_3}) & $12\times8$ & 192 & 825 & 1650\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\figuraT{T3/figuras/malla_problema_2.png}{0.48}{Malla 1: 48 Q9, con apoyos y carga.}\hfill
+\figuraT{T3/figuras/malla_problema_3.png}{0.48}{Malla 2: 192 Q9, con apoyos y carga.}
+\end{center}
+
+\begin{pendiente}
+Justificar la elecci\'on de las mallas (por qu\'e se refina junto al agujero, por
+qu\'e la raz\'on 3) y, si se agregan m\'as mallas para el estudio de convergencia,
+completar la tabla.
+\end{pendiente}
+\end{desarrollo}
+
+%----------------------------------------------------------------------
+\begin{desarrollo}{7. Ensamble, condiciones de borde y resoluci\'on}
+
+El ensamble es igual que en las tareas anteriores, solo que ahora cada nodo
+tiene 2 GDL y cada elemento 18: los GDL globales del elemento son
+$[2n_0,\,2n_0+1,\,2n_1,\,2n_1+1,\dots]$ y $\mathbf{K}^{(e)}$ se suma en esas
+filas y columnas de $\mathbf{K}$. Las condiciones de simetr\'ia ($u_y=0$ en
+$y=0$, $u_x=0$ en $x=0$) se imponen eliminando las filas y columnas
+correspondientes, se resuelve el sistema reducido
+$\mathbf{K}_{red}\,\mathbf{U}_{red}=\mathbf{F}_{red}$ y se reconstruye
+$\mathbf{U}$ con ceros en los GDL restringidos (\texttt{Restriciones},
+\texttt{Sist\_red} y \texttt{U\_completa}, iguales a T1 y T2).
+\end{desarrollo}
+
+%----------------------------------------------------------------------
+\begin{desarrollo}{8. C\'alculo de tensiones}
+
+Con los desplazamientos nodales, en cada elemento se calcula
+\[
+\bm\sigma=\mathbf{D}\,\mathbf{B}(\xi,\eta)\,\mathbf{u}^{(e)}
+\]
+evaluando $\mathbf{B}$ en las coordenadas naturales de cada uno de sus 9 nodos.
+Dentro de un elemento el campo de tensiones es continuo, pero entre elementos
+salta (el MEF en desplazamientos solo asegura continuidad de $\mathbf{u}$, no de
+sus derivadas). Por eso cada nodo compartido recibe un valor de cada elemento
+vecino y se \textbf{promedia}. Adem\'as se calcula la tensi\'on de von Mises en
+tensi\'on plana,
+\[
+\sigma_{VM}=\sqrt{\sigma_{xx}^2-\sigma_{xx}\sigma_{yy}+\sigma_{yy}^2+3\tau_{xy}^2}.
+\]
+Las tensiones en los nodos son menos precisas que en los puntos de Gauss (donde
+la derivada del desplazamiento converge m\'as r\'apido), y justo el m\'aximo de
+Kirsch ocurre en un nodo de borde (el punto B), as\'i que la convergencia de
+$\sigma_{xx}(B)$ con la malla es un buen indicador de la calidad del resultado.
+\end{desarrollo}
+
+%----------------------------------------------------------------------
+\begin{desarrollo}{9. Resultados del MEF}
+
+\begin{center}
+\figuraT{T3/figuras/tensiones_problema_2.png}{0.95}{Campos $\sigma_{xx}$, $\sigma_{yy}$, $\tau_{xy}$ y von Mises con la malla 1 (\texttt{tensiones\_problema\_2.png}).}
+
+\vspace{6pt}
+\figuraT{T3/figuras/tensiones_problema_3.png}{0.95}{Campos $\sigma_{xx}$, $\sigma_{yy}$, $\tau_{xy}$ y von Mises con la malla 2 (\texttt{tensiones\_problema\_3.png}).}
+
+\vspace{6pt}
+\figuraT{T3/figuras/deformada_mef.png}{0.6}{Deformada amplificada y campo de desplazamientos $u_x$, $u_y$.}
+\end{center}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+& \multicolumn{3}{c}{Malla 1 (48 Q9)} & \multicolumn{3}{c}{Malla 2 (192 Q9)}\\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+Punto & $u$ [mm] & $\sigma_{xx}$ [MPa] & $\sigma_{yy}$ [MPa] & $u$ [mm] & $\sigma_{xx}$ [MPa] & $\sigma_{yy}$ [MPa]\\
+\midrule
+A $(a,0)$ & $u_x=$ \pend & \pend & \pend & $u_x=$ \pend & \pend & \pend\\
+B $(0,a)$ & $u_y=$ \pend & \pend & \pend & $u_y=$ \pend & \pend & \pend\\
+C $(L,0)$ & $u_x=$ \pend & \pend & \pend & $u_x=$ \pend & \pend & \pend\\
+D $(0,L)$ & $u_y=$ \pend & \pend & \pend & $u_y=$ \pend & \pend & \pend\\
+\midrule
+\multicolumn{7}{@{}l}{$K_t=\sigma_{xx}(B)/S$:\quad malla 1 = \pend \qquad malla 2 = \pend}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{pendiente}[Por completar: an\'alisis de los resultados del MEF]
+Describir los campos: d\'onde est\'a el m\'aximo de $\sigma_{xx}$ (punto B,
+$\theta=90^\circ$), la compresi\'on $\sigma_{yy}<0$ en el punto A, qu\'e tan r\'apido
+se recupera el campo uniforme al alejarse del agujero (car\'acter localizado del
+efecto) y c\'omo cambian los valores entre la malla 1 y la malla 2 (convergencia).
+\end{pendiente}
+\end{desarrollo}
