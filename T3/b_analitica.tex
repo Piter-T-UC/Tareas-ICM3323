@@ -7,90 +7,30 @@
 %----------------------------------------------------------------------
 \begin{desarrollo}{1. Soluci\'on de Kirsch (Timoshenko \& Goodier, \S35)}
 
-Se considera una placa \textbf{infinita} con un agujero circular de radio $a$,
-sometida a una tracci\'on uniforme $S$ en la direcci\'on $x$. Por el principio
-de Saint-Venant, el agujero solo perturba el campo cerca de \'el; en un c\'irculo
-conc\'entrico de radio $b\gg a$ las tensiones son las de la placa sin agujero,
-escritas en polares:
-\[
-(\sigma_r)_{r=b}=S\cos^2\theta=\tfrac12 S\,(1+\cos2\theta),
-\qquad
-(\tau_{r\theta})_{r=b}=-\tfrac12 S\sin2\theta .
-\]
-El anillo $a\le r\le b$ se resuelve superponiendo dos partes:
-
-\textbf{Parte 1: presi\'on uniforme.} La componente constante $\tfrac12 S$ es un
-problema de cilindro de pared gruesa (Lam\'e) con presi\'on exterior. Con
-$b\to\infty$:
-\[
-\sigma_r=\tfrac{S}{2}\left(1-\tfrac{a^2}{r^2}\right),\qquad
-\sigma_\theta=\tfrac{S}{2}\left(1+\tfrac{a^2}{r^2}\right),\qquad
-\tau_{r\theta}=0 .
-\]
-
-\textbf{Parte 2: carga en $\cos2\theta$.} La parte
-$\tfrac12 S\cos2\theta$, $-\tfrac12 S\sin2\theta$ se obtiene de una funci\'on de
-tensiones $\phi=f(r)\cos2\theta$. Al imponer la compatibilidad
-$\nabla^4\phi=0$ queda una ecuaci\'on de Euler para $f(r)$, cuya soluci\'on
-general es
-\[
-f(r)=A\,r^2+B\,r^4+\frac{C}{r^2}+D ,
-\]
-y las tensiones son
+\textbf{Hip\'otesis.} Placa \emph{infinita}, agujero de radio $a$ con borde libre
+y tracci\'on uniforme $S$ en $x$ lejos del agujero. Timoshenko la obtiene
+superponiendo una presi\'on uniforme (Lam\'e) y una carga en $\cos2\theta$,
+resuelta con una funci\'on de tensiones $\phi=f(r)\cos2\theta$. El resultado
+(ec.~61) es:
 \begin{align*}
-\sigma_r&=\frac1r\frac{\partial\phi}{\partial r}+\frac1{r^2}\frac{\partial^2\phi}{\partial\theta^2}
-=-\left(2A+\frac{6C}{r^4}+\frac{4D}{r^2}\right)\cos2\theta,\\
-\sigma_\theta&=\frac{\partial^2\phi}{\partial r^2}
-=\left(2A+12Br^2+\frac{6C}{r^4}\right)\cos2\theta,\\
-\tau_{r\theta}&=-\frac{\partial}{\partial r}\left(\frac1r\frac{\partial\phi}{\partial\theta}\right)
-=\left(2A+6Br^2-\frac{6C}{r^4}-\frac{2D}{r^2}\right)\sin2\theta .
-\end{align*}
-Las 4 constantes salen de imponer las tracciones en $r=b$ y borde libre en
-$r=a$ ($\sigma_r=\tau_{r\theta}=0$). Con $a/b\to0$ (placa infinita):
-\[
-A=-\frac S4,\qquad B=0,\qquad C=-\frac{a^4}{4}S,\qquad D=\frac{a^2}{2}S .
-\]
-
-\textbf{Resultado (ec.~61 de Timoshenko).} Sumando las dos partes:
-\begin{align*}
-\sigma_r&=\frac S2\left(1-\frac{a^2}{r^2}\right)+\frac S2\left(1+\frac{3a^4}{r^4}-\frac{4a^2}{r^2}\right)\cos2\theta,\\
-\sigma_\theta&=\frac S2\left(1+\frac{a^2}{r^2}\right)-\frac S2\left(1+\frac{3a^4}{r^4}\right)\cos2\theta,\\
-\tau_{r\theta}&=-\frac S2\left(1-\frac{3a^4}{r^4}+\frac{2a^2}{r^2}\right)\sin2\theta .
+\sigma_r&=\tfrac S2\left(1-\tfrac{a^2}{r^2}\right)+\tfrac S2\left(1+\tfrac{3a^4}{r^4}-\tfrac{4a^2}{r^2}\right)\cos2\theta,\\
+\sigma_\theta&=\tfrac S2\left(1+\tfrac{a^2}{r^2}\right)-\tfrac S2\left(1+\tfrac{3a^4}{r^4}\right)\cos2\theta,\\
+\tau_{r\theta}&=-\tfrac S2\left(1-\tfrac{3a^4}{r^4}+\tfrac{2a^2}{r^2}\right)\sin2\theta .
 \end{align*}
 
-\textbf{Consecuencias importantes.}
-\begin{itemize}[itemsep=3pt]
-  \item En el borde del agujero ($r=a$): $\sigma_r=\tau_{r\theta}=0$ y
-  $\sigma_\theta=S-2S\cos2\theta$.
-  \item El m\'aximo es $\sigma_\theta=3S$ en $\theta=\pm\pi/2$ (punto B): el
-  factor de concentraci\'on de tensiones de la placa infinita es $K_t=3$.
-  \item En $\theta=0,\pi$ (punto A) $\sigma_\theta=-S$: hay \textbf{compresi\'on}
-  tangencial aunque la placa est\'e traccionada.
-  \item En la secci\'on $\theta=\pi/2$ (eje $y$):
-  $\sigma_\theta=\tfrac S2\left(2+\tfrac{a^2}{r^2}+3\tfrac{a^4}{r^4}\right)$, que
-  baja muy r\'apido a $S$; en $r=2a$ ya vale $1.22\,S$. El efecto del agujero
-  es \emph{localizado}.
+\textbf{Valores clave.}
+\begin{itemize}[itemsep=2pt]
+  \item Borde del agujero: $\sigma_\theta=S-2S\cos2\theta$.
+  \item Punto B ($\theta=90^\circ$): $\sigma_\theta=3S$, es decir $K_t=3$.
+  \item Punto A ($\theta=0$): $\sigma_\theta=-S$ (compresi\'on).
+  \item Eje $y$: en $r=2a$ ya vale $1.22\,S$; el efecto del agujero es local.
 \end{itemize}
 
-\textbf{Desplazamientos.} Integrando las deformaciones (con $G=E/2(1+\nu)$ y
-$\kappa=(3-\nu)/(1+\nu)$ en tensi\'on plana, $\kappa=3-4\nu$ en deformaci\'on
-plana), y eligiendo el movimiento r\'igido para que se cumpla la simetr\'ia:
-\begin{align*}
-u_r&=\frac{S}{8Gr}\left[(\kappa-1)\,r^2+2a^2+2\left(r^2+(\kappa+1)\,a^2-\frac{a^4}{r^2}\right)\cos2\theta\right],\\
-u_\theta&=-\frac{S}{8Gr}\;2\left(r^2+(\kappa-1)\,a^2+\frac{a^4}{r^2}\right)\sin2\theta .
-\end{align*}
-Estas expresiones cumplen $u_y=0$ en $\theta=0$ y $u_x=0$ en $\theta=\pi/2$, las
-mismas condiciones de simetr\'ia del modelo de MEF.
-
-\textbf{Paso a cartesianas.} El MEF entrega $\sigma_{xx},\sigma_{yy},\tau_{xy}$,
-as\'i que la soluci\'on anal\'itica se rota con $c=\cos\theta$, $s=\sin\theta$:
-\[
-\sigma_{xx}=\sigma_rc^2+\sigma_\theta s^2-2\tau_{r\theta}sc,\quad
-\sigma_{yy}=\sigma_rs^2+\sigma_\theta c^2+2\tau_{r\theta}sc,\quad
-\tau_{xy}=(\sigma_r-\sigma_\theta)sc+\tau_{r\theta}(c^2-s^2),
-\]
-y $u_x=u_rc-u_\theta s$, $u_y=u_rs+u_\theta c$. Todo esto est\'a programado en
-\texttt{kirsch.py} y \texttt{solucion\_kirsch.py}.
+\textbf{C\'omo se evalu\'o.} En \texttt{kirsch.py} se programaron las tensiones,
+los desplazamientos ($u_r$, $u_\theta$, con $\kappa=(3-\nu)/(1+\nu)$ en tensi\'on
+plana y el movimiento r\'igido elegido para cumplir la misma simetr\'ia del
+modelo) y el paso a cartesianas, para comparar directamente con
+$\sigma_{xx},\sigma_{yy},\tau_{xy}$ y $u_x,u_y$ del MEF.
 
 \begin{center}
 \figuraT{T3/figuras/kirsch_campos.png}{0.95}{Campos anal\'iticos de Kirsch ($\sigma_{xx}$, $\sigma_{yy}$, $\tau_{xy}$, von Mises) alrededor del agujero (\texttt{kirsch\_campos.png}).}
@@ -153,10 +93,8 @@ Punto & Variable & Kirsch & MEF malla 1 & MEF malla 2 & error malla 2\\
 La comparaci\'on no es entre dos soluciones del \emph{mismo} problema. Hay dos
 fuentes de diferencia, y conviene separarlas:
 
-\textbf{(i) Error de discretizaci\'on del MEF.} Es el que baja al refinar la
-malla: los desplazamientos son polinomios cuadr\'aticos por elemento, las
-tensiones salen de derivarlos (un orden menos de precisi\'on) y se promedian en
-los nodos. Se mide comparando la malla 1 con la malla 2.
+\textbf{(i) Error de discretizaci\'on del MEF.} Baja al refinar la malla; se
+mide comparando la malla 1 con la malla 2.
 
 \textbf{(ii) Diferencia de modelo: placa finita contra placa infinita.} Kirsch
 supone una placa infinita, mientras que el modelo tiene ancho $d=100$ mm y la
