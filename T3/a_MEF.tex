@@ -4,14 +4,11 @@
 \newpage
 \section*{a) Soluci\'on por el m\'etodo de elementos finitos}
 
-En esta tarea el problema deja de ser unidimensional: ya no hay barras ni vigas
-cuyo campo depende solo de la coordenada axial, sino una placa en la que los
-desplazamientos $u_x(x,y)$ y $u_y(x,y)$ y las tres tensiones
-$\sigma_{xx},\sigma_{yy},\tau_{xy}$ var\'ian en todo el plano. Para resolverlo
+ Para resolverlo
 escrib\'i un c\'odigo de elasticidad plana en Python, ordenado por etapas igual
 que en las tareas anteriores (malla $\to$ interpolaci\'on $\to$ matrices $\to$
 resolver $\to$ graficar), con elementos isoparam\'etricos T3, T6, Q4, Q8 y Q9.
-El problema de Kirsch se resolvi\'o con elementos \textbf{Q9}.
+El problema de Kirsch se resolvi\'o con elementos \text{Q9}.
 
 %----------------------------------------------------------------------
 \begin{desarrollo}{1. Par\'ametros elegidos y modelo}
@@ -31,28 +28,28 @@ Radio del agujero & $r = a$ & $10$ mm \\
 Semiancho y semilargo de la placa & $L$ & $50$ mm \\
 Ancho total & $d = 2L$ & $100$ mm \\
 Espesor & $t$ & $10$ mm \\
-M\'odulo de Young & $E$ & $200$ GPa \\
+M\'odulo de Young & $E$ & $210$ GPa \\
 Coeficiente de Poisson & $\nu$ & $0.3$ \\
 Estado & -- & tensi\'on plana \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-\textbf{¿Por qu\'e estas dimensiones?} Timoshenko indica que si el ancho de la
-placa no es menor que cuatro di\'ametros del agujero, el error de usar la
-soluci\'on de placa infinita para $(\sigma_\theta)_{\max}$ no supera el 6\,\%.
-Aqu\'i $d/(2r) = 100/20 = 5 \ge 4$, as\'i que la comparaci\'on del apartado b)
-tiene sentido.
 
-\textbf{Tensi\'on plana.} La placa es delgada ($t \ll d$) y no tiene cargas
+En este caso el libro no coloca medidas exactas lo unico que dice es que si el ancho de la placa no es menor que cuatro di\'ametros del agujero, el error de usar la
+soluci\'on de placa infinita para $(\sigma_\theta)_{\max}$ no supera el 6\,\%.
+Con esto es buena la aproximacion por ende se pueden comparar la analitica con la solucion de MEF.
+
+
+En este caso el problema es con una placa delgada ($t \ll d$) y no tiene cargas
 fuera del plano, as\'i que $\sigma_{zz}=\tau_{xz}=\tau_{yz}=0$. Adem\'as, para
 este problema las tensiones en el plano de la soluci\'on de Kirsch son las mismas
 en tensi\'on plana y en deformaci\'on plana (Timoshenko, p.~96); lo que cambia
 son los desplazamientos y la tensi\'on $\sigma_{zz}=\nu(\sigma_r+\sigma_\theta)$
 que aparece en deformaci\'on plana. El c\'odigo acepta los dos casos
-(\texttt{estado} en \texttt{matriz\_D}).
+(\texttt{estado} en \texttt{matriz\_D}).\\
 
-\textbf{Simetr\'ia: se modela 1/4 de placa.} La geometr\'ia y la carga son
+La geometr\'ia y la carga son
 sim\'etricas respecto a los ejes $x$ e $y$. Sobre un eje de simetr\'ia el
 desplazamiento normal a ese eje es nulo y el tangencial queda libre:
 \[
@@ -90,8 +87,8 @@ $\bar{\mathbf{t}}=(S,0)$; el borde $y=L$ y el borde del agujero $r=a$ quedan lib
     }
     \node[red!70!black] at (\Lq+1.25,\Lq/2) {\large $S$};
     % ejes
-    \draw[-{Latex[length=2mm]}, gray] (0,0) -- (1.9,0) node[below right=-1pt] {$x$};
-    \draw[-{Latex[length=2mm]}, gray] (0,0) -- (0,1.9) node[above left=-1pt] {$y$};
+    \draw[-{Latex[length=2mm]}, gray] (0,0) -- (1.9,0) node[above right=-1pt] {$x$};
+    \draw[-{Latex[length=2mm]}, gray] (0,0) -- (0,1.9) node[above right=-1pt] {$y$};
     % puntos de control
     \foreach \p/\pos/\lab in {{(\aq,0)}/above right/A, {(0,\aq)}/above right/B,
                               {(\Lq,0)}/above left/C, {(0,\Lq)}/below right/D}{
@@ -119,30 +116,16 @@ anal\'itica: \textbf{A} $=(a,0)$ y \textbf{B} $=(0,a)$ en el borde del agujero
 \end{desarrollo}
 
 %----------------------------------------------------------------------
-\begin{desarrollo}{2. Ecuaciones de gobierno y forma d\'ebil}
+\begin{desarrollo}{Ecuaciones}
 
-El problema de elasticidad plana es, en forma fuerte:
-\[
-\underbrace{\nabla\cdot\bm\sigma + \mathbf{b} = \mathbf{0}}_{\text{equilibrio}},
-\qquad
-\underbrace{\bm\varepsilon = \tfrac12\left(\nabla\mathbf{u} + \nabla\mathbf{u}^T\right)}_{\text{cinem\'atica}},
-\qquad
-\underbrace{\bm\sigma = \mathbf{D}\,\bm\varepsilon}_{\text{constitutiva}},
-\]
-con $\mathbf{u}=\bar{\mathbf{u}}$ en el borde con desplazamiento impuesto y
-$\bm\sigma\mathbf{n}=\bar{\mathbf{t}}$ en el borde con tracci\'on impuesta. En
-notaci\'on de Voigt,
-$\bm\sigma=[\sigma_{xx},\sigma_{yy},\tau_{xy}]^T$ y
-$\bm\varepsilon=[\varepsilon_{xx},\varepsilon_{yy},\gamma_{xy}]^T$
-(con $\gamma_{xy}=2\varepsilon_{xy}$, deformaci\'on ingenieril), y la matriz
+La matriz
 constitutiva de un material is\'otropo en tensi\'on plana es
 \[
 \mathbf{D} = \frac{E}{1-\nu^2}
 \begin{bmatrix} 1 & \nu & 0\\ \nu & 1 & 0\\ 0 & 0 & \frac{1-\nu}{2} \end{bmatrix}
 = \begin{bmatrix} 219.78 & 65.93 & 0\\ 65.93 & 219.78 & 0\\ 0 & 0 & 76.92 \end{bmatrix}\ \text{GPa}
 \]
-(en deformaci\'on plana:
-$\mathbf{D}=\frac{E}{(1+\nu)(1-2\nu)}\left[\begin{smallmatrix}1-\nu & \nu & 0\\ \nu & 1-\nu & 0\\ 0 & 0 & \frac{1-2\nu}{2}\end{smallmatrix}\right]$).
+
 
 Igual que con barras y vigas, el MEF no resuelve la forma fuerte sino el
 \textbf{principio de trabajos virtuales}: para todo desplazamiento virtual
