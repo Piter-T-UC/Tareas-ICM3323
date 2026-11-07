@@ -100,8 +100,8 @@ Tensiones & en los nodos, promediadas entre elementos vecinos \\
     }
     \node[red!70!black] at (\Lq+1.25,\Lq/2) {\large $S$};
     % ejes
-    \draw[-{Latex[length=2mm]}, gray] (0,0) -- (1.9,0) node[below right=-1pt] {$x$};
-    \draw[-{Latex[length=2mm]}, gray] (0,0) -- (0,1.9) node[above left=-1pt] {$y$};
+    \draw[-{Latex[length=2mm]}, gray] (0,0) -- (1.9,0) node[above right=-1pt] {$x$};
+    \draw[-{Latex[length=2mm]}, gray] (0,0) -- (0,1.9) node[above right=-1pt] {$y$};
     % puntos de control
     \foreach \p/\pos/\lab in {{(\aq,0)}/above right/A, {(0,\aq)}/above right/B,
                               {(\Lq,0)}/above left/C, {(0,\Lq)}/below right/D}{
@@ -116,7 +116,9 @@ Tensiones & en los nodos, promediadas entre elementos vecinos \\
     \node[font=\scriptsize, align=center] at (2.6,\Lq+0.3) {borde libre};
     \node[font=\scriptsize, align=center, rotate=-45] at (1.05,1.05) {libre};
 \end{tikzpicture}
+
 \end{center}
+
 
 \begin{center}
 \renewcommand{\arraystretch}{1.2}
@@ -154,8 +156,7 @@ en el elemento de referencia.
 \begin{itemize}[itemsep=2pt]
   \item Regla $3\times3$: $\xi,\eta\in\{-\sqrt{3/5},0,\sqrt{3/5}\}$, pesos
   $\{\tfrac{25}{81},\tfrac{40}{81},\tfrac{64}{81}\}$.
-  \item Es integraci\'on completa para el Q9. Con $2\times2$ aparecen modos
-  espurios (reloj de arena) y $\mathbf{K}$ queda singular.
+  \item Es integraci\'on completa para el Q9. 
   \item En cada punto se eval\'ua $\mathbf{J}$, y si $\det\mathbf{J}\le0$ el
   c\'odigo se detiene (elemento invertido o muy distorsionado).
   \item Los elementos junto al agujero son curvos, as\'i que la regla no es
@@ -189,10 +190,7 @@ en el elemento de referencia.
   \item El cuarto de placa se divide en dos bloques separados por la diagonal
   $y=x$: arco $0^\circ$--$45^\circ$ hasta $x=L$, y arco $45^\circ$--$90^\circ$
   hasta $y=L$.
-  \item Cada bloque se malla de forma estructurada (interpolaci\'on transfinita)
-  y luego se unen fundiendo los nodos de la diagonal.
-  \item Los elementos crecen en progresi\'on geom\'etrica hacia afuera (raz\'on 3):
-  peque\~nos junto al agujero, donde est\'a el gradiente de tensiones.
+  \item Los elementos crecen con una progresion generando de esta manera que los elementos mas pequeños esten cerca de la zona de concentracion de esfuerzos
   \item Los elementos del agujero tienen el lado curvo (par\'abola por 3 puntos
   del arco), as\'i que el contorno queda bien representado.
 \end{itemize}
@@ -214,10 +212,9 @@ Malla 2 (\texttt{problema\_3}) & $12\times8$ & 192 & 825 & 1650\\
 \figuraT{T3/figuras/malla_problema_3.png}{0.48}{Malla 2: 192 Q9, con apoyos y carga.}
 \end{center}
 
-\begin{pendiente}
-Comentario sobre las mallas (y si se agregan m\'as para la convergencia,
-completar la tabla).
-\end{pendiente}
+
+Para este caso se comparan ambos casos para asegurar que no sea dependiente de la malla y que sea el resultado sea representativo de la carga
+
 \end{desarrollo}
 
 %----------------------------------------------------------------------
@@ -241,10 +238,10 @@ completar la tabla).
 \begin{desarrollo}{6. Resultados del MEF}
 
 \begin{center}
-\figuraT{T3/figuras/tensiones_problema_2.png}{0.95}{Campos $\sigma_{xx}$, $\sigma_{yy}$, $\tau_{xy}$ y von Mises con la malla 1.}
+\figuraT{T3/figuras/tensiones_problema_2.png}{0.8}{Campos $\sigma_{xx}$, $\sigma_{yy}$, $\tau_{xy}$ y von Mises con la malla 1.}
 
 \vspace{6pt}
-\figuraT{T3/figuras/tensiones_problema_3.png}{0.95}{Campos $\sigma_{xx}$, $\sigma_{yy}$, $\tau_{xy}$ y von Mises con la malla 2.}
+\figuraT{T3/figuras/tensiones_problema_3.png}{0.8}{Campos $\sigma_{xx}$, $\sigma_{yy}$, $\tau_{xy}$ y von Mises con la malla 2.}
 
 \vspace{6pt}
 \figuraT{T3/figuras/deformada_mef.png}{0.6}{Deformada amplificada y desplazamientos $u_x$, $u_y$.}
