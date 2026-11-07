@@ -15,9 +15,6 @@ G = E / (2 * (1 + nu))
 kappa = (3 - nu) / (1 + nu) if PLANO == "tension" else 3 - 4 * nu
 
 
-# ----------------------------------------------------------------------------
-# Solución en polares
-# ----------------------------------------------------------------------------
 def tensiones_polares(r, th):
     """Ec. (61) de Timoshenko."""
     q2, q4 = (a / r) ** 2, (a / r) ** 4
@@ -36,9 +33,6 @@ def desplazamientos_polares(r, th):
     return ur, ut
 
 
-# ----------------------------------------------------------------------------
-# Conversión a cartesianas (lo que entrega un MEF)
-# ----------------------------------------------------------------------------
 def kirsch_tensiones(x, y):
     r, th = np.hypot(x, y), np.arctan2(y, x)
     srr, stt, trt = tensiones_polares(r, th)

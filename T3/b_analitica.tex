@@ -5,7 +5,7 @@
 \section*{b) Comparaci\'on con la soluci\'on anal\'itica}
 
 %----------------------------------------------------------------------
-\begin{desarrollo}{1. Soluci\'on de Kirsch (Timoshenko \& Goodier, \S35)}
+\begin{desarrollo}{1. Soluci\'on de Kirsch (Timoshenko \& Goodier, 35)}
 
 \textbf{Hip\'otesis.} Placa \emph{infinita}, agujero de radio $a$ con borde libre
 y tracci\'on uniforme $S$ en $x$ lejos del agujero. Timoshenko la obtiene
@@ -18,7 +18,7 @@ resuelta con una funci\'on de tensiones $\phi=f(r)\cos2\theta$. El resultado
 \tau_{r\theta}&=-\tfrac S2\left(1-\tfrac{3a^4}{r^4}+\tfrac{2a^2}{r^2}\right)\sin2\theta .
 \end{align*}
 
-\textbf{Valores clave.}
+Hay punto importante donde podemos comparar 
 \begin{itemize}[itemsep=2pt]
   \item Borde del agujero: $\sigma_\theta=S-2S\cos2\theta$.
   \item Punto B ($\theta=90^\circ$): $\sigma_\theta=3S$, es decir $K_t=3$.
@@ -26,7 +26,7 @@ resuelta con una funci\'on de tensiones $\phi=f(r)\cos2\theta$. El resultado
   \item Eje $y$: en $r=2a$ ya vale $1.22\,S$; el efecto del agujero es local.
 \end{itemize}
 
-\textbf{C\'omo se evalu\'o.} En \texttt{kirsch.py} se programaron las tensiones,
+Se programo un codigo (\texttt{kirsch.py}) para graficar las tensiones,
 los desplazamientos ($u_r$, $u_\theta$, con $\kappa=(3-\nu)/(1+\nu)$ en tensi\'on
 plana y el movimiento r\'igido elegido para cumplir la misma simetr\'ia del
 modelo) y el paso a cartesianas, para comparar directamente con
@@ -56,22 +56,22 @@ error relativo.
 Punto & Variable & Kirsch & MEF malla 1 & MEF malla 2 & error malla 2\\
 \midrule
 \multirow{2}{*}{A $(a,0)$}
-  & $u_x$ [mm] & $0.01500$ & \pend & \pend & \pend\\
-  & $\sigma_{yy}$ [MPa] & $-100.0$ & \pend & \pend & \pend\\
+  & $u_x$ [mm] & $0.01500$ & $0.01686$ & $0.01688$ & 12.5\%\\
+  & $\sigma_{yy}$ [MPa] & $-100.0$ & $-133.1$ & $-129.9$ & 29.9\%\\
 \midrule
 \multirow{2}{*}{B $(0,a)$}
-  & $u_y$ [mm] & $-0.00500$ & \pend & \pend & \pend\\
-  & $\sigma_{xx}$ [MPa] & $300.0$ & \pend & \pend & \pend\\
+  & $u_y$ [mm] & $-0.00500$ & $-0.00649$ & $-0.00650$ & 30.0\%\\
+  & $\sigma_{xx}$ [MPa] & $300.0$ & $342.2$ & $337.3$ & 12.4\%\\
 \midrule
 \multirow{2}{*}{C $(L,0)$}
-  & $u_x$ [mm] & $0.02762$ & \pend & \pend & \pend\\
-  & $\sigma_{xx}$ [MPa] & $90.24$ & \pend & \pend & \pend\\
+  & $u_x$ [mm] & $0.02762$ & $0.03063$ & $0.03065$ & 11.0\%\\
+  & $\sigma_{xx}$ [MPa] & $90.24$ & $101.5$ & $100.6$ & 11.5\%\\
 \midrule
 \multirow{2}{*}{D $(0,L)$}
-  & $u_y$ [mm] & $-0.00882$ & \pend & \pend & \pend\\
-  & $\sigma_{xx}$ [MPa] & $102.24$ & \pend & \pend & \pend\\
+  & $u_y$ [mm] & $-0.00882$ & $-0.01102$ & $-0.01104$ & 25.1\%\\
+  & $\sigma_{xx}$ [MPa] & $102.24$ & $83.5$ & $84.1$ & 17.7\%\\
 \midrule
-& $K_t=\sigma_{xx}(B)/S$ & $3.00$ & \pend & \pend & \pend\\
+& $K_t=\sigma_{xx}(B)/S$ & $3.00$ & $3.42$ & $3.37$ & 12.4\%\\
 \bottomrule
 \end{tabular}
 \end{center}
