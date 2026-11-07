@@ -33,7 +33,9 @@ def triangular(xy_m, conectividad, valores, n=9):
 
 ## Mapas de color de sxx, syy, txy y von Mises [MPa] con los bordes de los elementos
 ## sigma_nodos: (n_nodos, 3) [Pa] de tensiones.calc_tensiones
-def graficar_tensiones(xy, conectividad, sigma_nodos, titulo="Tensiones"):
+## zoom = (xmin, xmax, ymin, ymax) en las unidades de xy: muestra solo esa zona (min/max siguen
+## siendo los de toda la malla)
+def graficar_tensiones(xy, conectividad, sigma_nodos, titulo="Tensiones", zoom=None):
     xy_m = np.asarray(getattr(xy, "magnitude", xy), dtype=float)
     unidad = f"{xy.units:~}" if hasattr(xy, "units") else "m"
     campos = np.c_[sigma_nodos, von_mises(sigma_nodos)] / 1e6
@@ -55,6 +57,9 @@ def graficar_tensiones(xy, conectividad, sigma_nodos, titulo="Tensiones"):
         ax.plot(*xy_m[i_max], "*", color="gold", mec="k", ms=12)
         ax.set_title(f"{nombre}:  min {campos[:, k].min():.4g},  max {campos[:, k].max():.4g} MPa"
                      f"   (★ nodo {i_max})", fontsize=10)
+        if zoom is not None:
+            ax.set_xlim(zoom[0], zoom[1])
+            ax.set_ylim(zoom[2], zoom[3])
         ax.set_aspect("equal")
         ax.set_xlabel(f"x [{unidad}]")
         ax.set_ylabel(f"y [{unidad}]")

@@ -45,11 +45,11 @@ deben solo a la malla y al tipo de elemento.
 \toprule
 & Mi c\'odigo (apartado a) & Inventor Nastran\\
 \midrule
-Geometr\'ia modelada & 1/4 de placa, $L=50$ mm, $a=10$ mm & \pend\\
+Geometr\'ia modelada & 1/4 de placa, $L=200$ mm, $a=10$ mm & \pend\\
 Espesor $t$ & $10$ mm & \pend\\
 Material & $E=200$ GPa, $\nu=0.3$ & \pend\\
 Tipo de elemento & Q9 (elasticidad plana) & \pend\\
-Elementos / nodos / GDL & 192 / 825 / 1650 & \pend\\
+Elementos / nodos / GDL & 320 / 1353 / 2706 & \pend\\
 Condiciones de borde & simetr\'ia en $x=0$ e $y=0$ & \pend\\
 Carga & $S=100$ MPa en $x=L$ & \pend\\
 \bottomrule
@@ -57,6 +57,9 @@ Carga & $S=100$ MPa en $x=L$ & \pend\\
 \end{center}
 
 \begin{pendiente}[Por completar: descripci\'on del modelo]
+Ojo: el modelo comercial tiene que usar la placa nueva ($L=200$ mm, ancho
+$d=400$ mm), la misma del apartado a).
+
 Explicar c\'omo se arm\'o el modelo: geometr\'ia (placa completa o 1/4), tipo de
 idealizaci\'on (l\'amina en la superficie media o s\'olido), control de malla
 alrededor del agujero, c\'omo se impusieron la simetr\'ia o los apoyos y c\'omo
@@ -100,13 +103,13 @@ los nodos, porque eso cambia el valor m\'aximo en el borde del agujero.
 \toprule
 Variable & Kirsch (placa infinita) & MEF propio (malla 2) & Inventor Nastran\\
 \midrule
-$\sigma_{xx}(B)$ [MPa] & $300.0$ & \pend & \pend\\
-$\sigma_{yy}(A)$ [MPa] & $-100.0$ & \pend & \pend\\
-$K_t=\sigma_{xx}(B)/S$ & $3.00$ & \pend & \pend\\
-$u_x(C)$ [mm] & $0.02762$ & \pend & \pend\\
-$u_y(D)$ [mm] & $-0.00882$ & \pend & \pend\\
-$\sigma_{VM,\max}$ [MPa] & $300.0$ & \pend & \pend\\
-GDL & -- & 1650 & \pend\\
+$\sigma_{xx}(B)$ [MPa] & $300.0$ & $304.0$ & \pend\\
+$\sigma_{yy}(A)$ [MPa] & $-100.0$ & $-103.0$ & \pend\\
+$K_t=\sigma_{xx}(B)/S$ & $3.00$ & $3.04$ & \pend\\
+$u_x(C)$ [mm] & $0.10066$ & $0.10127$ & \pend\\
+$u_y(D)$ [mm] & $-0.03034$ & $-0.03076$ & \pend\\
+$\sigma_{VM,\max}$ [MPa] & $300.0$ & $301.0$ & \pend\\
+GDL & -- & 2706 & \pend\\
 \bottomrule
 \end{tabular}
 \end{center}

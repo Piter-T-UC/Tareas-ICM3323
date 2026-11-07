@@ -44,7 +44,7 @@ $\sigma_{xx},\sigma_{yy},\tau_{xy}$ y $u_x,u_y$ del MEF.
 \begin{desarrollo}{2. Comparaci\'on en los puntos de control}
 
 Los valores anal\'iticos se calcularon con \texttt{kirsch.py} para
-$S=100$ MPa, $a=10$ mm, $L=50$ mm, $E=200$ GPa y $\nu=0.3$ (tensi\'on plana).
+$S=100$ MPa, $a=10$ mm, $L=200$ mm, $E=200$ GPa y $\nu=0.3$ (tensi\'on plana).
 El error es $e=(\text{MEF}-\text{Kirsch})/\text{Kirsch}$; donde el valor anal\'itico
 es cero o muy peque\~no conviene comparar la diferencia absoluta en vez del
 error relativo.
@@ -56,22 +56,22 @@ error relativo.
 Punto & Variable & Kirsch & MEF malla 1 & MEF malla 2 & error malla 2\\
 \midrule
 \multirow{2}{*}{A $(a,0)$}
-  & $u_x$ [mm] & $0.01500$ & $0.01686$ & $0.01688$ & 12.5\%\\
-  & $\sigma_{yy}$ [MPa] & $-100.0$ & $-133.1$ & $-129.9$ & 29.9\%\\
+  & $u_x$ [mm] & $0.01500$ & $0.01510$ & $0.01511$ & 0.7\%\\
+  & $\sigma_{yy}$ [MPa] & $-100.0$ & $-104.9$ & $-103.0$ & 3.0\%\\
 \midrule
 \multirow{2}{*}{B $(0,a)$}
-  & $u_y$ [mm] & $-0.00500$ & $-0.00649$ & $-0.00650$ & 30.0\%\\
-  & $\sigma_{xx}$ [MPa] & $300.0$ & $342.2$ & $337.3$ & 12.4\%\\
+  & $u_y$ [mm] & $-0.00500$ & $-0.00508$ & $-0.00508$ & 1.7\%\\
+  & $\sigma_{xx}$ [MPa] & $300.0$ & $307.2$ & $304.0$ & 1.3\%\\
 \midrule
 \multirow{2}{*}{C $(L,0)$}
-  & $u_x$ [mm] & $0.02762$ & $0.03063$ & $0.03065$ & 11.0\%\\
-  & $\sigma_{xx}$ [MPa] & $90.24$ & $101.5$ & $100.6$ & 11.5\%\\
+  & $u_x$ [mm] & $0.10066$ & $0.10126$ & $0.10127$ & 0.6\%\\
+  & $\sigma_{xx}$ [MPa] & $99.38$ & $100.1$ & $100.0$ & 0.7\%\\
 \midrule
 \multirow{2}{*}{D $(0,L)$}
-  & $u_y$ [mm] & $-0.00882$ & $-0.01102$ & $-0.01104$ & 25.1\%\\
-  & $\sigma_{xx}$ [MPa] & $102.24$ & $83.5$ & $84.1$ & 17.7\%\\
+  & $u_y$ [mm] & $-0.03034$ & $-0.03075$ & $-0.03076$ & 1.4\%\\
+  & $\sigma_{xx}$ [MPa] & $100.13$ & $99.1$ & $99.1$ & $-1.0$\%\\
 \midrule
-& $K_t=\sigma_{xx}(B)/S$ & $3.00$ & $3.42$ & $3.37$ & 12.4\%\\
+& $K_t=\sigma_{xx}(B)/S$ & $3.00$ & $3.07$ & $3.04$ & 1.3\%\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -83,7 +83,7 @@ Punto & Variable & Kirsch & MEF malla 1 & MEF malla 2 & error malla 2\\
 \figuraT{T3/figuras/comparacion_eje_y.png}{0.75}{$\sigma_{xx}$ a lo largo del eje $y$ ($x=0$, de B a D): Kirsch y MEF.}
 
 \vspace{6pt}
-\figuraT{T3/figuras/convergencia_Kt.png}{0.6}{Convergencia de $K_t=\sigma_{xx}(B)/S$ con el n\'umero de GDL.}
+\figuraT{T3/figuras/convergencia_Kt.png}{0.6}{Convergencia de $K_t=\sigma_{xx}(B)/S$ con el n\'umero de GDL: placa del informe ($L=20a$) con $S$ uniforme y con las tracciones exactas de Kirsch en los bordes, y como referencia una placa chica ($L=5a$).}
 \end{center}
 \end{desarrollo}
 
@@ -97,50 +97,54 @@ fuentes de diferencia, y conviene separarlas:
 mide comparando la malla 1 con la malla 2.
 
 \textbf{(ii) Diferencia de modelo: placa finita contra placa infinita.} Kirsch
-supone una placa infinita, mientras que el modelo tiene ancho $d=100$ mm y la
-carga aplicada a solo $L=5a$ del centro del agujero.
+supone una placa infinita, mientras que el modelo tiene ancho $d=400$ mm y la
+carga aplicada a $L=20a$ del centro del agujero.
 \begin{itemize}[itemsep=3pt]
   \item \textbf{Ancho finito.} Como la carga total tiene que pasar por la
   secci\'on neta ($d-2r$ en vez de $d$), la tensi\'on media en la secci\'on del
   agujero sube y $K_t$ supera 3. Este es exactamente el caso de la Fig.~52:
   Howland encontr\'o, para $2r=d/2$, $\sigma_\theta=4.3S$ en $n$ y $0.75S$ en el
-  borde $m$. Para $2r/d=0.2$, la aproximaci\'on de Heywood (recopilada en
+  borde $m$. Para $2r/d=0.05$, la aproximaci\'on de Heywood (recopilada en
   Peterson's \emph{Stress Concentration Factors}),
   \[
-  K_t \approx \frac{2+(1-\lambda)^3}{1-\lambda},\qquad \lambda=\frac{2r}{d}=0.2
-  \quad\Longrightarrow\quad K_t\approx3.14 ,
+  K_t \approx \frac{2+(1-\lambda)^3}{1-\lambda},\qquad \lambda=\frac{2r}{d}=0.05
+  \quad\Longrightarrow\quad K_t\approx3.01 ,
   \]
   da un valor de referencia para la placa de ancho finito, referido a la
-  tensi\'on bruta $S$.
+  tensi\'on bruta $S$. Con $d=20\,(2r)$ el efecto del ancho ya es muy chico.
   \item \textbf{Largo finito.} Kirsch dice que en $x=L$ la tensi\'on no es
-  uniforme: $\sigma_{xx}=90.2$ MPa en C y $102.2$ MPa en D. El modelo, en
+  uniforme: $\sigma_{xx}=99.38$ MPa en C y $100.13$ MPa en D. El modelo, en
   cambio, impone $S=100$ MPa uniforme en todo ese borde. Por eso en C y D el MEF
-  \emph{no puede} coincidir con Kirsch, por fina que sea la malla, y la
-  diferencia en el borde se propaga un poco hacia el agujero. Con $L=5a$ el borde
-  cargado est\'a relativamente cerca; un modelo m\'as largo
-  ($L=10a$ o m\'as) reducir\'ia este efecto.
+  \emph{no puede} coincidir exactamente con Kirsch, por fina que sea la malla.
+  Con $L=20a$ la diferencia es menor al 1\,\%; con una placa chica ($L=5a$) era
+  de 10\,\% (Kirsch da 90.2 MPa en C).
   \item \textbf{Borde libre $y=L$.} En la placa infinita hay tensiones
-  $\sigma_{yy}\ne0$ en $y=L$ (en D, $\sigma_{yy}=5.76$ MPa); en el modelo ese
-  borde est\'a libre y obliga a $\sigma_{yy}=0$.
+  $\sigma_{yy}\ne0$ en $y=L$ (en D, $\sigma_{yy}=0.37$ MPa); en el modelo ese
+  borde est\'a libre y obliga a $\sigma_{yy}=0$. Con $L=5a$ era 5.76 MPa.
 \end{itemize}
 
-\begin{pendiente}[Sugerencia para aislar el error del MEF]
-Repetir el c\'alculo aplicando en los bordes $x=L$ e $y=L$ las tracciones
-\emph{exactas} de Kirsch, $\bar{\mathbf{t}}=\bm\sigma_{\text{Kirsch}}\,\mathbf{n}$,
-en vez de $S$ uniforme. Ya est\'a todo lo necesario en el c\'odigo:
-\texttt{kirsch\_tracciones(x, y, nx, ny, S, a)} en \texttt{solucion\_kirsch.py}
-y \texttt{cargas\_en(xy, conectividad, en, q)} en \texttt{mallador.py}, que
-acepta una funci\'on \texttt{q(x, y, nx, ny)}. As\'i el problema discreto
-corresponde \emph{exactamente} al de Kirsch recortado, y cualquier diferencia que
-quede es error de discretizaci\'on puro (deber\'ia tender a cero al refinar).
-\end{pendiente}
+\textbf{C\'omo se separaron las dos fuentes.} Se repiti\'o el c\'alculo aplicando
+en los bordes $x=L$ e $y=L$ las tracciones \emph{exactas} de Kirsch,
+$\bar{\mathbf{t}}=\bm\sigma_{\text{Kirsch}}\,\mathbf{n}$, en vez de $S$ uniforme
+(\texttt{placa\_agujero.py} con \texttt{carga="exacta"}). As\'i el problema
+discreto es \emph{exactamente} el de Kirsch recortado, y la diferencia que queda
+es solo error de discretizaci\'on. En la figura de convergencia:
+\begin{itemize}[itemsep=2pt]
+  \item Con las tracciones de Kirsch, $K_t$ tiende a 3 ($3.0016$ con 41\,538
+  GDL): el c\'odigo converge a la soluci\'on exacta.
+  \item Con $S$ uniforme, $K_t$ tiende a $3.023$: ese 0.8\,\% es el efecto de la
+  placa finita con $L=20a$, del orden del que predice Heywood ($3.01$).
+  \item Como referencia, la placa chica ($L=5a$) converge a $K_t=3.36$, un
+  12\,\% sobre Kirsch. Por eso en este informe se us\'o $L=20a$.
+\end{itemize}
 
 \begin{pendiente}[Por completar: discusi\'on]
 Discutir con los n\'umeros de la tabla: cu\'anto difiere $K_t$ del MEF de 3 y
-de 3.14, cu\'anto de esa diferencia baja al refinar (discretizaci\'on) y cu\'anto
-queda (placa finita), por qu\'e en el punto A el MEF da $|\sigma_{yy}|>S$, por qu\'e
-los desplazamientos del MEF salen mayores que los de Kirsch (¿la placa finita, con
-menos material alrededor del agujero, es m\'as flexible que la infinita?), y si el
+de 3.01, cu\'anto de esa diferencia baja al refinar (discretizaci\'on, de 3.07 a
+3.04 entre las mallas 1 y 2) y cu\'anto queda (placa finita, $\approx3.02$), por
+qu\'e en el punto A el MEF da $|\sigma_{yy}|>S$, por qu\'e los desplazamientos
+del MEF salen levemente mayores que los de Kirsch (¿la placa finita, con menos
+material alrededor del agujero, es m\'as flexible que la infinita?), y si el
 resultado cumple la cota de 6\,\% que da Timoshenko para $d\ge4\,(2r)$.
 \end{pendiente}
 \end{desarrollo}

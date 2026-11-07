@@ -13,8 +13,8 @@ en el anexo.
 \begin{desarrollo}{1. Par\'ametros del problema}
 
 El enunciado deja todos los par\'ametros libres. Se eligi\'o una placa de acero
-con un agujero peque\~no respecto al ancho, para que la soluci\'on de placa
-infinita sea una buena referencia.
+grande respecto al agujero ($L=20a$), para que la soluci\'on de placa infinita
+sea una buena referencia.
 
 \begin{center}
 \renewcommand{\arraystretch}{1.2}
@@ -25,8 +25,8 @@ infinita sea una buena referencia.
 \multirow{5}{*}{Geometr\'ia}
 & Radio del agujero & $r=a$ & $10$ mm \\
 & Di\'ametro del agujero & $2r$ & $20$ mm \\
-& Semiancho = semilargo de la placa & $L$ & $50$ mm \\
-& Ancho total & $d=2L$ & $100$ mm \\
+& Semiancho = semilargo de la placa & $L$ & $200$ mm \\
+& Ancho total & $d=2L$ & $400$ mm \\
 & Espesor & $t$ & $10$ mm \\
 \midrule
 \multirow{3}{*}{Material (acero)}
@@ -36,11 +36,11 @@ infinita sea una buena referencia.
 \midrule
 \multirow{2}{*}{Carga}
 & Tracci\'on en $x=\pm L$ & $S$ & $100$ MPa \\
-& Resultante en el 1/4 de placa & $S\,t\,L$ & $50$ kN \\
+& Resultante en el 1/4 de placa & $S\,t\,L$ & $200$ kN \\
 \midrule
 \multirow{2}{*}{Relaciones}
-& Ancho / di\'ametro & $d/2r$ & $5$ \\
-& Largo cargado / radio & $L/a$ & $5$ \\
+& Ancho / di\'ametro & $d/2r$ & $20$ \\
+& Largo cargado / radio & $L/a$ & $20$ \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -53,8 +53,8 @@ Par\'ametro de la discretizaci\'on & Valor \\
 \midrule
 Dominio modelado & 1/4 de placa ($x\ge0$, $y\ge0$), por simetr\'ia \\
 Tipo de elemento & Q9 isoparam\'etrico (9 nodos, 18 GDL) \\
-Mallas & malla 1: 48 Q9 (442 GDL); malla 2: 192 Q9 (1650 GDL) \\
-Graduaci\'on radial & raz\'on 3 entre el \'ultimo y el primer elemento \\
+Mallas & malla 1: 80 Q9 (714 GDL); malla 2: 320 Q9 (2706 GDL) \\
+Graduaci\'on radial & raz\'on 15 entre el \'ultimo y el primer elemento \\
 Integraci\'on en el interior ($\mathbf{K}^{(e)}$) & Gauss--Legendre $3\times3$ (9 puntos) \\
 Integraci\'on en los bordes ($\mathbf{f}^{(e)}$) & Gauss--Legendre 1D, 4 puntos por lado \\
 Tensiones & en los nodos, promediadas entre elementos vecinos \\
@@ -64,8 +64,12 @@ Tensiones & en los nodos, promediadas entre elementos vecinos \\
 
 \textbf{Justificaci\'on breve.}
 \begin{itemize}[itemsep=2pt]
-  \item $d/2r=5\ge4$: seg\'un Timoshenko, con eso el error de usar la soluci\'on
-  de placa infinita para $(\sigma_\theta)_{\max}$ es menor al 6\,\%.
+  \item $d/2r=20\ge4$: seg\'un Timoshenko, con $d/2r\ge4$ el error de usar la
+  soluci\'on de placa infinita para $(\sigma_\theta)_{\max}$ ya es menor al 6\,\%.
+  \item $L/a=20$: el borde cargado queda lejos del agujero. Con una placa m\'as
+  chica ($L=5a$) se obtuvo $K_t\approx3.36$, un 12\,\% sobre Kirsch, por el
+  tama\~no finito de la placa; con $L=20a$ esa diferencia baja a menos del 1\,\%
+  (ver b).
   \item Tensi\'on plana: la placa es delgada y sin cargas fuera del plano.
   \item 1/4 de placa: la geometr\'ia y la carga son sim\'etricas respecto a $x$ e $y$.
 \end{itemize}
@@ -116,6 +120,8 @@ Tensiones & en los nodos, promediadas entre elementos vecinos \\
     \node[font=\scriptsize, align=center] at (2.6,\Lq+0.3) {borde libre};
     \node[font=\scriptsize, align=center, rotate=-45] at (1.05,1.05) {libre};
 \end{tikzpicture}
+
+{\small Esquema, no a escala: en el modelo $L=20a$.}
 
 \end{center}
 
@@ -174,7 +180,7 @@ en el elemento de referencia.
   \item Se usan 4 puntos de Gauss, exacto en lados rectos (integrando de grado 3).
   \item Con $q$ constante el reparto es $q\ell\,(\tfrac16,\tfrac46,\tfrac16)$:
   el nodo del medio se lleva 4 veces lo de cada esquina.
-  \item Control: $\sum F_x = S\,t\,L = 50$ kN, que es lo que entrega el c\'odigo
+  \item Control: $\sum F_x = S\,t\,L = 200$ kN, que es lo que entrega el c\'odigo
   en las dos mallas.
 \end{itemize}
 
@@ -190,7 +196,11 @@ en el elemento de referencia.
   \item El cuarto de placa se divide en dos bloques separados por la diagonal
   $y=x$: arco $0^\circ$--$45^\circ$ hasta $x=L$, y arco $45^\circ$--$90^\circ$
   hasta $y=L$.
-  \item Los elementos crecen con una progresion generando de esta manera que los elementos mas pequeños esten cerca de la zona de concentracion de esfuerzos
+  \item Los elementos crecen con una progresion generando de esta manera que los elementos mas pequeños esten cerca de la zona de concentracion de esfuerzos.
+  Como la placa es grande ($L=20a$), se usa una raz\'on 15 entre el \'ultimo y
+  el primer elemento radial. Sobre el eje $x$, en la malla 2 el primer elemento
+  mide 1.8 mm y el \'ultimo 27 mm (en la malla 1, 3.5 y 52 mm): chicos donde
+  est\'a el gradiente y grandes donde el campo ya es casi uniforme.
   \item Los elementos del agujero tienen el lado curvo (par\'abola por 3 puntos
   del arco), as\'i que el contorno queda bien representado.
 \end{itemize}
@@ -201,15 +211,15 @@ en el elemento de referencia.
 \toprule
 Malla & \shortstack{divisiones por bloque\\(radial $\times$ angular)} & elementos Q9 & nodos & GDL\\
 \midrule
-Malla 1 (\texttt{problema\_2}) & $6\times4$ & 48 & 221 & 442\\
-Malla 2 (\texttt{problema\_3}) & $12\times8$ & 192 & 825 & 1650\\
+Malla 1 (\texttt{problema\_2}) & $10\times4$ & 80 & 357 & 714\\
+Malla 2 (\texttt{problema\_3}) & $20\times8$ & 320 & 1353 & 2706\\
 \bottomrule
 \end{tabular}
 \end{center}
 
 \begin{center}
-\figuraT{T3/figuras/malla_problema_2.png}{0.48}{Malla 1: 48 Q9, con apoyos y carga.}\hfill
-\figuraT{T3/figuras/malla_problema_3.png}{0.48}{Malla 2: 192 Q9, con apoyos y carga.}
+\figuraT{T3/figuras/malla_problema_2.png}{0.48}{Malla 1: 80 Q9, con apoyos y carga.}\hfill
+\figuraT{T3/figuras/malla_problema_3.png}{0.48}{Malla 2: 320 Q9, con apoyos y carga.}
 \end{center}
 
 
@@ -238,10 +248,10 @@ Para este caso se comparan ambos casos para asegurar que no sea dependiente de l
 \begin{desarrollo}{6. Resultados del MEF}
 
 \begin{center}
-\figuraT{T3/figuras/tensiones_problema_2.png}{0.8}{Campos $\sigma_{xx}$, $\sigma_{yy}$, $\tau_{xy}$ y von Mises con la malla 1.}
+\figuraT{T3/figuras/tensiones_problema_2.png}{0.8}{Campos $\sigma_{xx}$, $\sigma_{yy}$, $\tau_{xy}$ y von Mises con la malla 1, en la zona del agujero ($0\le x,y\le5a$; m\'as lejos el campo es casi uniforme).}
 
 \vspace{6pt}
-\figuraT{T3/figuras/tensiones_problema_3.png}{0.8}{Campos $\sigma_{xx}$, $\sigma_{yy}$, $\tau_{xy}$ y von Mises con la malla 2.}
+\figuraT{T3/figuras/tensiones_problema_3.png}{0.8}{Campos $\sigma_{xx}$, $\sigma_{yy}$, $\tau_{xy}$ y von Mises con la malla 2, en la zona del agujero ($0\le x,y\le5a$).}
 
 \vspace{6pt}
 \figuraT{T3/figuras/deformada_mef.png}{0.6}{Deformada amplificada y desplazamientos $u_x$, $u_y$.}
@@ -251,16 +261,16 @@ Para este caso se comparan ambos casos para asegurar que no sea dependiente de l
 \renewcommand{\arraystretch}{1.25}
 \begin{tabular}{@{}lcccccc@{}}
 \toprule
-& \multicolumn{3}{c}{Malla 1 (48 Q9)} & \multicolumn{3}{c}{Malla 2 (192 Q9)}\\
+& \multicolumn{3}{c}{Malla 1 (80 Q9)} & \multicolumn{3}{c}{Malla 2 (320 Q9)}\\
 \cmidrule(lr){2-4}\cmidrule(lr){5-7}
 Punto & $u$ [mm] & $\sigma_{xx}$ [MPa] & $\sigma_{yy}$ [MPa] & $u$ [mm] & $\sigma_{xx}$ [MPa] & $\sigma_{yy}$ [MPa]\\
 \midrule
-A $(a,0)$ & $u_x=0.01686$  & $-13.2$ & $-133.1$ & $u_x=0.01688$  & $-3.1$  & $-129.9$\\
-B $(0,a)$ & $u_y=-0.00649$ & $342.2$ & $19.6$   & $u_y=-0.00650$ & $337.3$ & $4.2$\\
-C $(L,0)$ & $u_x=0.03063$  & $101.5$ & $29.8$   & $u_x=0.03065$  & $100.6$ & $28.8$\\
-D $(0,L)$ & $u_y=-0.01102$ & $83.5$  & $-0.9$   & $u_y=-0.01104$ & $84.1$  & $-0.4$\\
+A $(a,0)$ & $u_x=0.01510$  & $-10.5$ & $-104.9$ & $u_x=0.01511$  & $-4.2$  & $-103.0$\\
+B $(0,a)$ & $u_y=-0.00508$ & $307.2$ & $16.4$   & $u_y=-0.00508$ & $304.0$ & $6.1$\\
+C $(L,0)$ & $u_x=0.10126$  & $100.1$ & $1.7$    & $u_x=0.10127$  & $100.0$ & $1.7$\\
+D $(0,L)$ & $u_y=-0.03075$ & $99.1$  & $-0.1$   & $u_y=-0.03076$ & $99.1$  & $0.0$\\
 \midrule
-\multicolumn{7}{@{}l}{$K_t=\sigma_{xx}(B)/S$:\quad malla 1 = $3.42$ \qquad malla 2 = $3.37$}\\
+\multicolumn{7}{@{}l}{$K_t=\sigma_{xx}(B)/S$:\quad malla 1 = $3.07$ \qquad malla 2 = $3.04$}\\
 \bottomrule
 \end{tabular}
 \end{center}-

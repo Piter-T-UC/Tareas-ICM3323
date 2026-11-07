@@ -23,7 +23,7 @@ from etapa5_graficar.graficar_tensiones import graficar_tensiones
 MPa = ureg.MPa
 
 
-titulo = "Placa con agujero (Kirsch) - 1/4 por simetria, malla refinada"
+titulo = "Placa con agujero (Kirsch) - 1/4 por simetria, L/a = 20, malla 2"
 
 # Material y seccion
 E = 200 * ureg.GPa
@@ -33,20 +33,21 @@ estado = "tension_plana" # o "deformacion_plana"
 
 # Geometria
 a = 10 * ureg.mm
-L = 50 * ureg.mm
+L = 200 * ureg.mm               # L/a = 20: borde cargado lejos del agujero (cerca de placa infinita)
 
 # Carga
 S = 100 * ureg.MPa              # traccion constante en el borde x = L
 
 
-# --- Malla Q9 igual a la del problema 2, pero mas fina -----------------------------------------
+# --- Malla 2: Q9, la malla 1 (problema 2) con el doble de divisiones en cada direccion ----------
 # Dos bloques separados por la diagonal y = x, cada uno con n_rad x n_ang elementos:
 #   bloque 1: arco r = a de 0 a 45 grados  ->  borde x = L
 #   bloque 2: arco r = a de 45 a 90 grados ->  borde y = L
-# razon_rad = largo del ultimo elemento radial / el primero (problema 2: 6 x 4 con razon 3)
+# razon_rad = largo del ultimo elemento radial / el primero. Con L/a = 20 se usa una razon grande
+# para que los elementos junto al agujero queden chicos (~1-2 mm) y los del borde exterior grandes
 tipo = "Q9"
-n_rad, n_ang = 12, 8
-razon_rad = 3
+n_rad, n_ang = 20, 8
+razon_rad = 15
 
 a_m, L_m = a.to(ureg.m).magnitude, L.to(ureg.m).magnitude
 p45 = a_m/np.sqrt(2)*np.array([1, 1])
@@ -128,6 +129,8 @@ fig, ax = graficar_malla(xy, conectividad, apoyos, fuerzas_desde_vector(F_dist),
                          titulo="Fuerzas nodales equivalentes de S en x = L")
 fig.savefig("fuerzas_nodales_problema_3.png", dpi=150)
 
-fig = graficar_tensiones(xy, conectividad, sigma_nodos, titulo=f"{titulo}, {tipo} - S = {S:~} en x = L")
+# Tensiones: zona del agujero (0 a 5a), donde estan los gradientes; lejos el campo es uniforme
+fig = graficar_tensiones(xy, conectividad, sigma_nodos, titulo=f"{titulo}, {tipo} - S = {S:~} en x = L",
+                         zoom=(0, 5*a.magnitude, 0, 5*a.magnitude))
 fig.savefig("tensiones_problema_3.png", dpi=150)
 plt.show()
