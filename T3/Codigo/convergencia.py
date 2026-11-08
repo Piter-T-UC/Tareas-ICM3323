@@ -59,11 +59,3 @@ for nr, na in mallas:
     print(f"{nr:>4}x{na:<3} {r['nel']:>6} {r['gdl']:>7} {r['Kt']:>8.4f} {100*(r['Kt']/3-1):>9.2f} "
           f"{r['syyA']:>8.4f} {100*(abs(r['syyA'])-1):>7.2f} {r['uxC']:>9.5f} {100*(r['uxC']/0.10066-1):>7.2f}")
 
-g = [r["gdl"] for r in res]
-fig, ax = plt.subplots(figsize=(6.5, 4))
-ax.semilogx(g, [100*abs(r["Kt"]/3-1) for r in res], "o-", label=r"$K_t=\sigma_{xx}(B)/S$")
-ax.semilogx(g, [100*abs(abs(r["syyA"])-1) for r in res], "s-", label=r"$|\sigma_{yy}(A)|/S$")
-ax.semilogx(g, [100*abs(r["uxC"]/0.10066-1) for r in res], "^-", label=r"$u_x(C)$")
-ax.set_xlabel("GDL"); ax.set_ylabel("error respecto de Kirsch [%]")
-ax.grid(True, which="both", alpha=.3); ax.legend()
-fig.tight_layout(); fig.savefig("../figuras/convergencia_error.png", dpi=200)
