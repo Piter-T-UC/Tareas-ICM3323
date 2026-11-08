@@ -21,14 +21,11 @@ def k_elemento(xy_e, D, t):
     tipo = tipo_elemento(xy_e)
     n_nodos = len(xy_e)
     K_e = np.zeros((2*n_nodos, 2*n_nodos))
-
-    # Puntos de Gauss del elemento de referencia: pts (m, 2) con [xi, eta] y pesos (m,)
     pts, pesos = puntos_gauss(tipo)
 
     for i in range(len(pesos)):
         xi, eta = pts[i]
         w = pesos[i]
-
         # B y det(J) evaluados en el punto de Gauss i
         B, detJ, _ = matriz_B(tipo, xy_e, xi, eta)
 
