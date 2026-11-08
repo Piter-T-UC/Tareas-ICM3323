@@ -82,6 +82,40 @@ Punto & Variable & Kirsch & C\'odigo malla 1 & C\'odigo malla 2 & error malla 2\
 \vspace{6pt}
 \figuraT{T3/figuras/comparacion_eje_y.png}{0.75}{$\sigma_{xx}$ a lo largo del eje $y$ ($x=0$, de B a D): Kirsch y c\'odigo.}
 \end{center}
+
+\textbf{Convergencia con la malla.} Se repiti\'o el c\'alculo refinando la malla
+de la placa (\texttt{convergencia.py}, mismas condiciones que en a), $S$ uniforme):
+las mallas 1 y 2 son las de $10\times4$ y $20\times8$ elementos por bloque.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{@{}rrrccc@{}}
+\toprule
+Malla & Elementos & GDL & $K_t$ & error $K_t$ & error $|\sigma_{yy}(A)|$\\
+\midrule
+$5\times2$   & 20   & 198    & $3.108$ & 3.6\% & 4.7\%\\
+$10\times4$  & 80   & 714    & $3.072$ & 2.4\% & 4.9\%\\
+$20\times8$  & 320  & 2706   & $3.040$ & 1.3\% & 3.0\%\\
+$30\times12$ & 720  & 5978   & $3.031$ & 1.0\% & 2.4\%\\
+$40\times16$ & 1280 & 10530  & $3.027$ & 0.9\% & 2.1\%\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\figuraT{T3/figuras/convergencia_error.png}{0.7}{Error respecto de Kirsch en funci\'on de los GDL al refinar la malla.}
+\end{center}
+
+El error de $K_t$ y de $\sigma_{yy}(A)$ baja al refinar, pero cada vez menos: de
+$3.6\,\%$ a $0.9\,\%$ en $K_t$, y el error entre las dos \'ultimas mallas ya es
+solo de $0.004$. El error parece no tender a cero sino a un valor del orden de $0.7$\,\%
+($K_t\approx3.02$, extrapolando la tendencia), que ser\'ia la diferencia de modelo
+entre la placa finita y la infinita, coherente con el $3.01$ de Heywood. El desplazamiento $u_x(C)$ casi no cambia con la malla ($0.6\,\%$ en
+todas), porque es una cantidad global y su diferencia con Kirsch es de modelo,
+no de malla.
+
+\begin{center}
+\end{center}
 \end{desarrollo}
 
 %----------------------------------------------------------------------
@@ -126,10 +160,11 @@ carga aplicada a $L=20a$ del centro del agujero.
   $2r/d=0.05$: la diferencia con Kirsch es de $2.3$\,\% en la malla 1 y de
   $1.3$\,\% en la malla 2.
   \item \textbf{Discretizaci\'on contra placa finita.} Al refinar, $K_t$ baja de
-  $3.07$ a $3.04$ entre las mallas 1 y 2, y se acerca al valor de la placa
-  finita, que Heywood da como $3.01$. Entonces la mayor parte de la diferencia
-  con Kirsch en las mallas usadas es error de discretizaci\'on, y lo que
-  quedar\'ia al refinar (del orden de $0.01$) es el efecto de la placa finita.
+  $3.07$ a $3.04$ entre las mallas 1 y 2 y a $3.027$ con la malla m\'as fina, y
+  se acerca al valor de la placa finita, que Heywood da como $3.01$. Entonces la
+  mayor parte de la diferencia con Kirsch en las mallas usadas es error de
+  discretizaci\'on, y lo que quedar\'ia al refinar (del orden de $0.02$) es el
+  efecto de la placa finita.
   \item \textbf{Punto A.} Kirsch da $\sigma_{yy}(A)=-S$ y el c\'odigo da $-104.9$ y
   $-103.0$ MPa, o sea $|\sigma_{yy}|>S$ en $5$ y $3$\,\%. Como el error baja
   con la malla, es sobre todo discretizaci\'on: junto al agujero el gradiente es
