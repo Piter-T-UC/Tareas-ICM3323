@@ -70,13 +70,13 @@ $0.102$ mm, en el borde cargado.
 \end{desarrollo}
 
 %----------------------------------------------------------------------
-\begin{desarrollo}{4. Comparaci\'on: Kirsch, MEF propio y programa comercial}
+\begin{desarrollo}{4. Comparaci\'on: Kirsch, c\'odigo creado y programa comercial}
 
 \begin{center}
 \renewcommand{\arraystretch}{1.25}
 \begin{tabular}{@{}lccc@{}}
 \toprule
-Variable & Kirsch (placa infinita) & MEF propio (malla 2) & Inventor Nastran\\
+Variable & Kirsch (placa infinita) & C\'odigo creado (malla 2) & Inventor Nastran\\
 \midrule
 $\sigma_{xx}(B)$ [MPa] & $300.0$ & $304.0$ & $319.3$\\
 $K_t=\sigma_{xx}(B)/S$ & $3.00$ & $3.04$ & $3.19$\\
@@ -86,7 +86,7 @@ $\sigma_{VM,\max}$ [MPa] & $300.0$ & $301.0$ & $313.9$\\
 \end{tabular}
 \end{center}
 
-\textbf{Qu\'e esperar.} Si los dos modelos de MEF resuelven el mismo problema
+\textbf{Qu\'e esperar.} Si los dos modelos (mi c\'odigo y Nastran) resuelven el mismo problema
 (misma placa finita, mismas condiciones de borde), deber\'ian parecerse
 \emph{entre s\'i} m\'as que a Kirsch, porque los dos tienen el efecto de ancho y
 largo finitos discutido en b). Las diferencias entre mi c\'odigo y Nastran vienen
@@ -104,11 +104,11 @@ de:
 \textbf{Discusi\'on.}
 \begin{itemize}[itemsep=3pt]
   \item Los tres m\'etodos coinciden en lo esencial: concentraci\'on de
-  tensiones en B, con $K_t=3.00$ (Kirsch), $3.04$ (MEF propio) y $3.19$
-  (Nastran). El MEF propio queda a $1.3$\,\% de Kirsch y Nastran a $6.3$\,\%.
+  tensiones en B, con $K_t=3.00$ (Kirsch), $3.04$ (c\'odigo creado) y $3.19$
+  (Nastran). El c\'odigo creado queda a $1.3$\,\% de Kirsch y Nastran a $6.3$\,\%.
   \item Nastran difiere de mi c\'odigo en $5$\,\% en $K_t$ y en $4$\,\% en
   von Mises, m\'as que mi c\'odigo respecto de Kirsch. No es lo que esperaba
-  (que los dos MEF se parecieran m\'as entre s\'i). Lo atribuyo a la malla
+  (que los dos modelos se parecieran m\'as entre s\'i). Lo atribuyo a la malla
   autom\'atica y no estructurada, y a que la tensi\'on m\'axima en el borde del
   agujero es un valor puntual muy sensible al tama\~no local del elemento y a
   c\'omo el programa post-procesa las tensiones, aun con los $100$ elementos en
