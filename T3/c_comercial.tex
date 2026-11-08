@@ -39,33 +39,12 @@ Para que la comparaci\'on sea justa, el modelo comercial debe resolver
 espesor, condiciones de borde y carga. As\'i las diferencias que queden se
 deben solo a la malla y al tipo de elemento.
 
-\begin{center}
-\renewcommand{\arraystretch}{1.25}
-\begin{tabular}{@{}lcc@{}}
-\toprule
-& Mi c\'odigo (apartado a) & Inventor Nastran\\
-\midrule
-Geometr\'ia modelada & 1/4 de placa, $L=200$ mm, $a=10$ mm & \pend\\
-Espesor $t$ & $10$ mm & \pend\\
-Material & $E=200$ GPa, $\nu=0.3$ & \pend\\
-Tipo de elemento & Q9 (elasticidad plana) & \pend\\
-Elementos / nodos / GDL & 320 / 1353 / 2706 & \pend\\
-Condiciones de borde & simetr\'ia en $x=0$ e $y=0$ & \pend\\
-Carga & $S=100$ MPa en $x=L$ & \pend\\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\begin{pendiente}[Por completar: descripci\'on del modelo]
-Ojo: el modelo comercial tiene que usar la placa nueva ($L=200$ mm, ancho
-$d=400$ mm), la misma del apartado a).
-
-Explicar c\'omo se arm\'o el modelo: geometr\'ia (placa completa o 1/4), tipo de
-idealizaci\'on (l\'amina en la superficie media o s\'olido), control de malla
-alrededor del agujero, c\'omo se impusieron la simetr\'ia o los apoyos y c\'omo
-se aplic\'o la tracci\'on $S$ (como presi\'on sobre la cara del borde o como
-fuerza total $S\,t\,L$ repartida).
-\end{pendiente}
+En el programa se model\'o un cuarto de la placa, igual que en el apartado a),
+con simetr\'ia en los bordes $x=0$ e $y=0$ y la tracci\'on $S=100$ MPa aplicada
+en el borde $x=L$ (figura de condiciones de borde). La malla es autom\'atica y
+se refin\'o en el borde importante, el del agujero, donde se usaron
+\textbf{100 elementos}, porque ah\'i est\'a el gradiente de tensiones y el
+m\'aximo.
 
 \begin{center}
 \figuraT{T3/figuras/nastran_malla.png}{0.48}{Malla del programa comercial, con detalle del refinamiento junto al agujero.}\hfill
@@ -77,21 +56,17 @@ fuerza total $S\,t\,L$ repartida).
 \begin{desarrollo}{3. Resultados del programa comercial}
 
 \begin{center}
-\figuraT{T3/figuras/nastran_sxx.png}{0.48}{$\sigma_{xx}$ (en Nastran, componente normal en la direcci\'on de la carga).}\hfill
-\figuraT{T3/figuras/nastran_syy.png}{0.48}{$\sigma_{yy}$.}
+\figuraT{T3/figuras/nastran_sxx.png}{0.48}{$\sigma_{xx}$ (componente normal en la direcci\'on de la carga).}\hfill
+\figuraT{T3/figuras/nastran_vonmises.png}{0.48}{Tensi\'on de von Mises.}
 
 \vspace{6pt}
-\figuraT{T3/figuras/nastran_vonmises.png}{0.48}{Tensi\'on de von Mises.}\hfill
-\figuraT{T3/figuras/nastran_desplazamiento.png}{0.48}{Desplazamiento (deformada amplificada).}
+\figuraT{T3/figuras/nastran_desplazamiento.png}{0.48}{Desplazamiento en $x$.}
 \end{center}
 
-\begin{pendiente}
-Ojo con la convenci\'on de ejes del programa: si la placa qued\'o en otro plano
-(por ejemplo $xz$ en vez de $xy$), indicar qu\'e componente de Nastran corresponde
-a $\sigma_{xx}$ y $\sigma_{yy}$ de este informe. Indicar tambi\'en si las tensiones
-mostradas son en las esquinas de los elementos, en el centroide o promediadas en
-los nodos, porque eso cambia el valor m\'aximo en el borde del agujero.
-\end{pendiente}
+El m\'aximo de $\sigma_{xx}$ es $319.3$ MPa y aparece en el borde del agujero,
+sobre el eje perpendicular a la carga (punto B); el de von Mises es
+$313.9$ MPa en el mismo lugar, y el desplazamiento m\'aximo en $x$ es
+$0.102$ mm, en el borde cargado.
 \end{desarrollo}
 
 %----------------------------------------------------------------------
@@ -104,12 +79,9 @@ los nodos, porque eso cambia el valor m\'aximo en el borde del agujero.
 Variable & Kirsch (placa infinita) & MEF propio (malla 2) & Inventor Nastran\\
 \midrule
 $\sigma_{xx}(B)$ [MPa] & $300.0$ & $304.0$ & $319.3$\\
-$\sigma_{yy}(A)$ [MPa] & $-100.0$ & $-103.0$ & \pend\\
 $K_t=\sigma_{xx}(B)/S$ & $3.00$ & $3.04$ & $3.19$\\
-$u_x(C)$ [mm] & $0.10066$ & $0.10127$ & $0.102$\\
-$u_y(D)$ [mm] & $-0.03034$ & $-0.03076$ & \pend\\
+$u_x$ m\'aximo [mm] & $0.10066$ & $0.10127$ & $0.102$\\
 $\sigma_{VM,\max}$ [MPa] & $300.0$ & $301.0$ & $313.9$\\
-GDL & -- & 2706 & \pend\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -120,9 +92,6 @@ GDL & -- & 2706 & \pend\\
 largo finitos discutido en b). Las diferencias entre mi c\'odigo y Nastran vienen
 de:
 \begin{itemize}[itemsep=3pt]
-  \item \textbf{Tipo de elemento}: Q9 (lagrangiano, 9 nodos) contra
-  \texttt{CQUAD8}/\texttt{CTRIA6} (serend\'ipito, 8 nodos). Los dos son
-  cuadr\'aticos y deber\'ian converger a lo mismo.
   \item \textbf{Malla}: la m\'ia es estructurada y graduada a mano; la del
   programa es autom\'atica, no estructurada y en general con muchos m\'as
   elementos.
@@ -132,11 +101,25 @@ de:
   eso.
 \end{itemize}
 
-\begin{pendiente}[Por completar: discusi\'on]
-Comparar los tres resultados: diferencia de $K_t$ entre el MEF propio y Nastran,
-si esa diferencia es menor que la diferencia de ambos con Kirsch (lo esperable),
-qu\'e ventajas tiene el programa comercial (mallado autom\'atico, post-proceso,
-geometr\'ia CAD) y qu\'e ventajas tiene el c\'odigo propio (control total del
-modelo, saber exactamente qu\'e se integra y c\'omo se calculan las tensiones).
-\end{pendiente}
+\textbf{Discusi\'on.}
+\begin{itemize}[itemsep=3pt]
+  \item Los tres m\'etodos coinciden en lo esencial: concentraci\'on de
+  tensiones en B, con $K_t=3.00$ (Kirsch), $3.04$ (MEF propio) y $3.19$
+  (Nastran). El MEF propio queda a $1.3$\,\% de Kirsch y Nastran a $6.3$\,\%.
+  \item Nastran difiere de mi c\'odigo en $5$\,\% en $K_t$ y en $4$\,\% en
+  von Mises, m\'as que mi c\'odigo respecto de Kirsch. No es lo que esperaba
+  (que los dos MEF se parecieran m\'as entre s\'i). Lo atribuyo a la malla
+  autom\'atica y no estructurada, y a que la tensi\'on m\'axima en el borde del
+  agujero es un valor puntual muy sensible al tama\~no local del elemento y a
+  c\'omo el programa post-procesa las tensiones, aun con los $100$ elementos en
+  ese borde.
+  \item Los desplazamientos, en cambio, casi no dependen de la malla:
+  $0.102$ mm en Nastran contra $0.1013$ mm en mi c\'odigo ($0.7$\,\% de
+  diferencia), porque son una cantidad global.
+  \item \textbf{Programa comercial:} importa la geometr\'ia CAD, mallado
+  autom\'atico y post-proceso listo, lo que ahorra mucho tiempo. \textbf{C\'odigo
+  propio:} se controla todo el modelo, se sabe exactamente qu\'e se integra y
+  c\'omo se calculan las tensiones, y se puede refinar de forma sistem\'atica
+  para estudiar la convergencia, como en b).
+\end{itemize}
 \end{desarrollo}
