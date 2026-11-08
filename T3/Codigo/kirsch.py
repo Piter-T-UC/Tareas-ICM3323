@@ -2,13 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Circle
 
-# ----------------------------------------------------------------------------
-# Parámetros (SI)
-# ----------------------------------------------------------------------------
-S  = 100e6      # tensión aplicada lejos [Pa]
-a  = 0.01       # radio del agujero [m]
-E  = 200e9      # módulo de Young [Pa]
-nu = 0.3        # Poisson
+S  = 100e6# tensión aplicada lejos [Pa]
+a  = 0.01 # radio del agujero [m]
+E  = 200e9  # módulo de Young [Pa]
+nu = 0.3  # Poisson
 PLANO = "tension"   # "tension" o "deformacion"
 
 G = E / (2 * (1 + nu))
@@ -51,8 +48,7 @@ def kirsch_desplazamientos(x, y):
 
 
 def kirsch_tracciones(x, y, nx, ny):
-    """t = sigma·n en un punto de borde con normal exterior (nx, ny).
-    Sirve para cargar un dominio finito MEF con las condiciones EXACTAS."""
+
     sxx, syy, txy = kirsch_tensiones(x, y)
     return sxx * nx + txy * ny, txy * nx + syy * ny
 
@@ -60,10 +56,6 @@ def kirsch_tracciones(x, y, nx, ny):
 def von_mises(sxx, syy, txy):
     return np.sqrt(sxx**2 - sxx * syy + syy**2 + 3 * txy**2)
 
-
-# ----------------------------------------------------------------------------
-# Verificación: las deformaciones de u deben cumplir Hooke con las tensiones
-# ----------------------------------------------------------------------------
 def verificar(n=7, h=1e-7):
     rng = np.random.default_rng(0)
     x = rng.uniform(-5 * a, 5 * a, n); y = rng.uniform(-5 * a, 5 * a, n)
@@ -84,17 +76,14 @@ def verificar(n=7, h=1e-7):
     print(f"Error relativo deformaciones (u) vs Hooke(sigma): {err:.1e}")
 
 
-# ----------------------------------------------------------------------------
-# Gráficos
-# ----------------------------------------------------------------------------
+
 def malla_polar(L=5 * a, nr=200, nt=360):
-    """Malla polar que respeta el agujero; se recorta al cuadrado [-L, L]^2."""
     r = a * np.logspace(0, np.log10(np.sqrt(2) * L / a), nr)
     th = np.linspace(-np.pi, np.pi, nt)
     R, T = np.meshgrid(r, th)
     return R * np.cos(T), R * np.sin(T)
 
-
+## Aqui abajo me ayudo mucho la IA
 def graficar(L=5 * a, escala=None):
     X, Y = malla_polar(L)
     sxx, syy, txy = kirsch_tensiones(X, Y)
